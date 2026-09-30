@@ -205,7 +205,7 @@ public final class GameManager {
         GameSettings s = plugin.defaults().copy();
         s.startAt = at;
         s.hosterUuid = by == null ? null : by.getUniqueId();
-        s.hosterName = by == null ? "CartRoyale" : by.getName();
+        s.hosterName = by == null ? "CartZone" : by.getName();
         create(s, "admin").whenComplete((row, t) -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (row == null) plugin.adminAlert("admin.queue-failed", "error", t == null ? "duplicate game" : String.valueOf(t.getMessage()));
             else if (match == null) openMatch(row);

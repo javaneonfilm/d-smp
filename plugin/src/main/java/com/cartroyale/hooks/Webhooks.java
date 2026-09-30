@@ -25,7 +25,7 @@ public final class Webhooks {
     private final CartRoyale plugin;
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     private final ExecutorService queue = Executors.newSingleThreadExecutor(r -> {
-        Thread t = new Thread(r, "CartRoyale-Webhooks");
+        Thread t = new Thread(r, "CartZone-Webhooks");
         t.setDaemon(true);
         return t;
     });
@@ -53,7 +53,7 @@ public final class Webhooks {
         String url = plugin.secret("discord-webhook-url");
         String role = plugin.getConfig().getString("webhooks.events-role-id", "").trim();
         StringBuilder json = new StringBuilder("{");
-        json.append("\"username\":").append(q(plugin.getConfig().getString("webhooks.username", "CartRoyale"))).append(',');
+        json.append("\"username\":").append(q(plugin.getConfig().getString("webhooks.username", "CartZone"))).append(',');
         if (ping && role.matches("\\d{5,25}")) {
             json.append("\"content\":").append(q("<@&" + role + ">")).append(',');
             json.append("\"allowed_mentions\":{\"parse\":[],\"roles\":[").append(q(role)).append("]},");

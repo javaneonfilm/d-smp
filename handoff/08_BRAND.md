@@ -1,7 +1,7 @@
 # Brand
 
 ## Name and voice
-- **Name:** CartRoyale (was CartMC until 2026-09-30). On the site it is written CARTROYALE.COM with "CART" in white, "ROYALE" in TNT red and ".COM" small and grey. The server name and the game mode are the same thing now: **Cart Royale**, a minecart PvP battle royale.
+- **Name:** CartZone (was CartMC, then briefly CartRoyale, on 2026-09-30). On the site it is written CARTZONE.VIP with "CART" in white, "ZONE" in TNT red and ".VIP" small and grey. The game mode is still called **Cart Royale**, a minecart PvP battle royale.
 - **Tagline:** "Last Cart Standing."
 - **Voice:** short, confident, a bit playful ("Board the cart", "Climb in"). Never corporate. No pay-to-win language: cosmetics and access only.
 - **Metaphors:** rails, stops, tickets, departure boards, TNT, fuses. They are used on the site already. Keep them.
@@ -27,7 +27,7 @@
 **In game:**
 - Tier colours: Bronze `#CD7F32`, Silver `#C0C0C0`, Gold `#FFD700`.
 - Rarities: Common grey, Rare blue, Epic purple, Legendary gold.
-- Chat prefix: `<#FF0000><b>CartRoyale</b> <gray>»`. Ranks: `[VIP]` green, `[VIP+]` gold.
+- Chat prefix: `<#FF0000><b>CartZone</b> <gray>»`. Ranks: `[VIP]` green, `[VIP+]` gold.
 
 ## Type (website)
 - Headings: **Barlow Condensed** 800–900, uppercase, tight leading

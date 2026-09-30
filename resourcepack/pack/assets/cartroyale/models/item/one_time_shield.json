@@ -1,8 +1,8 @@
 {
   "gui_light": "front",
   "textures": {
-    "face": "cartroyale:item/one_time_shield",
-    "particle": "cartroyale:item/one_time_shield"
+    "face": "cartzone:item/one_time_shield",
+    "particle": "cartzone:item/one_time_shield"
   },
   "elements": [
     {

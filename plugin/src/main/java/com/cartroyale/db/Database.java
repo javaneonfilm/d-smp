@@ -44,7 +44,7 @@ public final class Database {
         this.folder = folder;
         this.log = log;
         this.exec = Executors.newSingleThreadExecutor(r -> {
-            Thread t = new Thread(r, "CartRoyale-DB");
+            Thread t = new Thread(r, "CartZone-DB");
             t.setDaemon(true);
             return t;
         });
@@ -54,7 +54,7 @@ public final class Database {
     public boolean open() {
         try {
             return exec.submit(() -> {
-                File f = new File(folder, "cartroyale.db");
+                File f = new File(folder, "cartzone.db");
                 f.getParentFile().mkdirs();
                 Class.forName("org.sqlite.JDBC");
                 conn = DriverManager.getConnection("jdbc:sqlite:" + f.getAbsolutePath());

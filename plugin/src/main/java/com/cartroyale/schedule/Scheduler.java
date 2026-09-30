@@ -134,7 +134,7 @@ public final class Scheduler {
             s.purgeCap = e.purgeCap;
             s.map = e.map;
             s.startAt = at;
-            s.hosterName = plugin.getConfig().getString("schedule.hoster-name", "CartRoyale");
+            s.hosterName = plugin.getConfig().getString("schedule.hoster-name", "CartZone");
             tried.add(source);
             plugin.games().create(s, source);
         }

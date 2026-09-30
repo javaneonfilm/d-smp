@@ -86,7 +86,7 @@ public final class CartRoyale extends JavaPlugin {
     public void onEnable() {
         if (Bukkit.getCurrentTick() > 100) {
             // TECH-3: a /reload leaves players mid-state; refuse instead of half-working.
-            getLogger().severe("CartRoyale was loaded by /reload. Restart the server instead. The plugin stays disabled.");
+            getLogger().severe("CartZone was loaded by /reload. Restart the server instead. The plugin stays disabled.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -119,7 +119,7 @@ public final class CartRoyale extends JavaPlugin {
         db = new Database(this);
         if (!db.open()) {
             // TECH-3: fail safe. Without a database nothing can be tracked or charged correctly.
-            getLogger().severe("The database could not be opened. CartRoyale is disabling itself.");
+            getLogger().severe("The database could not be opened. CartZone is disabling itself.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -169,7 +169,7 @@ public final class CartRoyale extends JavaPlugin {
         games.startTicking();
         started = true;
         for (Player p : Bukkit.getOnlinePlayers()) lobby.send(p);
-        getLogger().info("CartRoyale ready. Arena: " + arenas.loadedMap() + ", queued games: " + games.queue().size()
+        getLogger().info("CartZone ready. Arena: " + arenas.loadedMap() + ", queued games: " + games.queue().size()
             + ", time zone " + zoneId().getId() + ", webhooks " + (hooks.configured() ? "on" : "off (secrets.yml)"));
     }
 
@@ -252,7 +252,7 @@ public final class CartRoyale extends JavaPlugin {
     public void adminAlert(String key, Object... kv) {
         var c = msg.get(key, kv);
         getLogger().warning(Msg.strip(c));
-        for (Player p : Bukkit.getOnlinePlayers()) if (p.hasPermission("cartroyale.admin")) p.sendMessage(msg.get("admin.alert-prefix").append(c));
+        for (Player p : Bukkit.getOnlinePlayers()) if (p.hasPermission("cartzone.admin")) p.sendMessage(msg.get("admin.alert-prefix").append(c));
     }
 
     public Msg msg() { return msg; }

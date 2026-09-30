@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/** Section 5.19. Everything except /cart host and /cart help needs cartroyale.admin. */
+/** Section 5.19. Everything except /cart host and /cart help needs cartzone.admin. */
 public final class CartCommand implements TabExecutor {
 
     private static final List<String> SUBS = List.of("help", "host", "start", "stop", "queue", "cancel", "schedule", "kit", "arena", "zone",

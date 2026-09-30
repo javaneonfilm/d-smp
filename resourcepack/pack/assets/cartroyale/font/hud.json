@@ -2,7 +2,7 @@
   "providers": [
     {
       "type": "bitmap",
-      "file": "cartroyale:font/cart.png",
+      "file": "cartzone:font/cart.png",
       "ascent": 7,
       "height": 9,
       "chars": [
@@ -11,7 +11,7 @@
     },
     {
       "type": "bitmap",
-      "file": "cartroyale:font/bar.png",
+      "file": "cartzone:font/bar.png",
       "ascent": 9,
       "height": 13,
       "chars": [

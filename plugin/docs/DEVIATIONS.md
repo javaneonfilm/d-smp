@@ -5,7 +5,7 @@ Where the build differs from `handoff/01_PROMPT_plugin.md` and `04_DECISIONS-and
 | Area | Plan | What was built | Why |
 |---|---|---|---|
 | Build tool | Gradle (Kotlin DSL) | Maven (`pom.xml`), offline build with the Maven in `MC Developing/maven-install` | Every other plugin on this PC builds with that Maven and its cached Paper 1.21.11 API. No new toolchain needed. |
-| Package | `eu.cartmc.royale` | `com.cartroyale` | Rename to cartroyale.com. |
+| Package | `eu.cartmc.royale` | `com.cartroyale` | Internal only, kept from the short-lived CartRoyale name. Players never see it. |
 | LuckPerms | API as a soft dependency | No LuckPerms API at all. Ranks are read from permission nodes; the temporary `host` group is granted by running LuckPerms' own console command (`lp user <uuid> parent addtemp host 6h accumulate`). | Linking against a soft-depend API is what crashed CorruptFFA on a server without LuckPerms. This way the jar starts with or without LuckPerms. |
 | Happy Ghast movement | Move with velocity, no AI, no gravity | Teleported along the route every tick (`deploy.move-mode: TELEPORT`) | Tested on 1.21.11: a no-AI Happy Ghast ignores velocity. The plugin switches to teleport mode on its own if velocity is chosen and the ghasts don't move. |
 | Ghast harness | "Equip any harness required" | No harness by default (`deploy.harness: false`) | Riders mount through the API without one, and without a harness no rider can steer the ghast. |

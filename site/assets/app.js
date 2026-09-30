@@ -1,8 +1,8 @@
 /* ============================================================
-   CARTROYALE.COM — site config. Edit the values in this first block.
+   CARTZONE.VIP — site config. Edit the values in this first block.
    ============================================================ */
 const SITE = {
-  ip: "play.cartroyale.com",   // the address players type into Minecraft
+  ip: "play.cartzone.vip",   // the address players type into Minecraft
   discord: "#",           // your Discord invite link
   edition: "Java Edition",
   liveStatus: true,       // live player count via api.mcsrvstat.us (visitors' browsers ask it for your server's status)

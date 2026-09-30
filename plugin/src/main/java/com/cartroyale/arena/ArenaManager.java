@@ -26,7 +26,7 @@ import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Owns the arena world. Map templates live in plugins/CartRoyale/templates/&lt;name&gt;/ (a full
+ * Owns the arena world. Map templates live in plugins/CartZone/templates/&lt;name&gt;/ (a full
  * world folder). On every boot the arena folder is wiped and copied from the template before the
  * world loads, which is the most reliable way to undo a match's damage (END-4).
  */
@@ -119,7 +119,7 @@ public final class ArenaManager {
                 plugin.getLogger().warning("Could not wipe the stand-in arena: " + e.getMessage());
             }
             plugin.getLogger().warning("No arena template found. Using the generated stand-in arena. "
-                + "Install your map: put the world folder in plugins/CartRoyale/templates/<name>/, then /cart arena load <name>.");
+                + "Install your map: put the world folder in plugins/CartZone/templates/<name>/, then /cart arena load <name>.");
         }
         load(name);
     }

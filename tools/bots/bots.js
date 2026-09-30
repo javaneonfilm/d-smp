@@ -1,4 +1,4 @@
-// CartRoyale test bots. Usage: node bots.js <count> [prefix] [port] [--fight] [--stay]
+// CartZone test bots. Usage: node bots.js <count> [prefix] [port] [--fight] [--stay]
 // Each bot logs one line per interesting event, so a whole match can be read from stdout.
 const mineflayer = require('mineflayer');
 

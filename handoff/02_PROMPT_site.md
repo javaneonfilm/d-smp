@@ -1,4 +1,4 @@
-# PROMPT: finish, connect and launch the CartRoyale website
+# PROMPT: finish, connect and launch the CartZone website
 
 You are a front-end engineer. A first version of the website already exists in `site/` (this folder). Your job: connect it to the store and the plugin, fix what's out of date, and help launch it.
 
@@ -11,7 +11,7 @@ A static, dependency-free site: `site/index.html`, `site/assets/style.css`, `sit
 - **Look:** warm industrial "rail yard" theme (charcoal, TNT red, amber). Headings in Barlow Condensed, body in Barlow, data in JetBrains Mono (Google Fonts). The header's bottom edge is a rail with a cart that rides as you scroll. The hero has a clickable TNT cart with embers and an explosion effect.
 - **Sections:** Play (hero + status strip), How it works (ticket cards), News, Leaderboards (departure-board style: top riders + recent rounds), Store (VIP, VIP+, Game Ticket), Rules (accordions), Staff, Join.
 - **Config:** the first block of `assets/app.js` (`SITE`, `SHOP`, `DATA`, `DEMO`).
-  - `SITE.ip` = `play.cartroyale.com`, `SITE.discord` = `#`, `SITE.demo` = `true` (shows sample data).
+  - `SITE.ip` = `play.cartzone.vip`, `SITE.discord` = `#`, `SITE.demo` = `true` (shows sample data).
   - `SHOP` holds the three products. Each has a `url` that is empty, so buttons say "Coming soon".
 - **Live status:** the browser asks `api.mcsrvstat.us` for the server's online state and player count (`SITE.liveStatus`).
 - Works from `file://` or any static host. To preview: `python -m http.server 5173` inside `site/`.
@@ -31,7 +31,7 @@ A static, dependency-free site: `site/index.html`, `site/assets/style.css`, `sit
 6. **Legal and trust.** Add footer links to the store's Terms and Privacy pages and the site's own privacy note (the status check and the fonts call third-party services). Add an imprint/contact if the owner's country requires it.
 7. **Polish.** Add an Open Graph image and correct absolute `og:` URLs after the domain is known. Add a favicon set. Add `robots.txt` and `sitemap.xml` if wanted.
 8. **Deploy.** Use a free static host (Netlify Drop or Cloudflare Pages). Upload the **contents of `site/`**, never the whole handoff folder (it contains planning documents). Add the custom domain and follow the host's DNS steps. The game address (`play.` subdomain) is a separate record pointing at the Minecraft server (`06_INFRASTRUCTURE-checklist.md`).
-9. **Resource pack hosting (optional).** The site host can serve `pack/cartroyale-pack.zip` at a stable URL for the plugin (needs its SHA-1).
+9. **Resource pack hosting (optional).** The site host can serve `pack/cartzone-pack.zip` at a stable URL for the plugin (needs its SHA-1).
 10. **QA.** Test at 360, 390, 768, 1024, 1440 px. Keyboard only. `prefers-reduced-motion`. Slow network. Fonts blocked. JavaScript disabled (core content should still be readable). Run Lighthouse and fix accessibility and performance findings.
 
 ## 3. Constraints

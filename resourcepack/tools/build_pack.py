@@ -1,13 +1,13 @@
-"""Builds the CartRoyale resource pack (UI-3) and zips it with its SHA-1.
+"""Builds the CartZone resource pack (UI-3) and zips it with its SHA-1.
 
     py resourcepack/tools/build_pack.py
 
 Contents, all original art drawn here:
-- One Time Shield: a 3D shield model (item_model cartroyale:one_time_shield) with a
+- One Time Shield: a 3D shield model (item_model cartzone:one_time_shield) with a
   separate blocking pose, TNT-red face with a crack across it.
 - IP bar: the PINK boss bar is made invisible and its title draws a red rounded bar with a
-  minecart icon (font cartroyale:hud). Nothing else on the server uses a pink bar.
-Output: resourcepack/pack/ (the files) and cartroyale-pack.zip + SHA-1 in docs/RESOURCEPACK.md.
+  minecart icon (font cartzone:hud). Nothing else on the server uses a pink bar.
+Output: resourcepack/pack/ (the files) and cartzone-pack.zip + SHA-1 in docs/RESOURCEPACK.md.
 """
 import hashlib
 import json
@@ -21,7 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)                 # cartroyale/resourcepack
 PROJECT = os.path.dirname(ROOT)              # cartroyale
 OUT = os.path.join(ROOT, "pack")
-ZIP = os.path.join(ROOT, "cartroyale-pack.zip")
+ZIP = os.path.join(ROOT, "cartzone-pack.zip")
 
 # Keep in sync with plugin/src/main/java/com/cartroyale/lobby/HudText.java
 BAR_W, BAR_H, BAR_ASCENT = 150, 13, 9
@@ -110,7 +110,7 @@ def shield_model():
     }
     return {
         "gui_light": "front",
-        "textures": {"face": "cartroyale:item/one_time_shield", "particle": "cartroyale:item/one_time_shield"},
+        "textures": {"face": "cartzone:item/one_time_shield", "particle": "cartzone:item/one_time_shield"},
         "elements": [plate, handle],
         # Same poses as the vanilla shield so it sits in the offhand the way players expect.
         "display": {
@@ -127,7 +127,7 @@ def shield_model():
 
 def shield_blocking_model():
     return {
-        "parent": "cartroyale:item/one_time_shield",
+        "parent": "cartzone:item/one_time_shield",
         "display": {
             "thirdperson_righthand": {"rotation": [45, 135, 0], "translation": [3.51, 11, -2], "scale": [1, 1, 1]},
             "thirdperson_lefthand": {"rotation": [45, 135, 0], "translation": [13.51, 3, 5], "scale": [1, 1, 1]},
@@ -182,8 +182,8 @@ def hud_font():
         advances[chr(0xF821 + i)] = 1 << i
     return {
         "providers": [
-            {"type": "bitmap", "file": "cartroyale:font/cart.png", "ascent": ICON_ASCENT, "height": ICON_H + 1, "chars": [""]},
-            {"type": "bitmap", "file": "cartroyale:font/bar.png", "ascent": BAR_ASCENT, "height": BAR_H, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/cart.png", "ascent": ICON_ASCENT, "height": ICON_H + 1, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/bar.png", "ascent": BAR_ASCENT, "height": BAR_H, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
     }
@@ -195,7 +195,7 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     write_json("pack.mcmeta", {"pack": {
-        "description": "CartRoyale - IP bar and One Time Shield",
+        "description": "CartZone - IP bar and One Time Shield",
         # 1.21.11 is format 75; 1.21.9+ reads the min/max range, older clients read pack_format.
         "pack_format": 75, "min_format": 64, "max_format": 99}})
     save_png("pack.png", Image.open(os.path.join(PROJECT, "site", "assets", "logo.png")).convert("RGBA").resize((128, 128), Image.LANCZOS))
@@ -205,8 +205,8 @@ def main():
     write_json("assets/cartroyale/models/item/one_time_shield_blocking.json", shield_blocking_model())
     write_json("assets/cartroyale/items/one_time_shield.json", {"model": {
         "type": "minecraft:condition", "property": "minecraft:using_item",
-        "on_false": {"type": "minecraft:model", "model": "cartroyale:item/one_time_shield"},
-        "on_true": {"type": "minecraft:model", "model": "cartroyale:item/one_time_shield_blocking"}}})
+        "on_false": {"type": "minecraft:model", "model": "cartzone:item/one_time_shield"},
+        "on_true": {"type": "minecraft:model", "model": "cartzone:item/one_time_shield_blocking"}}})
 
     save_png("assets/cartroyale/textures/font/bar.png", bar_background())
     save_png("assets/cartroyale/textures/font/cart.png", cart_icon())
@@ -236,7 +236,7 @@ def main():
     with open(doc, "w", encoding="utf-8", newline="\n") as f:
         f.write(f"""# Resource pack
 
-Built by `py resourcepack/tools/build_pack.py` (needs Pillow). Output: `resourcepack/cartroyale-pack.zip`.
+Built by `py resourcepack/tools/build_pack.py` (needs Pillow). Output: `resourcepack/cartzone-pack.zip`.
 
 | | |
 |---|---|
@@ -245,16 +245,16 @@ Built by `py resourcepack/tools/build_pack.py` (needs Pillow). Output: `resource
 | pack_format | 75 (1.21.11), accepted range 64-99 |
 
 ## What is in it
-- **One Time Shield** model (`item_model` `cartroyale:one_time_shield`), with a separate blocking pose.
+- **One Time Shield** model (`item_model` `cartzone:one_time_shield`), with a separate blocking pose.
 - **IP bar**: the pink boss bar sprites are transparent, and the bar's title draws a red rounded bar
-  and a minecart icon from the `cartroyale:hud` font. Only the plugin's IP bar uses a pink boss bar.
-- `pack.png` is the CartRoyale logo.
+  and a minecart icon from the `cartzone:hud` font. Only the plugin's IP bar uses a pink boss bar.
+- `pack.png` is the CartZone logo.
 
 It changes no vanilla textures other than the two pink boss bar sprites.
 
 ## Hosting (mcpacks)
-1. Upload `cartroyale-pack.zip` to mcpacks and copy the **direct download** link (it must download the zip itself, not a web page).
-2. In `plugins/CartRoyale/config.yml`:
+1. Upload `cartzone-pack.zip` to mcpacks and copy the **direct download** link (it must download the zip itself, not a web page).
+2. In `plugins/CartZone/config.yml`:
    ```yaml
    resource-pack:
      enabled: true

@@ -1,6 +1,6 @@
-# MASTER PROMPT: build the CartRoyale Paper plugin
+# MASTER PROMPT: build the CartZone Paper plugin
 
-You are a senior Minecraft server-plugin engineer. Build **CartRoyale**, a single Paper plugin that runs an entire minecart-PvP battle royale server for **cartroyale.com**: access control, hosted games, purge, teams, deployment from Happy Ghasts, loot chests, a shrinking zone, cosmetics and a daily shop, Discord announcements, and stats for the website.
+You are a senior Minecraft server-plugin engineer. Build **CartZone**, a single Paper plugin that runs an entire minecart-PvP battle royale server for **cartzone.vip**: access control, hosted games, purge, teams, deployment from Happy Ghasts, loot chests, a shrinking zone, cosmetics and a daily shop, Discord announcements, and stats for the website.
 
 Read these files first, in order. They are all in this folder.
 1. `00_START-HERE.md`: context and project status
@@ -33,7 +33,7 @@ Bedrock support, anti-cheat, an Elo/rating system (see D18), several arenas at o
 
 ## 2. Tech stack (requirements)
 
-- **Language/build:** Java (use the Java version Paper requires; 21 for 1.21.x). Gradle (Kotlin DSL). `paper-plugin.yml` or `plugin.yml`. Package root `com.cartroyale`. Output jar: `CartRoyale.jar`.
+- **Language/build:** Java (use the Java version Paper requires; 21 for 1.21.x). Gradle (Kotlin DSL). `paper-plugin.yml` or `plugin.yml`. Package root `com.cartroyale`. Output jar: `CartZone.jar`.
 - **APIs:** Paper API, Adventure/MiniMessage. **LuckPerms API** as a soft dependency. Keep NMS out unless there is no alternative, and isolate it if used.
 - **Persistence:** SQLite via JDBC (with a small connection pool or a single-writer queue). All database and HTTP work happens **off the main thread**. Use transactions for anything that touches coins, tickets or purchases.
 - **Config:** YAML files with comments, reloadable with `/cart reload`. All text lives in `messages.yml` (MiniMessage). Nothing user-visible is hardcoded.
@@ -85,7 +85,7 @@ Send with `java.net.http.HttpClient` **asynchronously**. Retry on HTTP 429 using
 
 - **HOOK-1 Game hosted.** When a game is created. Message content: `<@&EVENTS_ROLE_ID>` with `allowed_mentions.roles` set. One embed:
   - Title: `Game #{id} ({region})`
-  - Description: `To be notified for games hosted, please go to <id:customize>` then a **Game Settings** list: Map, Team Size, Duration, Purge Cap, Mode, Modifiers (code-styled tags, or "None"), then an **Info** list: `Starting: <t:UNIX:R>` and `Server IP: \`play.cartroyale.com\``.
+  - Description: `To be notified for games hosted, please go to <id:customize>` then a **Game Settings** list: Map, Team Size, Duration, Purge Cap, Mode, Modifiers (code-styled tags, or "None"), then an **Info** list: `Starting: <t:UNIX:R>` and `Server IP: \`play.cartzone.vip\``.
   - No unicode emoji anywhere in webhook text (owner's rule). Custom server emojis only if the owner uploads them.
   - Footer: `Hosted by {hoster}`. Colour `#FF0000`.
 - **HOOK-2 5-minute warning.** 5 minutes before each game (including every queued game). Pings the role. Embed `5 minute warning!`, Server IP, "Hosted by".
@@ -211,8 +211,8 @@ Ranks come from LuckPerms groups/permissions (see `05_STORE-and-ranks.md`).
 - **Acceptance:** after a test match the JSON contains the right winner, kills and times. A failed upload retries and never affects gameplay.
 
 ### 5.18 UI and branding (UI)
-- **UI-1** Primary colour **#FF0000**. MiniMessage everywhere. Prefix `<#FF0000><b>CartRoyale</b> <gray>»` (D22).
-- **UI-2 Top-centre IP bar.** A permanent boss-bar-style element for every player showing the IP (`play.cartroyale.com`, configurable). Build it with a custom boss-bar sprite plus a font glyph icon from the resource pack (see `reference/` image 3). Make it original: red, with the minecart icon. Choose a boss-bar colour slot no other bar uses, because a sprite override applies to every bar of that colour.
+- **UI-1** Primary colour **#FF0000**. MiniMessage everywhere. Prefix `<#FF0000><b>CartZone</b> <gray>»` (D22).
+- **UI-2 Top-centre IP bar.** A permanent boss-bar-style element for every player showing the IP (`play.cartzone.vip`, configurable). Build it with a custom boss-bar sprite plus a font glyph icon from the resource pack (see `reference/` image 3). Make it original: red, with the minecart icon. Choose a boss-bar colour slot no other bar uses, because a sprite override applies to every bar of that colour.
 - **UI-3 Resource pack** (D21). Generate `resourcepack/` and a zip with a stable SHA-1. Contents: One Time Shield item model (via `item_model`), the IP-bar sprites and font, and GUI icons if wanted. Set the correct `pack_format`, send the pack on join with a prompt, and handle declines with a clear message. The pack must not break vanilla visuals.
 - **UI-4** Every GUI title, button and message uses the brand style, with clear lore text. GUIs are safe: cancel all clicks and drags, and guard against dupe exploits.
 - **Acceptance:** with the pack applied, the shield has its model and the IP bar shows at the top centre. Without the pack, the game still works and shows a fallback boss bar with plain text.
@@ -233,7 +233,7 @@ Ranks come from LuckPerms groups/permissions (see `05_STORE-and-ranks.md`).
 | `/cart reload` | admin | Reload configs |
 | `/team invite\|accept\|leave\|list` | player | Teams |
 
-Permissions: `cartroyale.admin`, `cartroyale.host`, `cartroyale.rank.vip`, `cartroyale.rank.vipplus`. Provide tab completion, usage messages and clear errors.
+Permissions: `cartzone.admin`, `cartzone.host`, `cartzone.rank.vip`, `cartzone.rank.vipplus`. Provide tab completion, usage messages and clear errors.
 
 ### 5.20 Safety and performance (TECH)
 - **TECH-1** No blocking I/O on the main thread. Chest scanning uses chunk snapshots off-thread and places blocks in small batches.
@@ -287,9 +287,9 @@ Deliver in this order. Each milestone ends with tests and a commit.
 
 ## 9. Deliverables
 
-- `plugin/` source and Gradle project, and the built `CartRoyale.jar`
+- `plugin/` source and Gradle project, and the built `CartZone.jar`
 - `plugin/src/test/...` unit tests
-- `resourcepack/` and `cartroyale-pack.zip` with its SHA-1 in `docs/RESOURCEPACK.md`
+- `resourcepack/` and `cartzone-pack.zip` with its SHA-1 in `docs/RESOURCEPACK.md`
 - Example configs with comments: `config.yml`, `messages.yml`, `loot.yml`, `cosmetics.yml`, `zone.yml`, `schedule.yml`, `secrets.example.yml`
 - `docs/ADMIN-GUIDE.md`: how an owner sets up kits, maps, loot, zone and the schedule
 - `docs/CONFIG.md`, `docs/TEST-LOG.md`, `docs/DEVIATIONS.md`, `CHANGELOG.md`

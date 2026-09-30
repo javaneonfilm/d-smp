@@ -46,7 +46,7 @@ public final class OneTimeShield implements Listener {
         it.unsetData(DataComponentTypes.DAMAGE);
         it.setData(DataComponentTypes.MAX_STACK_SIZE, 16);
         if (blocking != null) it.setData(DataComponentTypes.BLOCKS_ATTACKS, blocking);
-        String model = plugin.getConfig().getString("shield.item-model", "cartroyale:one_time_shield");
+        String model = plugin.getConfig().getString("shield.item-model", "cartzone:one_time_shield");
         if (plugin.getConfig().getBoolean("resource-pack.enabled", false) && model != null && !model.isBlank()) {
             it.setData(DataComponentTypes.ITEM_MODEL, Key.key(model));
         }

@@ -15,7 +15,7 @@ public final class GameSettings {
     public String map;
     public long startAt;
     public UUID hosterUuid;
-    public String hosterName = "CartRoyale";
+    public String hosterName = "CartZone";
 
     public GameSettings copy() {
         GameSettings g = new GameSettings();

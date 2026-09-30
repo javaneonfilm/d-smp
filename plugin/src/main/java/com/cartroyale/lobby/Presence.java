@@ -50,7 +50,7 @@ public final class Presence implements Listener {
     private final CartRoyale plugin;
     private final Map<UUID, BossBar> bars = new HashMap<>();
     private final Set<UUID> packLoaded = new HashSet<>();
-    private final UUID packId = UUID.nameUUIDFromBytes("cartroyale-pack".getBytes());
+    private final UUID packId = UUID.nameUUIDFromBytes("cartzone-pack".getBytes());
 
     public Presence(CartRoyale plugin) {
         this.plugin = plugin;
@@ -170,7 +170,7 @@ public final class Presence implements Listener {
 
     private void updateBar(Player p, BossBar bar) {
         boolean styled = packLoaded.contains(p.getUniqueId()) && plugin.getConfig().getBoolean("resource-pack.enabled", false);
-        String ip = plugin.getConfig().getString("server-ip", "play.cartroyale.com");
+        String ip = plugin.getConfig().getString("server-ip", "play.cartzone.vip");
         bar.name(styled ? HudText.bar(plugin.msg().get("ip-bar.styled", "ip", ip), ip) : plugin.msg().get("ip-bar.plain", "ip", ip));
         bar.color(barColor());
     }

@@ -53,7 +53,7 @@ public final class Stats {
         if (mode.equals("OFF") || mode.equals("FALSE") || !busy.compareAndSet(false, true)) return;
         Match m = plugin.games().match();
         int online = 0;
-        for (Player p : Bukkit.getOnlinePlayers()) if (!p.hasPermission("cartroyale.admin")) online++;
+        for (Player p : Bukkit.getOnlinePlayers()) if (!p.hasPermission("cartzone.admin")) online++;
         String state = m == null ? (plugin.games().next() == null ? "idle" : "lobby") : m.state.inArena() ? "playing" : "lobby";
         int max = plugin.games().next() != null ? plugin.games().next().s.purgeCap : m != null ? m.s().purgeCap : plugin.getConfig().getInt("host.default-cap", 100);
         String status = "{\"online\":" + online + ",\"max\":" + max + ",\"state\":\"" + state + "\"}";
@@ -138,6 +138,6 @@ public final class Stats {
     public void show(Player p) {
         plugin.store().profile(p.getUniqueId()).thenAccept(pr -> Bukkit.getScheduler().runTask(plugin, () ->
             plugin.msg().send(p, "stats.self", "coins", pr.coins(), "kills", pr.kills(), "wins", pr.wins(), "played", pr.played(),
-                "site", com.cartroyale.core.Msg.link(plugin.getConfig().getString("stats.site-url", "https://cartroyale.com/#boards")))));
+                "site", com.cartroyale.core.Msg.link(plugin.getConfig().getString("stats.site-url", "https://cartzone.vip/#boards")))));
     }
 }

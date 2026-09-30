@@ -1,6 +1,6 @@
 # Config files
 
-All in `plugins/CartRoyale/`. Every file has comments. `/cart reload` reloads everything except
+All in `plugins/CartZone/`. Every file has comments. `/cart reload` reloads everything except
 worlds and the database. A file with a YAML syntax error is never overwritten: the plugin says so
 in the console and ignores it (config.yml errors stop the plugin from starting).
 
@@ -17,7 +17,7 @@ in the console and ignores it (config.yml errors stop the plugin from starting).
 | `maps/<name>.yml` | Per map: centre, border, spectator spawn, ghast route, zone start and final centre, chest zones | `/cart arena`, `/cart zone`, `/cart chests` |
 | `maps/<name>.spots` | Cached chest spots (delete to rescan, or `/cart chests scan`) | automatic |
 | `templates/<name>/` | Arena world templates | `/cart arena save` |
-| `cartroyale.db` | SQLite: players, coins, stats, games, tickets, cosmetics, daily shop | automatic, back it up daily |
+| `cartzone.db` | SQLite: players, coins, stats, games, tickets, cosmetics, daily shop | automatic, back it up daily |
 
 Key numbers and defaults:
 

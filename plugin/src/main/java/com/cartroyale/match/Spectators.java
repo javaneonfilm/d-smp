@@ -134,7 +134,7 @@ public final class Spectators implements Listener {
         Player p = e.getPlayer();
         Match m = plugin.games().match();
         if (m == null || !isWatcher(p)) return;
-        e.viewers().removeIf(v -> v instanceof Player vp && !isWatcher(vp) && !vp.hasPermission("cartroyale.admin"));
+        e.viewers().removeIf(v -> v instanceof Player vp && !isWatcher(vp) && !vp.hasPermission("cartzone.admin"));
     }
 
     public boolean isDeadInMatch(UUID u) {

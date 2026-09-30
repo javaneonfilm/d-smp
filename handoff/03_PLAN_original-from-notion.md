@@ -79,7 +79,7 @@ A Discord webhook message posted by a bot. It pings the role `@Events` and has o
 - **Info** list: Starting: (Discord relative time, e.g. "in 30 minutes") / Server IP: `as.mace.vip`
 - Footer: "Hosted by @name"
 
-For CartRoyale the "Scenarios" line becomes the modifiers (No Fall Damage, Luckier Loot, Pearls) and a Mode line (LT Cart / HT Cart) is added. The Ranked line is dropped (decision D18).
+For CartZone the "Scenarios" line becomes the modifiers (No Fall Damage, Luckier Loot, Pearls) and a Mode line (LT Cart / HT Cart) is added. The Ranked line is dropped (decision D18).
 
 ### Image 2: `reference/notion-image-2-webhooks-warning-purge-results.jpg`
 Three more webhook messages in sequence:
@@ -88,4 +88,4 @@ Three more webhook messages in sequence:
 3. Embed **"Game #487 Results"**: **Winner(s):** `name` `name` (**5 Kills**) and **MVP:** `name` (**5 Kills**).
 
 ### Image 3: `reference/notion-image-3-top-center-bar.jpg`
-A small pixel-art bar at the top-middle of the screen: a rounded green bar with a small icon and the text "IN COMBAT – 23s". It looks like a custom boss-bar-style HUD element with a resource-pack texture and font. The owner wants the same kind of element at the top-middle showing **the server IP** instead. Make it original: red (#FF0000 family), with the CartRoyale minecart icon.
+A small pixel-art bar at the top-middle of the screen: a rounded green bar with a small icon and the text "IN COMBAT – 23s". It looks like a custom boss-bar-style HUD element with a resource-pack texture and font. The owner wants the same kind of element at the top-middle showing **the server IP** instead. Make it original: red (#FF0000 family), with the CartZone minecart icon.

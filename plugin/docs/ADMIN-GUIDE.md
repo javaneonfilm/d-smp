@@ -1,4 +1,4 @@
-# CartRoyale admin guide
+# CartZone admin guide
 
 Everything an owner does to set the server up and run games. Commands are typed in game unless
 marked console. `/cart help` lists them; `/cart diag` shows everything that could be wrong on one
@@ -6,15 +6,15 @@ screen. `/cart selftest` checks the arena block rules in 3 seconds.
 
 ## 1. Install
 
-1. Paper **1.21.11**, Java 21. Put `CartRoyale.jar` in `plugins/`. Recommended: **LuckPerms** and **CraftingStore**.
+1. Paper **1.21.11**, Java 21. Put `CartZone.jar` in `plugins/`. Recommended: **LuckPerms** and **CraftingStore**.
 2. `server.properties`: `white-list=true`, `enforce-whitelist=true`, `online-mode=true`, `max-players` above your largest purge cap plus staff (e.g. 150), `spawn-protection=0`.
 3. `level-name` is your **lobby** world (`worlds.lobby` in config.yml, default `lobby`). The plugin loads the **arena** world itself.
-4. Purpify restarts the server when it stops. CartRoyale stops the server once after every game (`match.restart-after: true`) so the arena is restored on the next boot.
-5. Start once. `plugins/CartRoyale/` is created with every config file.
+4. Purpify restarts the server when it stops. CartZone stops the server once after every game (`match.restart-after: true`) so the arena is restored on the next boot.
+5. Start once. `plugins/CartZone/` is created with every config file.
 
 ## 2. Secrets (never share these)
 
-Edit `plugins/CartRoyale/secrets.yml` (see `secrets.example.yml`):
+Edit `plugins/CartZone/secrets.yml` (see `secrets.example.yml`):
 - `discord-webhook-url`: Discord channel settings > Integrations > Webhooks > New Webhook > Copy Webhook URL.
 - `stats-token`: the random token your stats Worker checks (only if you use the website stats).
 
@@ -27,19 +27,19 @@ lp creategroup vip
 lp creategroup vipplus
 lp creategroup host
 lp creategroup admin
-lp group vip permission set cartroyale.rank.vip true
-lp group vipplus permission set cartroyale.rank.vipplus true
+lp group vip permission set cartzone.rank.vip true
+lp group vipplus permission set cartzone.rank.vipplus true
 lp group vipplus parent add vip
-lp group admin permission set cartroyale.admin true
+lp group admin permission set cartzone.admin true
 ```
 `host` needs no permission: a Game Ticket is what lets someone host. The plugin grants `host`
 temporarily (6 h, `host.ticket-hours`) so the rank shows.
 
-Admins (`cartroyale.admin`) never play; they spectate. `/cart play` toggles that for you (for testing).
+Admins (`cartzone.admin`) never play; they spectate. `/cart play` toggles that for you (for testing).
 
 ## 4. The arena map
 
-1. Copy your map's **world folder** (the one with `level.dat`) to `plugins/CartRoyale/templates/<name>/`, e.g. `templates/canyon/`.
+1. Copy your map's **world folder** (the one with `level.dat`) to `plugins/CartZone/templates/<name>/`, e.g. `templates/canyon/`.
 2. Restart, or with no game running: `/cart arena load canyon`. You are teleported there.
 3. Stand at the middle: `/cart arena setcenter`. Set the map edge: `/cart arena setborder 300` (half the width, square).
 4. Where dead players appear: `/cart arena setspawn`.
@@ -101,14 +101,14 @@ If a bought game can't run (not enough players, server down), the ticket is give
 
 ## 9. Resource pack (mcpacks)
 
-See `docs/RESOURCEPACK.md`: upload `cartroyale-pack.zip`, paste the direct link and the SHA-1 into
+See `docs/RESOURCEPACK.md`: upload `cartzone-pack.zip`, paste the direct link and the SHA-1 into
 `resource-pack` in config.yml, set `enabled: true`, `/cart reload`.
 
 ## 10. Website stats
 
 `stats.export.mode: WORKER` with `stats.export.url` (your Cloudflare Worker, https) and
 `stats-token` in secrets.yml posts leaderboards every 60 s. `FILE` writes
-`plugins/CartRoyale/stats.json` instead. `'OFF'` (with quotes) turns it off.
+`plugins/CartZone/stats.json` instead. `'OFF'` (with quotes) turns it off.
 
 ## 11. When something is wrong
 

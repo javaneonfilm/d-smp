@@ -14,9 +14,9 @@ public final class Ranks {
 
     public enum Rank { DEFAULT, VIP, VIPPLUS, ADMIN }
 
-    public static final String ADMIN = "cartroyale.admin";
-    public static final String VIP = "cartroyale.rank.vip";
-    public static final String VIPPLUS = "cartroyale.rank.vipplus";
+    public static final String ADMIN = "cartzone.admin";
+    public static final String VIP = "cartzone.rank.vip";
+    public static final String VIPPLUS = "cartzone.rank.vipplus";
 
     private Ranks() {
     }

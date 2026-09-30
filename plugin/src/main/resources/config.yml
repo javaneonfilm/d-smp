@@ -1,7 +1,7 @@
-# CartRoyale - main config. Reload with /cart reload (worlds and the database need a restart).
+# CartZone - main config. Reload with /cart reload (worlds and the database need a restart).
 # Secrets (Discord webhook URL, stats token) do NOT go here. They live in secrets.yml.
 
-server-ip: play.cartroyale.com
+server-ip: play.cartzone.vip
 # Shown in the webhook title, e.g. "Game #12 (EU)". It is the server's region, not the domain.
 region: EU
 # Wall-clock times: schedule, Host GUI times, daily shop reset. Any Java zone id (UTC, Europe/Berlin...).
@@ -49,11 +49,11 @@ host:
   ticket-hours: 6           # length of the temporary LuckPerms host group
   host-group: host
   revoke-cancels-game: true # a chargeback cancels the game the ticket paid for
-  store-url: https://cartroyale.com/#depot
+  store-url: https://cartzone.vip/#depot
 
 schedule:
   create-ahead-minutes: 60  # scheduled games are created (and announced) this far ahead
-  hoster-name: CartRoyale
+  hoster-name: CartZone
 
 deploy:
   distance: 300             # blocks the ghasts fly before dropping everyone
@@ -90,7 +90,7 @@ chests:
   scan-chunks-per-tick: 8
 
 shield:
-  item-model: cartroyale:one_time_shield
+  item-model: cartzone:one_time_shield
 
 economy:
   coins-per-kill: 5
@@ -130,7 +130,7 @@ lobby-items:
 
 webhooks:
   enabled: true
-  username: CartRoyale
+  username: CartZone
   events-role-id: ''        # right-click the @Events role with Developer Mode on, Copy Role ID
   flag: ''                  # optional text before the title; plain text, no emoji
   warning-minutes: 5
@@ -145,9 +145,9 @@ webhooks:
       '4': ''
 
 stats:
-  site-url: https://cartroyale.com/#boards
+  site-url: https://cartzone.vip/#boards
   export:
-    mode: 'OFF'             # WORKER (POST to url), FILE (plugins/CartRoyale/stats.json) or 'OFF' (keep the quotes)
+    mode: 'OFF'             # WORKER (POST to url), FILE (plugins/CartZone/stats.json) or 'OFF' (keep the quotes)
     url: ''                 # the Cloudflare Worker endpoint, https only
     interval-seconds: 60
 

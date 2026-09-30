@@ -3,16 +3,16 @@
 Everything needed around the plugin and site. Tick these off in roughly this order.
 
 ## 1. Domain and DNS
-- [ ] Secure the domain. **`cartroyale.com` is already registered** (checked 2026-09-30: registered 2012 at GoDaddy, parked on Afternic, so probably for sale). Buy it from the owner through Afternic, or pick a free name and replace `cartroyale.com` everywhere. Free on 2026-09-30: `cartroyale.net`, `playcartroyale.com`, `cartroyalemc.com`.
+- [ ] Buy **cartzone.vip** (unregistered when checked on 2026-09-30). Turn on auto-renew and registrar 2FA.
 - [ ] Website: point the domain at the static host (follow the host's instructions).
-- [ ] Game address: an **A record** `play.cartroyale.com` → the Minecraft server's IP. If the server isn't on port 25565, also add an **SRV record** `_minecraft._tcp.play` → target `play.cartroyale.com`, port = your port.
-- [ ] Optional: the store on its own subdomain (`store.cartroyale.com`) via CraftingStore's custom-domain guide. HTTPS on a custom domain needs their Silver plan.
+- [ ] Game address: an **A record** `play.cartzone.vip` → the Minecraft server's IP. If the server isn't on port 25565, also add an **SRV record** `_minecraft._tcp.play` → target `play.cartzone.vip`, port = your port.
+- [ ] Optional: the store on its own subdomain (`store.cartzone.vip`) via CraftingStore's custom-domain guide. HTTPS on a custom domain needs their Silver plan.
 
 ## 2. Minecraft server
 - [ ] A host with enough resources. Rough starting point for around 100 players: 4+ fast CPU cores, 8–12 GB RAM, SSD. Use a reputable host with DDoS protection.
 - [ ] **Paper** for the chosen version (must include the Happy Ghast, Java 1.21.6+). Java version as Paper requires. Accept the EULA.
 - [ ] `server.properties`: `white-list=true`, `enforce-whitelist=true`, `online-mode=true`, `max-players` above the largest purge cap plus staff plus buffer, sensible `view-distance` and `simulation-distance`, `spawn-protection=0`. Keep RCON **off** unless a plugin needs it, and firewall it if on.
-- [ ] Plugins: **LuckPerms**, **CraftingStore**, **CartRoyale**. Avoid extras.
+- [ ] Plugins: **LuckPerms**, **CraftingStore**, **CartZone**. Avoid extras.
 - [ ] LuckPerms groups: `default`, `vip`, `vipplus`, `host`, `admin` and their permission nodes (see `01_PROMPT_plugin.md` 5.19).
 - [ ] **Restart loop.** The plugin shuts the server down after every match, so something must start it again. Linux/macOS:
   ```bash
@@ -33,9 +33,9 @@ Everything needed around the plugin and site. Tick these off in roughly this ord
   goto loop
   ```
   Managed panels (Pterodactyl and similar) usually restart automatically. Confirm.
-- [ ] **Worlds:** a static `lobby` world and an `arena` world. Arena templates live in `plugins/CartRoyale/templates/<name>/`. `/cart arena save <name>` snapshots the arena.
-- [ ] **Backups:** daily backup of `plugins/CartRoyale/` (database, configs, templates) and the LuckPerms data, stored off the server.
-- [ ] **Resource pack:** host `cartroyale-pack.zip` at a stable HTTPS URL, and record its SHA-1.
+- [ ] **Worlds:** a static `lobby` world and an `arena` world. Arena templates live in `plugins/CartZone/templates/<name>/`. `/cart arena save <name>` snapshots the arena.
+- [ ] **Backups:** daily backup of `plugins/CartZone/` (database, configs, templates) and the LuckPerms data, stored off the server.
+- [ ] **Resource pack:** host `cartzone-pack.zip` at a stable HTTPS URL, and record its SHA-1.
 
 ## 3. Discord
 - [ ] A community server with channels such as `#announcements`, `#events` (webhook posts here), `#rules`, `#support`.

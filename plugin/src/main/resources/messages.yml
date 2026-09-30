@@ -1,8 +1,8 @@
-# CartRoyale messages. MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
+# CartZone messages. MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
 # Placeholders look like <name>. <prefix> inserts the prefix below.
 # The discord.* entries are plain Discord markdown, not MiniMessage.
 
-prefix: '<#FF0000><b>CartRoyale</b> <gray>»</gray> '
+prefix: '<#FF0000><b>CartZone</b> <gray>»</gray> '
 
 # ------------------------------------------------------------------ Discord (HOOK-1..4)
 discord:
@@ -73,9 +73,9 @@ categories:
 
 # ------------------------------------------------------------------ access / lobby
 access:
-  no-game: "<#FF0000><b>CartRoyale</b>\n\n<white>No game is being hosted right now.\n<gray>See our Discord for the next one."
-  next-game: "<#FF0000><b>CartRoyale</b>\n\n<white>Game #<id> starts at <yellow><start></yellow>.\n<gray>Logins open <minutes> minutes before the start. See you there."
-  in-progress: "<#FF0000><b>CartRoyale</b>\n\n<white>Game #<id> is already running.\n<gray>Watch Discord for the next one."
+  no-game: "<#FF0000><b>CartZone</b>\n\n<white>No game is being hosted right now.\n<gray>See our Discord for the next one."
+  next-game: "<#FF0000><b>CartZone</b>\n\n<white>Game #<id> starts at <yellow><start></yellow>.\n<gray>Logins open <minutes> minutes before the start. See you there."
+  in-progress: "<#FF0000><b>CartZone</b>\n\n<white>Game #<id> is already running.\n<gray>Watch Discord for the next one."
 
 lobby:
   welcome: '<prefix><white>Welcome, <yellow><player></yellow>. Last cart standing wins.'
@@ -91,16 +91,16 @@ ranks:
   admin-tag: '<#FF0000>[Staff]</#FF0000>'
 
 ip-bar:
-  plain: '<#FF0000><b>CartRoyale</b></#FF0000> <gray>|</gray> <white><ip>'
+  plain: '<#FF0000><b>CartZone</b></#FF0000> <gray>|</gray> <white><ip>'
   # With the resource pack the plugin draws the red bar and minecart icon; this is the text on it.
   styled: "<white><ip>"
 
 tab:
-  header: "\n<#FF0000><b>CARTROYALE</b></#FF0000>\n<gray><ip>\n"
+  header: "\n<#FF0000><b>CARTZONE</b></#FF0000>\n<gray><ip>\n"
   footer: "\n<gray>Online: <white><online></white>   <gray><state>\n<dark_gray>Last cart standing wins.\n"
 
 sidebar:
-  title: '<#FF0000><b>CARTROYALE</b>'
+  title: '<#FF0000><b>CARTZONE</b>'
   lobby:
     - '<dark_gray>----------------'
     - '<gray>Online: <white><online>'
@@ -274,7 +274,7 @@ loot:
   added: '<prefix><white>Added <item> to tier <tier>.'
 
 pack:
-  prompt: '<white>CartRoyale uses a small resource pack for the IP bar and the One Time Shield.'
+  prompt: '<white>CartZone uses a small resource pack for the IP bar and the One Time Shield.'
   declined-kick: "<#FF0000><b>Resource pack required</b>\n\n<white>Enable server resource packs for this server and join again."
   failed: '<prefix><gray>The resource pack did not load. Everything still works, it just looks plainer.'
   misconfigured: 'The resource pack is enabled but resource-pack.url or resource-pack.sha1 is missing or invalid.'
@@ -344,7 +344,7 @@ arena:
 
 # ------------------------------------------------------------------ admin
 admin:
-  alert-prefix: '<#FF0000>[CartRoyale]</#FF0000> '
+  alert-prefix: '<#FF0000>[CartZone]</#FF0000> '
   no-game: '<prefix><gray>No game is running.'
   no-arena: '<prefix><gray>The arena is not loaded.'
   no-such-game: '<prefix><gray>No queued game #<id>.'
@@ -368,7 +368,7 @@ admin:
   queue-failed: 'The game could not be queued: <error>'
 
 diag:
-  head: '<#FF0000><b>CartRoyale diagnostics</b>'
+  head: '<#FF0000><b>CartZone diagnostics</b>'
   state: '<gray>State: <white><state></white> game <white><game></white> players <white><players></white> alive <white><alive>'
   next: '<gray>Next: <white><next></white> <gray>(<queued> queued)'
   eligible: '<gray>Would be selected now: <white><n></white> <gray>(min <min>), whitelist <white><whitelist>'
@@ -394,12 +394,12 @@ cmd:
 
 help:
   player:
-    - '<#FF0000><b>CartRoyale</b>'
+    - '<#FF0000><b>CartZone</b>'
     - '<white>/cart host <gray>- host a game with your ticket'
     - '<white>/team invite|accept|leave|list <gray>- team up after the purge'
     - '<white>/spectate <gray>- follow a player while spectating'
   admin:
-    - '<#FF0000><b>CartRoyale admin</b>'
+    - '<#FF0000><b>CartZone admin</b>'
     - '<white>/cart host | start [now] | stop | queue | cancel <id> | schedule'
     - '<white>/cart kit set|preview <lt|ht> <gray>and</gray> /kitready'
     - '<white>/cart arena info|list|tp|load|save <name>|setspawn|setcenter|setborder <r>|setdeploy'

@@ -94,7 +94,7 @@ public final class MapConfig {
     public void save() {
         YamlConfiguration c = yml.get();
         c.options().setHeader(List.of(
-            "CartRoyale map setup for '" + name + "'. Set these in game:",
+            "CartZone map setup for '" + name + "'. Set these in game:",
             "/cart arena setcenter, setborder <radius>, setspawn, setdeploy",
             "/cart zone start <radius>, /cart zone final, /cart chests include|exclude <radius>"));
         c.set("center.x", centerX);

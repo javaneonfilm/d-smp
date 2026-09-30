@@ -14,7 +14,7 @@ The plan (`03_PLAN_original-from-notion.md`) leaves gaps. For every gap I chose 
 | Q4 | What time zone should schedules and the daily shop reset use? | `UTC`. |
 | Q5 | Which team sizes at launch: solo, duos, trios, squads? | Solo, Duos, Trios, Squads (1–4). |
 | Q6 | Is the server on a host with an automatic restart (panel/VPS)? | Provide a restart-loop script (see `06_INFRASTRUCTURE-checklist.md`). |
-| Q7 | Where will the resource pack be hosted (URL)? | Publish it on the website host, e.g. `https://cartroyale.com/pack/cartroyale-pack.zip`. |
+| Q7 | Where will the resource pack be hosted (URL)? | Publish it on the website host, e.g. `https://cartzone.vip/pack/cartzone-pack.zip`. |
 
 ### Owner's answers (2026-09-30)
 
@@ -155,7 +155,7 @@ The Discord webhook URL, the @Events role ID and every other secret: **never ask
 
 **D21. Resource pack.** One pack containing: the One Time Shield model (via the `item_model` component), the top-centre IP bar (custom boss-bar sprite plus font glyph), and optional GUI icons. It's forced, with a clear message if declined. `pack_format` must match the server version.
 
-**D22. Style.** Plugin primary colour **#FF0000**. Use MiniMessage. Chat prefix: `<#FF0000><b>CartRoyale</b> <gray>»`. Tier colours: bronze `#CD7F32`, silver `#C0C0C0`, gold `#FFD700`. Rarity colours: Common grey, Rare blue, Epic purple, Legendary gold.
+**D22. Style.** Plugin primary colour **#FF0000**. Use MiniMessage. Chat prefix: `<#FF0000><b>CartZone</b> <gray>»`. Tier colours: bronze `#CD7F32`, silver `#C0C0C0`, gold `#FFD700`. Rarity colours: Common grey, Rare blue, Epic purple, Legendary gold.
 
 **D23. One game at a time.** One arena, one active game. Upcoming games are queued in the database and survive restarts.
 

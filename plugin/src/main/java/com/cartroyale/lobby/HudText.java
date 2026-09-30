@@ -5,15 +5,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 /**
- * UI-2: builds the top-centre IP bar title from the pack's cartroyale:hud font. The bar glyph is
+ * UI-2: builds the top-centre IP bar title from the pack's cartzone:hud font. The bar glyph is
  * drawn first, then the pen is moved back with negative-space glyphs so the minecart icon and the
  * IP sit centred on it. Sizes must match resourcepack/tools/build_pack.py.
  */
 public final class HudText {
 
-    private static final Key FONT = Key.key("cartroyale", "hud");
+    private static final Key FONT = Key.key("cartzone", "hud");
     private static final int BAR_W = 150, ICON_ADVANCE = 10, SPACE = 4;
-    private static final char ICON = '', BAR = '';
+    private static final char ICON = '\uE000', BAR = '\uE001';
 
     private HudText() {
     }
@@ -33,7 +33,7 @@ public final class HudText {
     static String shift(int px) {
         StringBuilder sb = new StringBuilder();
         int n = Math.abs(px);
-        char base = px < 0 ? '' : '';
+        char base = px < 0 ? '\uF801' : '\uF821';
         for (int bit = 7; bit >= 0; bit--) {
             while (n >= (1 << bit)) {
                 sb.append((char) (base + bit));

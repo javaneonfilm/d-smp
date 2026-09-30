@@ -39,7 +39,7 @@ public final class HostGui {
         boolean admin = Ranks.isAdmin(p);
         plugin.store().tickets(p.getUniqueId()).thenAccept(tickets -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (!admin && tickets <= 0) {
-                plugin.msg().send(p, "host.no-ticket", "store", com.cartroyale.core.Msg.link(plugin.getConfig().getString("host.store-url", "https://cartroyale.com/#depot")));
+                plugin.msg().send(p, "host.no-ticket", "store", com.cartroyale.core.Msg.link(plugin.getConfig().getString("host.store-url", "https://cartzone.vip/#depot")));
                 return;
             }
             GameSettings s = drafts.computeIfAbsent(p.getUniqueId(), u -> {
@@ -166,7 +166,7 @@ public final class HostGui {
         }
         plugin.store().spendTicketAndQueue(p.getUniqueId(), g).thenAccept(id -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (id < 0) {
-                plugin.msg().send(p, "host.no-ticket", "store", com.cartroyale.core.Msg.link(plugin.getConfig().getString("host.store-url", "https://cartroyale.com/#depot")));
+                plugin.msg().send(p, "host.no-ticket", "store", com.cartroyale.core.Msg.link(plugin.getConfig().getString("host.store-url", "https://cartzone.vip/#depot")));
                 return;
             }
             done(p, plugin.games().queued(id, g, "ticket"));

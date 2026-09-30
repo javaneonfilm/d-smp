@@ -1,5 +1,5 @@
 {
-  "parent": "cartroyale:item/one_time_shield",
+  "parent": "cartzone:item/one_time_shield",
   "display": {
     "thirdperson_righthand": {
       "rotation": [

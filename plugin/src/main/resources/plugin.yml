@@ -1,16 +1,16 @@
-name: CartRoyale
+name: CartZone
 version: '${project.version}'
 main: com.cartroyale.CartRoyale
 api-version: '1.21.11'
 author: Cuda
-website: https://cartroyale.com
+website: https://cartzone.vip
 description: Minecart PvP battle royale - hosted games, purge, ghast drops, loot, zone, cosmetics.
 softdepend: [LuckPerms]
 load: POSTWORLD
 
 commands:
   cart:
-    description: CartRoyale commands.
+    description: CartZone commands.
     usage: /cart help
   team:
     description: Team up before a team game.
@@ -21,22 +21,22 @@ commands:
   kitready:
     description: Clear your inventory to build a kit.
     usage: /kitready
-    permission: cartroyale.admin
+    permission: cartzone.admin
 
 permissions:
-  cartroyale.admin:
-    description: Full control of CartRoyale.
+  cartzone.admin:
+    description: Full control of CartZone.
     default: op
     children:
-      cartroyale.host: true
-  cartroyale.host:
+      cartzone.host: true
+  cartzone.host:
     description: Can open the Host GUI when holding a ticket.
     default: true
-  cartroyale.rank.vip:
+  cartzone.rank.vip:
     description: VIP perks (lower purge chance, lobby wind charges, tag).
     default: false
-  cartroyale.rank.vipplus:
+  cartzone.rank.vipplus:
     description: VIP+ perks (purge immune, lobby elytra and wind charges, tag).
     default: false
     children:
-      cartroyale.rank.vip: true
+      cartzone.rank.vip: true

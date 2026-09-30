@@ -1,6 +1,6 @@
-# CartRoyale: hand-off folder
+# CartZone: hand-off folder
 
-Everything needed to build the **CartRoyale game server plugin**, finish the **website**, and launch. Give this whole folder to Claude (Claude Code) on the main PC.
+Everything needed to build the **CartZone game server plugin**, finish the **website**, and launch. Give this whole folder to Claude (Claude Code) on the main PC.
 
 Created 2026-09-30.
 
@@ -41,12 +41,12 @@ Created 2026-09-30.
 - Done: Store platform chosen: **CraftingStore** (Tebex can't be used). Its docs were read and the delivery commands are written down.
 - Done: Rules written.
 - Done: The game plan turned into detailed requirements.
-- Done 2026-09-30: **the plugin** (`../plugin/`, jar `../CartRoyale.jar`), **the resource pack** with the IP bar and the One Time Shield model (`../resourcepack/cartroyale-pack.zip`). Tested on a local Paper 1.21.11 server with up to 30 bots. Start with `../plugin/docs/ADMIN-GUIDE.md`; what was tested is in `../plugin/docs/TEST-LOG.md`, differences from the plan in `../plugin/docs/DEVIATIONS.md`.
+- Done 2026-09-30: **the plugin** (`../plugin/`, jar `../CartZone.jar`), **the resource pack** with the IP bar and the One Time Shield model (`../resourcepack/cartzone-pack.zip`). Tested on a local Paper 1.21.11 server with up to 30 bots. Start with `../plugin/docs/ADMIN-GUIDE.md`; what was tested is in `../plugin/docs/TEST-LOG.md`, differences from the plan in `../plugin/docs/DEVIATIONS.md`.
 
 ## Not done yet
 
 - To do: Install the real arena map (ADMIN-GUIDE section 4), set the kits, upload the pack to mcpacks, and check the visuals and menus in game (TEST-LOG, "Not tested with a real client").
-- To do: The domain. The project uses **cartroyale.com** (renamed from cartmc.eu on 2026-09-30). Checked the same day: `cartroyale.com` is **already registered** (since 2012, GoDaddy, parked on Afternic nameservers, so it is likely listed for sale). It has to be bought from its owner, or swap to a free name. Unregistered on 2026-09-30: `cartroyale.net`, `playcartroyale.com`, `cartroyalemc.com`.
+- To do: **Buy the domain cartzone.vip** (chosen 2026-09-30, after cartmc.eu and cartroyale.com; cartroyale.com turned out to be owned by someone else). The .vip registry's WHOIS showed cartzone.vip as unregistered on 2026-09-30. Buy it soon; until then someone else could.
 - To do: The CraftingStore account, payment provider connection and three packages. The site's buy buttons say "Coming soon" until their links are pasted in.
 - To do: The game server host, LuckPerms, the Discord server and webhook, and the Cloudflare Worker for stats.
 - To do: Real staff, news and leaderboard data on the site (it shows sample data).

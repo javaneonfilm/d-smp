@@ -24,7 +24,7 @@ public final class Announcer {
     }
 
     private String ip() {
-        return plugin.getConfig().getString("server-ip", "play.cartroyale.com");
+        return plugin.getConfig().getString("server-ip", "play.cartzone.vip");
     }
 
     private String title(long id) {
