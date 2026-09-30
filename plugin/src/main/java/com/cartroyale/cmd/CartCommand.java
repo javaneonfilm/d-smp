@@ -35,7 +35,7 @@ import java.util.UUID;
 public final class CartCommand implements TabExecutor {
 
     private static final List<String> SUBS = List.of("help", "host", "start", "stop", "queue", "cancel", "schedule", "kit", "arena", "zone",
-        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "shield", "shop");
+        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "shield", "shop");
 
     private final CartRoyale plugin;
 
@@ -125,10 +125,14 @@ public final class CartCommand implements TabExecutor {
                     m(s, plugin.rank().toggleFree(p) ? "admin.free-on" : "admin.free-off");
                 }
                 case "diag" -> diag(s);
+                case "selftest" -> new SelfTest(plugin).run(s);
                 case "shield" -> {
-                    if (!(s instanceof Player p)) return notPlayer(s);
+                    // /cart shield [n] [player] - the player is put on the offhand, ready to block.
                     int n = a.length > 1 ? Integer.parseInt(a[1]) : 16;
-                    p.getInventory().addItem(OneTimeShield.create(plugin, n));
+                    Player p = a.length > 2 ? Bukkit.getPlayerExact(a[2]) : s instanceof Player self ? self : null;
+                    if (p == null) return usage(s, "/cart shield [n] [player]");
+                    if (a.length > 2) p.getInventory().setItemInOffHand(OneTimeShield.create(plugin, n));
+                    else p.getInventory().addItem(OneTimeShield.create(plugin, n));
                     m(s, "admin.shield-given", "n", n);
                 }
                 case "shop" -> {
@@ -502,7 +506,8 @@ public final class CartCommand implements TabExecutor {
         lines.add(plugin.msg().plain("diag.pack", "enabled", plugin.getConfig().getBoolean("resource-pack.enabled") ? "on" : "off",
             "url", plugin.getConfig().getString("resource-pack.url", "").isBlank() ? "no url" : "url set"));
         lines.add(plugin.msg().plain("diag.perms", "lp", Ranks.luckPerms() ? "LuckPerms found" : "LuckPerms NOT installed", "db", plugin.db().healthy() ? "ok" : "FAILED"));
-        lines.add(plugin.msg().plain("diag.time", "zone", plugin.zoneId().getId(), "now", Times.dayClock(System.currentTimeMillis(), plugin.zoneId())));
+        lines.add(plugin.msg().plain("diag.shop", "items", String.join(", ", plugin.cosmetics().shop())));
+        lines.add(plugin.msg().plain("diag.time","zone", plugin.zoneId().getId(), "now", Times.dayClock(System.currentTimeMillis(), plugin.zoneId())));
         m(s, "diag.head");
         for (String l : lines) s.sendMessage(plugin.msg().parse(l));
     }

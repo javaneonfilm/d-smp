@@ -103,10 +103,63 @@ public final class Deployment implements Listener {
         return gliders.containsKey(u);
     }
 
+    // ------------------------------------------------------------------ preload
+
+    private final List<long[]> tickets = new ArrayList<>();
+    private World ticketWorld;
+
+    /**
+     * TECH-1: loads every chunk along the ghast route asynchronously (during the purge and team-up)
+     * and holds them with plugin tickets, so boarding never generates or loads chunks on the
+     * main thread. Released when the deployment ends.
+     */
+    public void preload(World w, MapConfig mc, int players) {
+        releaseTickets();
+        var cfg = plugin.getConfig();
+        double yaw = Math.toRadians(mc.deployYaw);
+        Vector d = new Vector(-Math.sin(yaw), 0, Math.cos(yaw)).normalize();
+        Vector side = new Vector(-d.getZ(), 0, d.getX());
+        int seats = Math.max(1, Math.min(4, cfg.getInt("deploy.riders-per-ghast", 4)));
+        int ghasts = Math.max(1, (players + seats - 1) / seats + 2);
+        int perRow = Math.max(1, cfg.getInt("deploy.per-row", 8));
+        double width = (Math.min(perRow, ghasts) - 1) * cfg.getDouble("deploy.spacing", 9) + 32;
+        double depth = ((ghasts + perRow - 1) / perRow) * cfg.getDouble("deploy.row-gap", 12) + 16;
+        double dist = cfg.getDouble("deploy.distance", 300) + 32;
+        java.util.Set<Long> keys = new java.util.HashSet<>();
+        for (double t = -depth; t <= dist; t += 8) {
+            for (double s = -width / 2; s <= width / 2; s += 8) {
+                int cx = (int) Math.floor((mc.deployX + d.getX() * t + side.getX() * s) / 16);
+                int cz = (int) Math.floor((mc.deployZ + d.getZ() * t + side.getZ() * s) / 16);
+                keys.add(((long) cx << 32) ^ (cz & 0xffffffffL));
+            }
+        }
+        ticketWorld = w;
+        for (long k : keys) {
+            int cx = (int) (k >> 32), cz = (int) k;
+            w.getChunkAtAsync(cx, cz, true).thenAccept(c -> {
+                if (ticketWorld == w && c.addPluginChunkTicket(plugin)) tickets.add(new long[]{cx, cz});
+            });
+        }
+        plugin.debug("preloading " + keys.size() + " route chunks");
+    }
+
+    private void releaseTickets() {
+        if (ticketWorld != null) {
+            for (long[] t : tickets) ticketWorld.removePluginChunkTicket((int) t[0], (int) t[1], plugin);
+        }
+        tickets.clear();
+        ticketWorld = null;
+    }
+
     // ------------------------------------------------------------------ start
 
     public void start(Match m, World w, MapConfig mc, Runnable done) {
+        List<long[]> keep = new ArrayList<>(tickets);
+        World keepWorld = ticketWorld;
+        tickets.clear();
         stop(true);
+        tickets.addAll(keep);
+        ticketWorld = keepWorld;
         this.onDone = done;
         this.routeDone = false;
         this.tick = 0;
@@ -123,37 +176,62 @@ public final class Deployment implements Listener {
 
         List<List<UUID>> loads = pack(m, seats);
         int used = Math.min(perRow, loads.size());
+        List<Location> spots = new ArrayList<>();
         for (int i = 0; i < loads.size(); i++) {
             int row = i / perRow, col = i % perRow;
             int inRow = Math.min(perRow, loads.size() - row * perRow);
             double off = (col - (inRow - 1) / 2.0) * spacing;
-            Location loc = new Location(w, mc.deployX, mc.deployY, mc.deployZ, mc.deployYaw, 0)
-                .add(side.clone().multiply(off)).subtract(dir.clone().multiply(row * rowGap));
-            w.getChunkAt(loc);
-            HappyGhast g = w.spawn(loc, HappyGhast.class, gh -> {
-                gh.setAI(false);
-                gh.setInvulnerable(true);
-                gh.setGravity(false);
-                gh.setSilent(true);
-                gh.setPersistent(false);
-                gh.setRemoveWhenFarAway(false);
-                gh.getPersistentDataContainer().set(Keys.ARENA_OBJECT, PersistentDataType.STRING, "game-" + m.id());
-                if (cfg.getBoolean("deploy.harness", false)) {
-                    gh.getEquipment().setItem(EquipmentSlot.BODY, new ItemStack(Material.RED_HARNESS));
-                }
-            });
-            Ride r = new Ride(g, loc.clone());
-            for (UUID u : loads.get(i)) {
-                Player p = Bukkit.getPlayer(u);
-                if (p == null) continue;
-                board(p, m, g, loc);
-                r.riders.add(u);
-            }
-            rides.add(r);
+            spots.add(new Location(w, mc.deployX, mc.deployY, mc.deployZ, mc.deployYaw, 0)
+                .add(side.clone().multiply(off)).subtract(dir.clone().multiply(row * rowGap)));
         }
         lastReport = loads.size() + " ghasts for " + m.players.size() + " players (" + used + " per row max), mode " + (teleportMode ? "teleport" : "velocity");
         plugin.getLogger().info("Deploy: " + lastReport);
-        task = Bukkit.getScheduler().runTaskTimer(plugin, this::tickAll, 1, 1);
+        // Boarding is spread over a few ticks (each cross-world teleport costs a few ms), then the
+        // whole fleet starts moving together.
+        int perTick = Math.max(1, cfg.getInt("deploy.ghasts-per-tick", 2));
+        long[] ns = new long[2];
+        task = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            int next = 0;
+
+            @Override
+            public void run() {
+                for (int n = 0; n < perTick && next < spots.size(); n++, next++) {
+                    spawnRide(m, w, spots.get(next), loads.get(next), cfg.getBoolean("deploy.harness", false), ns);
+                }
+                if (next >= spots.size()) {
+                    task.cancel();
+                    plugin.debug(String.format("deploy start: ghast spawns %.1f ms, boarding players %.1f ms (spread over %d ticks)",
+                        ns[0] / 1e6, ns[1] / 1e6, (spots.size() + perTick - 1) / perTick));
+                    task = Bukkit.getScheduler().runTaskTimer(plugin, Deployment.this::tickAll, 1, 1);
+                }
+            }
+        }, 0, 1);
+    }
+
+    private void spawnRide(Match m, World w, Location loc, List<UUID> riders, boolean harness, long[] ns) {
+        long a = System.nanoTime();
+        w.getChunkAt(loc);
+        HappyGhast g = w.spawn(loc, HappyGhast.class, gh -> {
+            gh.setAI(false);
+            gh.setInvulnerable(true);
+            gh.setGravity(false);
+            gh.setSilent(true);
+            gh.setPersistent(false);
+            gh.setRemoveWhenFarAway(false);
+            gh.getPersistentDataContainer().set(Keys.ARENA_OBJECT, PersistentDataType.STRING, "game-" + m.id());
+            if (harness) gh.getEquipment().setItem(EquipmentSlot.BODY, new ItemStack(Material.RED_HARNESS));
+        });
+        Ride r = new Ride(g, loc.clone());
+        long b = System.nanoTime();
+        ns[0] += b - a;
+        for (UUID u : riders) {
+            Player p = Bukkit.getPlayer(u);
+            if (p == null) continue;
+            board(p, m, g, loc);
+            r.riders.add(u);
+        }
+        ns[1] += System.nanoTime() - b;
+        rides.add(r);
     }
 
     /** First-fit: whole teams stay together on one ghast; spare seats take solo players. */
@@ -306,6 +384,7 @@ public final class Deployment implements Listener {
     private void dropped(Player p, Glider gl) {
         gl.riding = false;
         gl.droppedAt = System.currentTimeMillis();
+        plugin.debug("dropped " + p.getName() + " at " + com.cartroyale.util.Locs.pretty(p.getLocation()));
         p.setFallDistance(0);
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (p.isOnline() && !p.isOnGround()) p.setGliding(true);
@@ -341,6 +420,8 @@ public final class Deployment implements Listener {
         // The next fall-damage hit is cancelled whenever it comes (within 30 s), so a landing
         // registered a moment early can never turn into a lethal fall.
         safeLanding.put(p.getUniqueId(), System.currentTimeMillis() + 30_000);
+        plugin.debug("landed " + p.getName() + (forced ? " (forced)" : "") + " at " + com.cartroyale.util.Locs.pretty(p.getLocation())
+            + ", chest now " + (p.getInventory().getChestplate() == null ? "empty" : p.getInventory().getChestplate().getType()));
         plugin.msg().actionbar(p, forced ? "deploy.glide-timeout" : "deploy.landed");
     }
 
@@ -356,6 +437,7 @@ public final class Deployment implements Listener {
             r.ghast.remove();
         }
         rides.clear();
+        releaseTickets();
     }
 
     /** Ends deployment. With {@code cleanup} every rider/glider is landed safely and ghasts removed. */

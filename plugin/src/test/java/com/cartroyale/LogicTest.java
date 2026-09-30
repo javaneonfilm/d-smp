@@ -287,6 +287,20 @@ class LogicTest {
         assertTrue(n.get(Rarity.COMMON) > 5500);
     }
 
+    // ---------------- HUD ----------------
+
+    @Test
+    void hudShiftsAddUpExactly() throws Exception {
+        var m = Class.forName("com.cartroyale.lobby.HudText").getDeclaredMethod("shift", int.class);
+        m.setAccessible(true);
+        for (int px : new int[]{-151, -83, -1, 0, 1, 37, 255}) {
+            String s = (String) m.invoke(null, px);
+            int sum = 0;
+            for (char c : s.toCharArray()) sum += c >= '' ? 1 << (c - '') : -(1 << (c - ''));
+            assertEquals(px, sum, "shift " + px);
+        }
+    }
+
     // ---------------- SCHEDULE ----------------
 
     @Test

@@ -17,7 +17,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -53,6 +52,19 @@ public final class ChestManager {
         return chests.size();
     }
 
+    private long testKey = Long.MIN_VALUE;
+
+    /** /cart selftest: treat one block as a loot chest for a moment. */
+    public void protectForTest(Block b) {
+        testKey = key(b.getX(), b.getY(), b.getZ());
+        chestKeys.add(testKey);
+    }
+
+    public void clearTestProtection() {
+        chestKeys.remove(testKey);
+        testKey = Long.MIN_VALUE;
+    }
+
     public boolean isLootChest(Block b) {
         return chestKeys.contains(key(b.getX(), b.getY(), b.getZ()));
     }
@@ -61,32 +73,33 @@ public final class ChestManager {
     public CompletableFuture<Integer> spawn(World w, MapConfig mc, int players, boolean luckier, boolean pearls, String gameTag) {
         clear(w);
         var cfg = plugin.getConfig();
-        return plugin.scanner().spots(w, mc, plugin.arenas().spotsFile(mc.name)).thenCompose(spots -> {
+        // Config is read here on the main thread; the picking (hundreds of thousands of candidates)
+        // happens on the async thread that loaded the spots, never on the main thread (TECH-1).
+        int want = ChestSpots.countFor(players, cfg.getInt("chests.base", 20), cfg.getDouble("chests.per-player", 2.0), cfg.getInt("chests.max", 300));
+        double minDist = cfg.getDouble("chests.min-distance", 24);
+        List<Double> sh = cfg.getDoubleList("chests.tier-shares");
+        double[] shares = sh.size() == 3 ? new double[]{sh.get(0), sh.get(1), sh.get(2)} : new double[]{0.6, 0.3, 0.1};
+        Random rng = new Random();
+        return plugin.scanner().spots(w, mc, plugin.arenas().spotsFile(mc.name)).thenApplyAsync(spots -> {
+            List<ChestSpots.Spot> picked = ChestSpots.pick(spots, minDist, want, rng);
+            return new Object[]{spots.size(), ChestSpots.assignTiers(picked, shares, rng)};
+        }).thenCompose(res -> {
             CompletableFuture<Integer> done = new CompletableFuture<>();
+            int candidates = (Integer) res[0];
+            @SuppressWarnings("unchecked") List<ChestSpots.Placed> placed = (List<ChestSpots.Placed>) res[1];
             Bukkit.getScheduler().runTask(plugin, () -> {
-                Random rng = new Random();
-                int want = ChestSpots.countFor(players, cfg.getInt("chests.base", 20), cfg.getDouble("chests.per-player", 2.0), cfg.getInt("chests.max", 300));
-                List<ChestSpots.Spot> picked = ChestSpots.pick(spots, cfg.getDouble("chests.min-distance", 24), want, rng);
-                List<Double> sh = cfg.getDoubleList("chests.tier-shares");
-                double[] shares = sh.size() == 3 ? new double[]{sh.get(0), sh.get(1), sh.get(2)} : new double[]{0.6, 0.3, 0.1};
-                List<ChestSpots.Placed> placed = ChestSpots.assignTiers(picked, shares, rng);
-                lastReport = spots.size() + " candidate spots, " + want + " wanted, " + placed.size() + " placed";
-                if (spots.isEmpty()) plugin.adminAlert("chests.no-spots", "map", mc.name);
-                int perTick = Math.max(1, cfg.getInt("chests.place-per-tick", 20));
-                new BukkitRunnable() {
-                    int i = 0;
-
-                    @Override
-                    public void run() {
-                        for (int n = 0; n < perTick && i < placed.size(); n++, i++) {
-                            place(w, placed.get(i), luckier, pearls, rng, gameTag);
-                        }
-                        if (i >= placed.size()) {
-                            cancel();
-                            done.complete(placed.size());
-                        }
-                    }
-                }.runTaskTimer(plugin, 1, 1);
+                lastReport = candidates + " candidate spots, " + want + " wanted, " + placed.size() + " placed";
+                if (candidates == 0) plugin.adminAlert("chests.no-spots", "map", mc.name);
+                // Each chest's chunk is loaded asynchronously first; the block is placed in the
+                // callback on the main thread, so no chunk is ever loaded synchronously (TECH-1).
+                java.util.concurrent.atomic.AtomicInteger left = new java.util.concurrent.atomic.AtomicInteger(placed.size());
+                if (placed.isEmpty()) done.complete(0);
+                for (ChestSpots.Placed p : placed) {
+                    w.getChunkAtAsync(p.spot().x() >> 4, p.spot().z() >> 4, true).whenComplete((c, t) -> {
+                        if (t == null) place(w, p, luckier, pearls, rng, gameTag);
+                        if (left.decrementAndGet() == 0) done.complete(chests.size());
+                    });
+                }
             });
             return done;
         });

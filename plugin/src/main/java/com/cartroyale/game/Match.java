@@ -39,6 +39,7 @@ public final class Match {
     public long playingAt;
     public int onlineAtPurge;
     public int placementCounter;
+    public boolean purged;
 
     public Match(GameRow row) {
         this.row = row;

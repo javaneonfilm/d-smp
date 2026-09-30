@@ -171,7 +171,7 @@ public final class Presence implements Listener {
     private void updateBar(Player p, BossBar bar) {
         boolean styled = packLoaded.contains(p.getUniqueId()) && plugin.getConfig().getBoolean("resource-pack.enabled", false);
         String ip = plugin.getConfig().getString("server-ip", "play.cartroyale.com");
-        bar.name(plugin.msg().get(styled ? "ip-bar.styled" : "ip-bar.plain", "ip", ip));
+        bar.name(styled ? HudText.bar(plugin.msg().get("ip-bar.styled", "ip", ip), ip) : plugin.msg().get("ip-bar.plain", "ip", ip));
         bar.color(barColor());
     }
 
@@ -198,6 +198,7 @@ public final class Presence implements Listener {
     @EventHandler
     public void onPack(PlayerResourcePackStatusEvent e) {
         Player p = e.getPlayer();
+        plugin.debug("Resource pack " + e.getStatus() + " for " + p.getName());
         switch (e.getStatus()) {
             case SUCCESSFULLY_LOADED -> {
                 packLoaded.add(p.getUniqueId());

@@ -64,12 +64,16 @@ public final class OneTimeShield implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player p)) return;
+        if (is(p.getInventory().getItemInOffHand()) || is(p.getInventory().getItemInMainHand())) {
+            plugin.debug("shield check " + p.getName() + ": blocking=" + p.isBlocking() + " handRaised=" + p.isHandRaised()
+                + " activeItem=" + p.getActiveItem().getType() + " hand=" + p.getActiveItemHand() + " cause=" + e.getCause());
+        }
         if (!p.isBlocking()) return;
         EquipmentSlot hand = p.getActiveItemHand();
         ItemStack used = hand == EquipmentSlot.OFF_HAND ? p.getInventory().getItemInOffHand() : p.getInventory().getItemInMainHand();
         if (!is(used)) return;
         if (!blockable(e.getCause())) return;
-        long tick = p.getWorld().getFullTime();
+        long tick = org.bukkit.Bukkit.getCurrentTick(); // the arena clock is frozen, so never use world time here
         Long prev = lastBreak.get(p.getUniqueId());
         e.setCancelled(true);
         if (prev != null && prev == tick) return;
@@ -80,6 +84,7 @@ public final class OneTimeShield implements Listener {
         p.getWorld().playSound(p.getLocation(), Sound.ITEM_SHIELD_BREAK, 1f, 1f);
         if (used.getAmount() <= 0) p.clearActiveItem();
         plugin.msg().actionbar(p, "shield.broke", "left", Math.max(0, used.getAmount()));
+        plugin.debug("One Time Shield blocked " + e.getCause() + " for " + p.getName() + ", " + Math.max(0, used.getAmount()) + " left");
     }
 
     private static boolean blockable(EntityDamageEvent.DamageCause c) {

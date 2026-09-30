@@ -254,7 +254,7 @@ public final class Cosmetics implements Listener {
     private void runStep(UUID source, Step s, Location at) {
         World w = at.getWorld();
         if (w == null) return;
-        long now = w.getFullTime();
+        long now = Bukkit.getCurrentTick(); // server ticks: the arena clock is frozen
         if (now != budgetTick) {
             budget.clear();
             budgetTick = now;

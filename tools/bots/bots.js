@@ -15,7 +15,7 @@ function log(name, ...a) {
 function start(i) {
   const name = `${prefix}${i}`;
   const bot = mineflayer.createBot({ host: '127.0.0.1', port, username: name, version: '1.21.11', auth: 'offline' });
-  let mountedAt = 0, dropped = false, landedLogged = false, wasGliding = false;
+  let mountedAt = 0, dropped = false, landedLogged = false, wasGliding = false, blockTicks = 0;
 
   bot.once('spawn', () => log(name, 'spawned in', bot.game.dimension, 'at', fmt(bot.entity.position)));
   bot.on('kicked', r => log(name, 'KICKED', typeof r === 'string' ? r : JSON.stringify(r).slice(0, 300)));
@@ -26,14 +26,23 @@ function start(i) {
   bot.on('death', () => log(name, 'DIED at', fmt(bot.entity.position)));
   bot.on('mount', () => { mountedAt = Date.now(); log(name, 'mounted', bot.vehicle && bot.vehicle.name, 'at', fmt(bot.entity.position)); });
   bot.on('dismount', () => { dropped = true; log(name, 'dismounted at', fmt(bot.entity.position)); });
-  bot.on('resourcePack', () => bot.acceptResourcePack && bot.acceptResourcePack());
+  bot.on('resourcePack', () => { log(name, 'resource pack offered, accepting'); bot.acceptResourcePack && bot.acceptResourcePack(); });
+
+  // --teams: pairs (0,1), (2,3) team up by command; everyone accepts any invite.
+  bot.on('messagestr', m => {
+    if (process.argv.includes('--teams') && m.includes('Team up!') && i % 2 === 0 && i < 4) {
+      setTimeout(() => bot.chat(`/team invite ${prefix}${i + 1}`), 1500);
+    }
+    if (m.includes('invited you')) { log(name, 'got invite:', m); setTimeout(() => bot.chat('/team accept'), 800); }
+    if (m.includes('joined the team')) log(name, m);
+  });
 
   // Staggered early drops: bot i sneaks 3+3i seconds after mounting (even bots wait for the auto drop).
   setInterval(() => {
     if (!bot.entity) return;
     const chest = bot.inventory.slots[6];
     const gliding = !!bot.entity.elytraFlying;
-    if (mountedAt && !dropped && i % 2 === 1 && Date.now() - mountedAt > 3000 + 3000 * i) {
+    if (mountedAt && !dropped && !process.argv.includes('--shield') && i % 2 === 1 && Date.now() - mountedAt > 3000 + 3000 * i) {
       bot.setControlState('sneak', true);
       setTimeout(() => bot.setControlState('sneak', false), 600);
     }
@@ -51,6 +60,28 @@ function start(i) {
       }, 400);
     }
   }, 250);
+
+  // --shield: bot 0 blocks with its offhand, bot 1 keeps hitting it. Everyone else stays still.
+  if (process.argv.includes('--shield')) {
+    setInterval(() => {
+      if (!bot.entity || !landedLogged) return;
+      if (i === 0) {
+        const off = bot.inventory.slots[45];
+        if (!off || off.name !== 'shield') return;
+        // Re-raise now and then: a use that started before the shield arrived does nothing.
+        blockTicks = (blockTicks || 0) + 1;
+        if (blockTicks % 6 === 1) { bot.deactivateItem(); bot.activateItem(true); log(name, 'raising shield, stack', off.count); }
+        return;
+      }
+      if (i !== 1) return;
+      const t = bot.players[`${prefix}0`] && bot.players[`${prefix}0`].entity;
+      if (!t) return;
+      bot.lookAt(t.position.offset(0, 1.5, 0), true);
+      const d = t.position.distanceTo(bot.entity.position);
+      bot.setControlState('forward', d > 2.5);
+      if (d < 3.4) bot.attack(t);
+    }, 700);
+  }
 
   if (fight) {
     setInterval(() => {

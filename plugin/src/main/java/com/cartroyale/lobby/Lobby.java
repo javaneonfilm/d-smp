@@ -254,7 +254,7 @@ public final class Lobby implements Listener {
     @EventHandler
     public void onWindHit(ProjectileHitEvent e) {
         if (!(e.getEntity() instanceof WindCharge wc) || !isLobby(wc.getWorld())) return;
-        long tick = wc.getWorld().getFullTime();
+        long tick = Bukkit.getCurrentTick();
         if (tick != burstTick) {
             bursts.clear();
             burstTick = tick;
@@ -266,7 +266,7 @@ public final class Lobby implements Listener {
     public void onKnockback(EntityKnockbackEvent e) {
         if (!(e.getEntity() instanceof Player p) || !isLobby(p.getWorld())) return;
         if (e.getCause() != EntityKnockbackEvent.Cause.EXPLOSION) return;
-        long tick = p.getWorld().getFullTime();
+        long tick = org.bukkit.Bukkit.getCurrentTick(); // the arena clock is frozen, so never use world time here
         if (tick == burstTick) {
             for (Object[] b : bursts) {
                 if (p.getUniqueId().equals(b[0]) && ((Location) b[1]).distanceSquared(p.getLocation()) < 36) return;

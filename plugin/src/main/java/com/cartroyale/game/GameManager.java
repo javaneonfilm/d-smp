@@ -273,7 +273,13 @@ public final class GameManager {
                 if (now >= s.startAt) beginPurge();
             }
             case PURGE -> {
-                if (match.inStateMs() >= 3000) doPurge();
+                if (!match.purged && match.inStateMs() >= 3000) doPurge();
+                // Solo: a short gap after the purge lets the route chunks finish loading off-thread.
+                else if (match.purged && match.inStateMs() >= 3000 + plugin.getConfig().getInt("deploy.solo-board-delay-seconds", 5) * 1000L) {
+                    for (UUID u : match.players.keySet()) match.teams.add(new ArrayList<>(List.of(u)));
+                    assignTeamIndexes();
+                    beginBoarding();
+                }
             }
             case TEAMING -> {
                 long left = plugin.getConfig().getInt("teams.phase-seconds", 90) - match.inStateMs() / 1000;
@@ -380,15 +386,20 @@ public final class GameManager {
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
         }
         match.startedAt = System.currentTimeMillis();
+        World arena = plugin.arenas().world();
+        if (arena != null && plugin.arenas().map() != null) plugin.deploy().preload(arena, plugin.arenas().map(), res.kept().size());
         plugin.store().markStarted(match.id(), match.startedAt, res.kept().size() + "/" + s.purgeCap);
         plugin.getLogger().info("Game #" + match.id() + " purge done: " + res.kept().size() + " selected, " + res.purged().size() + " purged");
+        match.purged = true;
         if (s.squad > 1) {
             match.enter(GameState.TEAMING);
             plugin.teams().begin(match);
         } else {
-            for (UUID u : match.players.keySet()) match.teams.add(new ArrayList<>(List.of(u)));
-            assignTeamIndexes();
-            beginBoarding();
+            for (UUID u : match.players.keySet()) {
+                Player p = Bukkit.getPlayer(u);
+                if (p != null) p.showTitle(Title.title(plugin.msg().get("titles.board"), plugin.msg().get("titles.board-sub"),
+                    Title.Times.times(Duration.ofMillis(200), Duration.ofSeconds(3), Duration.ofMillis(500))));
+            }
         }
     }
 
@@ -418,16 +429,23 @@ public final class GameManager {
         }
         GameSettings s = match.s();
         w.setGameRule(GameRule.FALL_DAMAGE, !s.has(Modifier.NO_FALL_DAMAGE));
-        plugin.chests().spawn(w, mc, match.players.size(), s.has(Modifier.LUCKIER_LOOT), s.has(Modifier.PEARLS), "game-" + match.id())
-            .thenAccept(n -> plugin.getLogger().info("Game #" + match.id() + ": " + plugin.chests().report()))
+        long id = match.id();
+        long t0 = System.nanoTime();
+        plugin.chests().spawn(w, mc, match.players.size(), s.has(Modifier.LUCKIER_LOOT), s.has(Modifier.PEARLS), "game-" + id)
+            .thenAccept(n -> plugin.getLogger().info("Game #" + id + ": " + plugin.chests().report()))
             .exceptionally(t -> {
                 plugin.getLogger().log(Level.WARNING, "Chest placement failed", t);
                 plugin.adminAlert("chests.failed", "error", String.valueOf(t.getMessage()));
                 return null;
             });
+        long t1 = System.nanoTime();
         plugin.nametags().applyMatch(match);
+        long t2 = System.nanoTime();
         match.enter(GameState.DEPLOY);
         plugin.deploy().start(match, w, mc, this::beginPlaying);
+        long t3 = System.nanoTime();
+        plugin.debug(String.format("boarding took %.1f ms (chests start %.1f, nametags %.1f, deploy %.1f)",
+            (t3 - t0) / 1e6, (t1 - t0) / 1e6, (t2 - t1) / 1e6, (t3 - t2) / 1e6));
         checkWin();
     }
 

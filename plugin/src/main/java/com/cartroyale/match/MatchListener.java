@@ -128,11 +128,53 @@ public final class MatchListener implements Listener {
         Match m = live();
         if (m == null || !m.isAlive(p.getUniqueId())) return;
         plugin.deploy().release(p);
+        settle(p, m, p.getLastDamageCause(), p.getKiller() == null ? null : p.getKiller().getUniqueId());
+    }
+
+    /**
+     * A lethal hit in a match never becomes a vanilla death: a respawn resends every chunk in view,
+     * which made a burst of eliminations cost hundreds of milliseconds. Instead the items drop
+     * where the player stood (armor still vanishes) and they switch to spectator on the spot.
+     * A player holding a Totem of Undying is left to vanilla so the totem still works.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onLethal(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player p)) return;
+        Match m = live();
+        if (m == null || !m.isAlive(p.getUniqueId()) || !plugin.arenas().isArena(p.getWorld())) return;
+        if (e.getFinalDamage() < p.getHealth() + p.getAbsorptionAmount()) return;
+        if (p.getInventory().getItemInMainHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING
+            || p.getInventory().getItemInOffHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING) return;
+        e.setCancelled(true);
+        Location at = p.getLocation();
+        plugin.deploy().release(p);
+        if (p.isInsideVehicle()) p.leaveVehicle();
+        for (ItemStack it : p.getInventory().getContents()) {
+            if (it == null || it.getType().isAir() || Items.isArmor(it) || Items.hasFlag(it, Keys.TEMP_ELYTRA)) continue;
+            at.getWorld().dropItemNaturally(at, it);
+        }
+        p.getInventory().clear();
+        p.setItemOnCursor(null);
+        for (var fx : p.getActivePotionEffects()) p.removePotionEffect(fx.getType());
+        var max = p.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
+        p.setHealth(max == null ? 20 : max.getValue());
+        p.setFireTicks(0);
+        p.setFallDistance(0);
+        p.setGliding(false);
+        at.getWorld().playSound(at, org.bukkit.Sound.ENTITY_PLAYER_DEATH, 1f, 1f);
+        at.getWorld().spawnParticle(org.bukkit.Particle.POOF, at.clone().add(0, 1, 0), 12, 0.3, 0.5, 0.3, 0.02);
+        UUID direct = null;
+        if (e instanceof EntityDamageByEntityEvent be) direct = responsible(be.getDamager());
+        settle(p, m, e, direct);
+        plugin.spectators().make(p, at);
+    }
+
+    /** Kill credit, the log line, the kill effect and the elimination, for both kinds of death. */
+    private void settle(Player p, Match m, EntityDamageEvent last, UUID direct) {
         UUID killer = null;
-        var last = p.getLastDamageCause();
         boolean zone = last != null && last.getDamageSource().getDamageType() == DamageType.OUTSIDE_BORDER;
         if (!zone) {
-            if (p.getKiller() != null) killer = p.getKiller().getUniqueId();
+            killer = direct;
             if (last instanceof EntityDamageByEntityEvent be) {
                 UUID r = responsible(be.getDamager());
                 if (r != null) killer = r;

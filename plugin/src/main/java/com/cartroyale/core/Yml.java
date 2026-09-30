@@ -15,6 +15,7 @@ public final class Yml {
     private final String name;
     private final File file;
     private YamlConfiguration cfg;
+    private boolean broken;
 
     public Yml(JavaPlugin plugin, String name, boolean copyDefault) {
         this.plugin = plugin;
@@ -25,7 +26,16 @@ public final class Yml {
     }
 
     public void reload() {
-        cfg = YamlConfiguration.loadConfiguration(file);
+        cfg = new YamlConfiguration();
+        broken = false;
+        if (file.exists()) {
+            try {
+                cfg.load(file);
+            } catch (Exception e) {
+                broken = true;
+                plugin.getLogger().severe(name + " has a syntax error; it is ignored and will not be overwritten: " + e.getMessage());
+            }
+        }
         var in = plugin.getResource(name);
         if (in != null) cfg.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(in, StandardCharsets.UTF_8)));
     }
@@ -39,6 +49,10 @@ public final class Yml {
     }
 
     public void save() {
+        if (broken) {
+            plugin.getLogger().severe("Not saving " + name + ": the file on disk has a syntax error. Fix it, then /cart reload.");
+            return;
+        }
         try {
             file.getParentFile().mkdirs();
             cfg.save(file);

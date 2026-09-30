@@ -90,6 +90,19 @@ public final class CartRoyale extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+        // A typo in config.yml must never cost the owner their settings: refuse to start instead of
+        // letting Bukkit fall back to an empty config that would then be saved over the file.
+        for (String name : java.util.List.of("config.yml", "messages.yml", "loot.yml", "zone.yml", "schedule.yml", "cosmetics.yml", "kits.yml")) {
+            File f = new File(getDataFolder(), name);
+            if (!f.exists()) continue;
+            try {
+                new org.bukkit.configuration.file.YamlConfiguration().load(f);
+            } catch (Exception e) {
+                getLogger().severe(name + " has a syntax error and was NOT changed. Fix it and restart. " + e.getMessage());
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
+        }
         saveDefaultConfig();
         getConfig().options().copyDefaults(true);
         saveConfig();
@@ -228,6 +241,11 @@ public final class CartRoyale extends JavaPlugin {
         s.squad = getConfig().getInt("host.defaults.squad", 1);
         s.purgeCap = getConfig().getInt("host.default-cap", 100);
         return s;
+    }
+
+    /** Console-only detail for testing; off unless config.yml has debug: true. */
+    public void debug(String line) {
+        if (getConfig().getBoolean("debug", false)) getLogger().info("[debug] " + line);
     }
 
     /** Tells online admins (and the console) about a problem, in game. */

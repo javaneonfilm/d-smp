@@ -92,8 +92,8 @@ ranks:
 
 ip-bar:
   plain: '<#FF0000><b>CartRoyale</b></#FF0000> <gray>|</gray> <white><ip>'
-  # With the resource pack: the minecart glyph from the pack's font, then the IP.
-  styled: "<font:cartroyale:hud><white>\uE000</white></font> <white><ip>"
+  # With the resource pack the plugin draws the red bar and minecart icon; this is the text on it.
+  styled: "<white><ip>"
 
 tab:
   header: "\n<#FF0000><b>CARTROYALE</b></#FF0000>\n<gray><ip>\n"
@@ -153,6 +153,8 @@ titles:
   countdown-sub: '<gray>Game #<id> - purge next'
   purge: '<#FF0000><b>PURGE'
   purge-sub: '<gray>Selecting players...'
+  board: '<#FF0000><b>ALL ABOARD'
+  board-sub: '<gray>The ghasts are coming for you...'
   victory: '<#FFD700><b>LAST CART STANDING'
   game-over: '<#FF0000><b>GAME OVER'
   end-sub: '<gray>Winner: <white><winners>'
@@ -380,6 +382,7 @@ diag:
   pack: '<gray>Resource pack: <white><enabled></white>, <white><url>'
   perms: '<gray>Permissions: <white><lp></white>, database <white><db>'
   time: '<gray>Time zone <white><zone></white>, now <white><now>'
+  shop: '<gray>Daily shop today: <white><items>'
 
 cmd:
   no-permission: '<prefix><gray>You cannot do that.'
@@ -407,6 +410,7 @@ help:
     - '<white>/cart coins give|take|set <player> <n>'
     - '<white>/cart play | build | spectate | free | shield [n] | shop | reload | setlobby'
     - '<white>/cart diag <gray>- everything that could be wrong, on one screen'
+    - '<white>/cart selftest <gray>- blows up a TNT cart in the arena and checks the block rules'
 
 schedule:
   today-head: "<prefix><white>Today's games (<count>):"
@@ -520,3 +524,9 @@ gui:
     enabled-lore: ['<dark_gray>Click to toggle.']
     delete: '<#FF0000>Delete'
     delete-lore: ['<dark_gray>Shift-click to delete.']
+
+selftest:
+  start: '<prefix><white>Self-test: a TNT cart explodes at <yellow><where></yellow> in the arena...'
+  pass: '<#7DDC6A>PASS</#7DDC6A> <white><check></white> <gray>(<detail>)'
+  fail: '<#FF0000>FAIL</#FF0000> <white><check></white> <gray>(<detail>)'
+  drops: '<gray>Items that appeared: <white><drops>'

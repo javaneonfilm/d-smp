@@ -65,6 +65,8 @@ deploy:
   harness: false            # riders without a harness can't steer the ghast
   move-mode: TELEPORT       # TELEPORT (tested on 1.21.11) or VELOCITY; Happy Ghasts ignore velocity while NoAI
   planned-seconds: 60       # added to the zone time for the "Duration" in Discord
+  solo-board-delay-seconds: 5  # solo games: pause after the purge so the route loads
+  ghasts-per-tick: 2         # boarding is spread over ticks so 120 players never freeze the server
 
 elytra:
   max-glide-seconds: 60
@@ -161,3 +163,6 @@ ip-bar:
 
 sidebar:
   enabled: true
+
+# Extra console lines for testing (shield blocks, resource pack status). Leave off on the live server.
+debug: false
