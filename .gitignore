@@ -1,0 +1,7 @@
+# never commit secrets or runtime data
+secrets.yml
+dev-server/
+plugin/target/
+tools/bots/node_modules/
+*.db
+*.log

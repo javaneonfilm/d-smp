@@ -1,0 +1,75 @@
+# Loot chests (D8, LOOT-2..4). Edit in game with /cart loot, or here and /cart reload.
+# An entry is `material: NAME`, `special: one_time_shield`, or `item: <serialized>` (written by the editor).
+# min/max: the amount rolled for that slot. pearl: true marks entries the Pearls modifier controls
+# (ender pearls are marked automatically).
+
+slots:
+  min: 3
+  max: 8
+
+rarity-weights:
+  COMMON: 60
+  RARE: 25
+  EPIC: 12
+  LEGENDARY: 3
+
+# Luckier Loot multiplies these weights.
+luckier-loot-multipliers:
+  COMMON: 1
+  RARE: 1.5
+  EPIC: 2
+  LEGENDARY: 3
+
+tiers:
+  # 1 star - Bronze
+  1:
+    - {material: RAIL, rarity: COMMON, min: 12, max: 46}
+    - {material: BREAD, rarity: COMMON, min: 2, max: 8}
+    - {material: ARROW, rarity: COMMON, min: 6, max: 16}
+    - {material: MINECART, rarity: COMMON, min: 1, max: 2}
+    - {material: OAK_PLANKS, rarity: COMMON, min: 8, max: 32}
+    - {material: COBBLESTONE, rarity: COMMON, min: 8, max: 32}
+    - {material: LEATHER_CHESTPLATE, rarity: COMMON, min: 1, max: 1}
+    - {material: CHAINMAIL_HELMET, rarity: RARE, min: 1, max: 1}
+    - {material: CHAINMAIL_BOOTS, rarity: RARE, min: 1, max: 1}
+    - {material: POWERED_RAIL, rarity: RARE, min: 4, max: 12}
+    - {material: TNT_MINECART, rarity: RARE, min: 1, max: 1}
+    - {material: STONE_SWORD, rarity: RARE, min: 1, max: 1}
+    - {material: ENDER_PEARL, rarity: RARE, min: 1, max: 2}
+    - {material: GOLDEN_CARROT, rarity: EPIC, min: 2, max: 6}
+    - {special: one_time_shield, rarity: EPIC, min: 1, max: 1}
+    - {material: GOLDEN_APPLE, rarity: LEGENDARY, min: 1, max: 1}
+  # 2 stars - Silver
+  2:
+    - {material: POWERED_RAIL, rarity: COMMON, min: 8, max: 24}
+    - {material: ACTIVATOR_RAIL, rarity: COMMON, min: 4, max: 12}
+    - {material: TNT_MINECART, rarity: COMMON, min: 1, max: 2}
+    - {material: COOKED_BEEF, rarity: COMMON, min: 3, max: 10}
+    - {material: ARROW, rarity: COMMON, min: 12, max: 32}
+    - {material: IRON_HELMET, rarity: RARE, min: 1, max: 1}
+    - {material: IRON_CHESTPLATE, rarity: RARE, min: 1, max: 1}
+    - {material: IRON_LEGGINGS, rarity: RARE, min: 1, max: 1}
+    - {material: IRON_BOOTS, rarity: RARE, min: 1, max: 1}
+    - {material: IRON_SWORD, rarity: RARE, min: 1, max: 1}
+    - {material: BOW, rarity: RARE, min: 1, max: 1}
+    - {material: ENDER_PEARL, rarity: RARE, min: 1, max: 3}
+    - {special: one_time_shield, rarity: RARE, min: 1, max: 2}
+    - {material: GOLDEN_APPLE, rarity: EPIC, min: 1, max: 2}
+    - {material: CROSSBOW, rarity: EPIC, min: 1, max: 1}
+    - {material: DIAMOND_CHESTPLATE, rarity: LEGENDARY, min: 1, max: 1}
+  # 3 stars - Gold
+  3:
+    - {material: TNT_MINECART, rarity: COMMON, min: 2, max: 4}
+    - {material: POWERED_RAIL, rarity: COMMON, min: 16, max: 48}
+    - {material: GOLDEN_APPLE, rarity: COMMON, min: 1, max: 3}
+    - {material: ARROW, rarity: COMMON, min: 16, max: 48}
+    - {material: DIAMOND_HELMET, rarity: RARE, min: 1, max: 1}
+    - {material: DIAMOND_LEGGINGS, rarity: RARE, min: 1, max: 1}
+    - {material: DIAMOND_BOOTS, rarity: RARE, min: 1, max: 1}
+    - {material: DIAMOND_SWORD, rarity: RARE, min: 1, max: 1}
+    - {special: one_time_shield, rarity: RARE, min: 1, max: 3}
+    - {material: ENDER_PEARL, rarity: RARE, min: 2, max: 4}
+    - {material: DIAMOND_CHESTPLATE, rarity: EPIC, min: 1, max: 1}
+    - {material: CROSSBOW, rarity: EPIC, min: 1, max: 1}
+    - {material: ENCHANTED_GOLDEN_APPLE, rarity: LEGENDARY, min: 1, max: 1}
+    - {material: NETHERITE_SWORD, rarity: LEGENDARY, min: 1, max: 1}

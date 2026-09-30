@@ -1,0 +1,31 @@
+# Recurring games (HOST-3). Edit in game with /cart schedule, or here and /cart reload.
+# days: daily, weekdays, weekends, or a list like MON,WED,FRI. time: 24h, in config.yml's timezone.
+# squad: 1 = Solos, 2 = Duos, 4 = Squads. map: random or a template name.
+games:
+  game1:
+    enabled: true
+    days: daily
+    time: '16:00'
+    mode: LT
+    squad: 2
+    purge-cap: 100
+    modifiers: []
+    map: random
+  game2:
+    enabled: true
+    days: daily
+    time: '18:00'
+    mode: LT
+    squad: 4
+    purge-cap: 100
+    modifiers: []
+    map: random
+  game3:
+    enabled: true
+    days: daily
+    time: '20:00'
+    mode: LT
+    squad: 1
+    purge-cap: 100
+    modifiers: []
+    map: random

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CARTROYALE.COM | Minecart Battle Royale</title>
+<meta name="description" content="CARTROYALE is a competitive minecart PvP battle royale for Minecraft: Java Edition. Last cart standing wins.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0b0a">
+<meta property="og:title" content="CARTROYALE.COM | Last cart standing">
+<meta property="og:description" content="A competitive minecart PvP battle royale for Minecraft: Java Edition.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="4 12 9 17 20 6"/></symbol>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ============ HEADER ============ -->
+<header class="top" id="top">
+  <div class="top__in">
+    <a class="logo" href="#hero" aria-label="CARTROYALE home">
+      <img src="assets/logo.png" alt="" width="36" height="34">
+      <span class="logo__t">CART<b>ROYALE</b><small>.COM</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Primary">
+      <a href="#hero">Play</a>
+      <a href="#ride">How it works</a>
+      <a href="#boards">Leaderboards</a>
+      <a href="#depot">Store</a>
+      <a href="#rules">Rules</a>
+      <a href="#crew">Staff</a>
+    </nav>
+    <button class="ip-pill" type="button" data-copy-ip aria-label="Copy server IP">
+      <span data-ip>play.cartroyale.com</span>
+      <svg class="ico"><use href="#i-copy"/></svg>
+    </button>
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span></button>
+  </div>
+  <!-- the header's bottom edge is a rail; the cart rides it as you scroll -->
+  <div class="railbar" id="railbar" aria-hidden="true">
+    <i class="railbar__fill"></i>
+    <img class="railbar__cart" src="assets/logo.png" alt="">
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero" data-station>
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <p class="eyebrow rv"><span class="dot"></span>Minecraft Battle Royale · Java Edition</p>
+      <h1 class="h-mega rv" style="--d:1"><span>Last</span><em>Cart</em><span>Standing.</span></h1>
+      <p class="lede rv" style="--d:2">Competitive minecart PvP. Drop in, gear up, and outlast the entire lobby.</p>
+      <div class="cta rv" style="--d:3">
+        <button class="btn btn--tnt" type="button" data-copy-ip>Board the cart <span class="btn__ip" data-ip>play.cartroyale.com</span></button>
+        <a class="btn btn--ghost" href="#" data-discord>Join Discord</a>
+      </div>
+    </div>
+
+    <div class="stage rv" id="stage" style="--d:2">
+      <div class="stage__glow"></div>
+      <button class="cart" id="cart" type="button" aria-label="Detonate the cart">
+        <img src="assets/logo.png" alt="A Minecraft TNT minecart" width="636" height="599">
+      </button>
+      <div class="track" aria-hidden="true"></div>
+      <p class="hint" id="hint">Psst. Click the cart.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="strip rv" role="group" aria-label="Server status">
+      <div class="cell is-unknown" id="st-state">
+        <span class="lab">Status</span>
+        <span class="val"><i class="led"></i><span id="st-label">Checking…</span></span>
+      </div>
+      <div class="cell">
+        <span class="lab">Players</span>
+        <span class="val" id="st-players">—</span>
+      </div>
+      <div class="cell">
+        <span class="lab">Edition</span>
+        <span class="val" id="st-edition">Java Edition</span>
+      </div>
+      <div class="cell cell--ip">
+        <span class="lab">Address</span>
+        <span class="val val--mono" data-ip>play.cartroyale.com</span>
+        <button class="mini" type="button" data-copy-ip aria-label="Copy server IP"><svg class="ico"><use href="#i-copy"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard" aria-hidden="true"></div>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="sec" id="ride" data-station>
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="kicker">The ride</p>
+      <h2>How a round runs</h2>
+      <p class="sec__sub">The short version, in four stops.</p>
+    </header>
+    <ol class="tickets">
+      <li class="ticket rv" style="--d:0">
+        <div class="ticket__top"><span class="ticket__tag">Stop</span><span class="ticket__no">01</span></div>
+        <div class="ticket__bot"><h3>Queue up</h3><p>Join the server and wait in the lobby. When the round starts, you get dropped in.</p></div>
+      </li>
+      <li class="ticket rv" style="--d:1">
+        <div class="ticket__top"><span class="ticket__tag">Stop</span><span class="ticket__no">02</span></div>
+        <div class="ticket__bot"><h3>Gear up</h3><p>Loot the map, build your kit, and get your cart ready before things heat up.</p></div>
+      </li>
+      <li class="ticket rv" style="--d:2">
+        <div class="ticket__top"><span class="ticket__tag">Stop</span><span class="ticket__no">03</span></div>
+        <div class="ticket__bot"><h3>Ride &amp; fight</h3><p>Take the fight to everyone else. Every cart on the map is a threat.</p></div>
+      </li>
+      <li class="ticket rv" style="--d:3">
+        <div class="ticket__top"><span class="ticket__tag">Final stop</span><span class="ticket__no">04</span></div>
+        <div class="ticket__bot"><h3>Last cart standing</h3><p>Outlast the lobby to win. Wins and kills climb the leaderboards.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ NEWS ============ -->
+<section class="sec" id="news" data-station>
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="kicker">Dispatches</p>
+      <h2>News</h2>
+    </header>
+    <div class="news" id="news-list"></div>
+  </div>
+</section>
+
+<!-- ============ LEADERBOARDS ============ -->
+<section class="sec" id="boards" data-station>
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="kicker">The departure board</p>
+      <h2>Leaderboards</h2>
+      <p class="sec__sub">Top riders and the latest rounds, straight off the board.</p>
+    </header>
+    <div class="boards">
+      <div class="board rv">
+        <div class="board__bar">
+          <span class="board__title">Top riders</span>
+          <div class="tabs" id="lb-tabs" role="group" aria-label="Leaderboard category"></div>
+        </div>
+        <div id="lb-body"></div>
+      </div>
+      <div class="board rv" style="--d:1">
+        <div class="board__bar"><span class="board__title">Recent rounds</span></div>
+        <div id="gm-body"></div>
+      </div>
+    </div>
+    <p class="demo-note" id="demo-note" hidden>Sample data shown so you can see the design. Set <code>demo: false</code> in assets/app.js to turn it off.</p>
+  </div>
+</section>
+
+<!-- ============ STORE ============ -->
+<section class="sec" id="depot" data-station>
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="kicker">The depot</p>
+      <h2>Store</h2>
+      <p class="sec__sub">Support the server and grab some extras. Pick a pass, or buy a game of your own.</p>
+    </header>
+    <div class="pledge rv">
+      <b>No pay-to-win</b>
+      <span>Nothing in the store changes how you fight.</span>
+    </div>
+    <div class="tiers" id="tiers"></div>
+    <p class="buynote rv">Checkout opens in a new tab. Enter your exact Minecraft username there so your purchase lands on the right account. Ranks are delivered automatically, usually within a few minutes. Problems with an order? <a href="#" data-discord>Ask in Discord</a>.</p>
+  </div>
+</section>
+
+<!-- ============ RULES ============ -->
+<section class="sec" id="rules" data-station>
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="kicker">The rulebook</p>
+      <h2>Rules</h2>
+      <p class="sec__sub">Break the spirit of these and it's still punishable. When in doubt, ask staff.</p>
+    </header>
+    <div class="rules">
+      <details class="rg rv" open>
+        <summary><h3>Cart Battle Royale</h3><span class="plus" aria-hidden="true"></span></summary>
+        <ol>
+          <li><div><b>No cheating or unfair mods</b>Hacked clients, kill aura, auto-clickers, macros, speed/fly, reach, ESP, radar and freecam are banned, along with anything else that gives an unfair advantage.
+            <div class="modlab">Allowed</div>
+            <div class="mods"><span class="mod mod--ok">Performance &amp; HUD</span><span class="mod mod--ok">Zoom</span><span class="mod mod--ok">Xaero's Minimap (Fairplay)</span><span class="mod mod--ok">Totem Pop Counter</span><span class="mod mod--ok">HurtCam</span><span class="mod mod--ok">Replay Mod</span><span class="mod mod--ok">FreeLook</span><span class="mod mod--ok">No Chat Reports</span><span class="mod mod--ok">Ping Equalizer</span><span class="mod mod--ok">BetterHitreg</span></div>
+            <div class="modlab">Not allowed</div>
+            <div class="mods"><span class="mod mod--no">Hacked clients</span><span class="mod mod--no">Macros / auto-clickers</span><span class="mod mod--no">Mouse Tweaks</span><span class="mod mod--no">Item Scroller</span><span class="mod mod--no">InvMove</span><span class="mod mod--no">Freecam (incl. Tweakeroo)</span><span class="mod mod--no">Accurate Block Placement</span><span class="mod mod--no">FightCam</span><span class="mod mod--no">Cart / rail automation</span></div>
+          </div></li>
+          <li><div><b>No bug or exploit abuse</b>Includes dupes, cart clipping, rail or cart duplication and border bypasses. Report bugs to staff.</div></li>
+          <li><div><b>No server disruption</b>No crashing or lagging the server, including cart or entity spam.</div></li>
+          <li><div><b>No real-money or cross-server trading</b>External gambling and boost or invite rewards aren't allowed either.</div></li>
+          <li><div><b>No teaming in solo games</b>Don't split loot, team up or throw fights for another player.</div></li>
+          <li><div><b>No stream sniping</b>Don't use a streamer's live feed to find or ambush them.</div></li>
+          <li><div><b>Use common sense</b>If it isn't listed but clearly breaks the spirit of the rules, it's still punishable.</div></li>
+        </ol>
+      </details>
+      <details class="rg rv" style="--d:1">
+        <summary><h3>Chat &amp; Community</h3><span class="plus" aria-hidden="true"></span></summary>
+        <ol>
+          <li><div><b>Follow Discord's ToS</b>Minimum age is 13. Serious violations may be reported to Discord.</div></li>
+          <li><div><b>No spam</b>No repeated messages, walls of text, mass reactions or voice channel spam.</div></li>
+          <li><div><b>No advertising</b>Don't promote other servers, socials or services without staff approval.</div></li>
+          <li><div><b>No hate speech or discrimination</b>Based on race, nationality, religion, gender or identity.</div></li>
+          <li><div><b>No doxxing</b>Never share someone's private info without their consent.</div></li>
+          <li><div><b>No threats</b>DDoS, swatting or doxxing threats, even as a joke, mean a permanent ban.</div></li>
+          <li><div><b>Keep it appropriate</b>No political or religious arguments, graphic content or NSFW.</div></li>
+          <li><div><b>Don't impersonate staff</b>Don't claim authority you don't have.</div></li>
+          <li><div><b>No punishment evasion</b>Using an alt to dodge a ban or mute gets every linked account banned.</div></li>
+          <li><div><b>No unnecessary pinging</b>Ping players and staff only when there's a real reason.</div></li>
+        </ol>
+      </details>
+    </div>
+    <p class="fine rv">Punishments range from a warning to a permanent ban, depending on severity.</p>
+  </div>
+</section>
+
+<!-- ============ STAFF ============ -->
+<section class="sec" id="crew" data-station>
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="kicker">The crew</p>
+      <h2>Staff</h2>
+    </header>
+    <div class="crew" id="crew-list"></div>
+  </div>
+</section>
+
+<!-- ============ JOIN ============ -->
+<div class="hazard hazard--top" aria-hidden="true"></div>
+<section class="join" id="join" data-station>
+  <div class="wrap">
+    <p class="kicker kicker--c rv">All aboard</p>
+    <h2 class="h-mega rv" style="--d:1">Climb <em>in.</em></h2>
+    <div class="ipbig rv" style="--d:2">
+      <span data-ip>play.cartroyale.com</span>
+      <button type="button" data-copy-ip>Copy</button>
+    </div>
+    <ol class="steps rv" style="--d:3">
+      <li>Open Minecraft: Java Edition</li>
+      <li>Multiplayer → Add Server</li>
+      <li>Paste the address and join</li>
+    </ol>
+    <p class="rv" style="--d:4;margin-top:34px"><a class="btn btn--ghost" href="#" data-discord>Join our Discord</a></p>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__row">
+    <a class="logo" href="#hero" aria-label="Back to top">
+      <img src="assets/logo.png" alt="" width="30" height="28">
+      <span class="logo__t">CART<b>ROYALE</b><small>.COM</small></span>
+    </a>
+    <span>Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang.</span>
+  </div>
+  <div class="foot__mega" aria-hidden="true">CARTROYALE</div>
+</footer>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="flash" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

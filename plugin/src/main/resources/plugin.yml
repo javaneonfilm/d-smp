@@ -1,0 +1,42 @@
+name: CartRoyale
+version: '${project.version}'
+main: com.cartroyale.CartRoyale
+api-version: '1.21.11'
+author: Cuda
+website: https://cartroyale.com
+description: Minecart PvP battle royale - hosted games, purge, ghast drops, loot, zone, cosmetics.
+softdepend: [LuckPerms]
+load: POSTWORLD
+
+commands:
+  cart:
+    description: CartRoyale commands.
+    usage: /cart help
+  team:
+    description: Team up before a team game.
+    usage: /team <invite|accept|leave|list>
+  spectate:
+    description: Pick a player to follow while spectating.
+    usage: /spectate
+  kitready:
+    description: Clear your inventory to build a kit.
+    usage: /kitready
+    permission: cartroyale.admin
+
+permissions:
+  cartroyale.admin:
+    description: Full control of CartRoyale.
+    default: op
+    children:
+      cartroyale.host: true
+  cartroyale.host:
+    description: Can open the Host GUI when holding a ticket.
+    default: true
+  cartroyale.rank.vip:
+    description: VIP perks (lower purge chance, lobby wind charges, tag).
+    default: false
+  cartroyale.rank.vipplus:
+    description: VIP+ perks (purge immune, lobby elytra and wind charges, tag).
+    default: false
+    children:
+      cartroyale.rank.vip: true

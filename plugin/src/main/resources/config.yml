@@ -1,0 +1,163 @@
+# CartRoyale - main config. Reload with /cart reload (worlds and the database need a restart).
+# Secrets (Discord webhook URL, stats token) do NOT go here. They live in secrets.yml.
+
+server-ip: play.cartroyale.com
+# Shown in the webhook title, e.g. "Game #12 (EU)". It is the server's region, not the domain.
+region: EU
+# Wall-clock times: schedule, Host GUI times, daily shop reset. Any Java zone id (UTC, Europe/Berlin...).
+timezone: UTC
+
+worlds:
+  lobby: lobby        # the server's main world (level-name in server.properties)
+  arena: arena        # loaded by the plugin and restored from its map template on every boot
+  default-map: ''     # template to boot with when no game names one (empty = first template)
+
+lobby:
+  spawn: ''           # set in game with /cart setlobby
+
+join:
+  window-minutes: 5         # players can log in this long before a game starts (D4)
+  countdown-seconds: 10     # title countdown at the end of the window
+  min-players: 2            # fewer eligible players at the purge cancels the game
+  start-command-seconds: 60 # /cart start opens the window this far ahead (/cart start now: countdown only)
+  missed-grace-minutes: 10  # a game whose start passed longer ago than this (server down) is marked missed
+
+purge:
+  action: KICK              # KICK or SPECTATE
+  weights:
+    default: 1.0
+    vip: 0.15               # lower = much less likely to be purged
+  vipplus-immune: true
+  hoster-immune: true
+
+teams:
+  phase-seconds: 90
+  sizes: [1, 2, 4]          # Solos, Duos, Squads
+
+host:
+  default-cap: 100
+  defaults:
+    mode: LT
+    squad: 1
+    modifiers: []
+  limits:
+    min-cap: 10
+    max-cap: 120            # ticket holders
+    admin-max-cap: 200
+  min-lead-minutes: 10      # ticket holders pick a start at least this far ahead
+  slot-minutes: 30          # two games never start closer than this
+  ticket-hours: 6           # length of the temporary LuckPerms host group
+  host-group: host
+  revoke-cancels-game: true # a chargeback cancels the game the ticket paid for
+  store-url: https://cartroyale.com/#depot
+
+schedule:
+  create-ahead-minutes: 60  # scheduled games are created (and announced) this far ahead
+  hoster-name: CartRoyale
+
+deploy:
+  distance: 300             # blocks the ghasts fly before dropping everyone
+  speed: 0.6                # blocks per tick (12 blocks/s)
+  riders-per-ghast: 4
+  spacing: 9
+  row-gap: 12
+  per-row: 8
+  harness: false            # riders without a harness can't steer the ghast
+  move-mode: TELEPORT       # TELEPORT (tested on 1.21.11) or VELOCITY; Happy Ghasts ignore velocity while NoAI
+  planned-seconds: 60       # added to the zone time for the "Duration" in Discord
+
+elytra:
+  max-glide-seconds: 60
+  allow-fireworks: false
+
+match:
+  hard-timeout-extra-minutes: 5
+  end-kick-seconds: 10
+  restart-after: true       # END-5: shut down once after a game; the host restarts the server
+  kill-credit-seconds: 15   # a death within this long of a player's hit counts as their kill
+  pvp-during-deploy: false
+
+chests:
+  min-distance: 24
+  base: 20
+  per-player: 2.0
+  max: 300
+  tier-shares: [0.6, 0.3, 0.1]
+  hologram-height: 1.35
+  place-per-tick: 20
+  scan-chunks-per-tick: 8
+
+shield:
+  item-model: cartroyale:one_time_shield
+
+economy:
+  coins-per-kill: 5
+  shop-per-category: 2
+  shop-salt: 0
+  shop-odds:
+    COMMON: 60
+    RARE: 28
+    EPIC: 10
+    LEGENDARY: 2
+
+cosmetics:
+  max-particles-per-step: 120
+  max-particles-per-tick: 200
+
+ranks:
+  wind-charges: 16
+
+lobby-items:
+  grapple:
+    slot: 0
+    cooldown-ms: 500
+    range: 40
+    base: 0.45
+    per-block: 0.075
+    lift: 0.35
+    max-velocity: 2.6
+  team:
+    slot: 2
+  host:
+    slot: 7
+  cosmetics:
+    slot: 4
+  stats:
+    enabled: true
+    slot: 8
+
+webhooks:
+  enabled: true
+  username: CartRoyale
+  events-role-id: ''        # right-click the @Events role with Developer Mode on, Copy Role ID
+  flag: ''                  # optional text before the title; plain text, no emoji
+  warning-minutes: 5
+  daily-post:
+    enabled: true
+    time: '12:00'           # in the time zone above
+    ping: false
+    # Optional custom server emoji per team size, e.g. '<:head:123456789012345678>'
+    emoji:
+      '1': ''
+      '2': ''
+      '4': ''
+
+stats:
+  site-url: https://cartroyale.com/#boards
+  export:
+    mode: 'OFF'             # WORKER (POST to url), FILE (plugins/CartRoyale/stats.json) or 'OFF' (keep the quotes)
+    url: ''                 # the Cloudflare Worker endpoint, https only
+    interval-seconds: 60
+
+resource-pack:
+  enabled: false
+  url: ''                   # direct download link (mcpacks)
+  sha1: ''                  # 40 hex characters, see docs/RESOURCEPACK.md
+  required: true
+
+ip-bar:
+  enabled: true
+  color: PINK               # the boss bar colour the resource pack re-skins; nothing else uses pink
+
+sidebar:
+  enabled: true

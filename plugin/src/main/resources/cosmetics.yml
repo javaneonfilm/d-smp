@@ -1,0 +1,215 @@
+# Cosmetics (D16, ECON-2/3). Purely visual: nothing here changes damage or explosion power.
+# category: kill (at the victim), explosion (on your TNT cart blasts) or suffix (after your name).
+# rarity: COMMON, RARE, EPIC, LEGENDARY. price in coins (5 per kill).
+# steps: particle/sound steps. delay in ticks. shape: burst, ring, column or spiral.
+#   particle: a Minecraft particle id (dust takes a color). sound: a Minecraft sound id.
+# suffix: text is MiniMessage.
+cosmetics:
+  # ---------------- kill effects ----------------
+  - id: kill_soot_puff
+    category: kill
+    rarity: COMMON
+    price: 60
+    name: Soot Puff
+    description: A puff of engine soot.
+    icon: COAL
+    steps:
+      - {particle: large_smoke, count: 25, spread: 0.4, speed: 0.02, y: 1.0}
+      - {sound: entity.generic.extinguish_fire, volume: 0.8, pitch: 1.2}
+  - id: kill_spark_shower
+    category: kill
+    rarity: COMMON
+    price: 90
+    name: Spark Shower
+    description: Sparks fly off the rails.
+    icon: FLINT
+    steps:
+      - {particle: crit, count: 40, spread: 0.5, speed: 0.4, y: 1.0}
+      - {sound: block.anvil.land, volume: 0.4, pitch: 1.8}
+  - id: kill_rail_sparks
+    category: kill
+    rarity: RARE
+    price: 250
+    name: Rail Sparks
+    description: Electric sparks along the track.
+    icon: POWERED_RAIL
+    steps:
+      - {particle: electric_spark, shape: ring, count: 30, radius: 1.3, y: 0.3}
+      - {particle: electric_spark, shape: ring, count: 30, radius: 0.8, y: 1.0, delay: 4}
+      - {sound: block.copper_bulb.turn_on, volume: 1.0, pitch: 1.3}
+  - id: kill_ember_ring
+    category: kill
+    rarity: RARE
+    price: 350
+    name: Ember Ring
+    description: A ring of embers where they fell.
+    icon: BLAZE_POWDER
+    steps:
+      - {particle: flame, shape: ring, count: 36, radius: 1.4, y: 0.2, speed: 0.01}
+      - {particle: small_flame, count: 20, spread: 0.6, y: 1.0}
+      - {sound: entity.blaze.shoot, volume: 0.7, pitch: 1.1}
+  - id: kill_soul_fuse
+    category: kill
+    rarity: EPIC
+    price: 700
+    name: Soul Fuse
+    description: A blue fuse burns up and away.
+    icon: SOUL_TORCH
+    steps:
+      - {particle: soul_fire_flame, shape: spiral, count: 40, radius: 0.7, y: 0.1}
+      - {particle: sculk_soul, count: 8, spread: 0.3, y: 2.0, delay: 8}
+      - {sound: block.sculk_shrieker.shriek, volume: 0.6, pitch: 1.6}
+  - id: kill_coin_burst
+    category: kill
+    rarity: EPIC
+    price: 900
+    name: Coin Burst
+    description: Their coins scatter everywhere.
+    icon: GOLD_NUGGET
+    steps:
+      - {particle: dust, color: '#FFD700', count: 60, spread: 0.7, y: 1.0}
+      - {particle: wax_on, count: 20, spread: 0.6, y: 1.2, delay: 3}
+      - {sound: block.amethyst_block.chime, volume: 1.0, pitch: 1.5}
+      - {sound: entity.experience_orb.pickup, volume: 1.0, pitch: 0.8, delay: 4}
+  - id: kill_last_stop
+    category: kill
+    rarity: LEGENDARY
+    price: 2200
+    name: Last Stop
+    description: The end of the line, with a bell.
+    icon: BELL
+    steps:
+      - {particle: end_rod, shape: column, count: 30, spread: 0.05, y: 0.2}
+      - {particle: totem_of_undying, count: 80, spread: 0.8, speed: 0.4, y: 1.5, delay: 6}
+      - {particle: dust, color: '#FF0000', shape: ring, count: 48, radius: 2.0, y: 0.1, delay: 6}
+      - {sound: block.bell.use, volume: 1.0, pitch: 0.8}
+      - {sound: block.bell.resonate, volume: 0.6, pitch: 1.0, delay: 10}
+
+  # ---------------- cart explosion effects ----------------
+  - id: boom_gravel_kick
+    category: explosion
+    rarity: COMMON
+    price: 55
+    name: Gravel Kick
+    description: Extra dust from the ballast.
+    icon: GRAVEL
+    steps:
+      - {particle: poof, count: 40, spread: 1.2, speed: 0.08, y: 0.5}
+  - id: boom_ash_cloud
+    category: explosion
+    rarity: COMMON
+    price: 85
+    name: Ash Cloud
+    description: A grey cloud that hangs for a moment.
+    icon: GUNPOWDER
+    steps:
+      - {particle: ash, count: 120, spread: 2.0, y: 1.0}
+      - {particle: large_smoke, count: 20, spread: 1.0, speed: 0.03, y: 1.0, delay: 5}
+  - id: boom_copper_flare
+    category: explosion
+    rarity: RARE
+    price: 260
+    name: Copper Flare
+    description: An orange shock ring.
+    icon: COPPER_INGOT
+    steps:
+      - {particle: dust, color: '#FF8A1F', shape: ring, count: 48, radius: 2.5, y: 0.3}
+      - {particle: dust, color: '#FF8A1F', shape: ring, count: 64, radius: 3.8, y: 0.3, delay: 3}
+  - id: boom_cinder_spray
+    category: explosion
+    rarity: RARE
+    price: 380
+    name: Cinder Spray
+    description: Hot cinders rain down.
+    icon: MAGMA_CREAM
+    steps:
+      - {particle: lava, count: 20, spread: 1.0, y: 0.5}
+      - {particle: small_flame, count: 50, spread: 1.6, speed: 0.05, y: 1.0}
+      - {sound: block.fire.extinguish, volume: 0.6, pitch: 0.7}
+  - id: boom_signal_lamp
+    category: explosion
+    rarity: EPIC
+    price: 750
+    name: Signal Lamp
+    description: A signal flare shoots up.
+    icon: REDSTONE_LAMP
+    steps:
+      - {particle: end_rod, shape: column, count: 40, spread: 0.1, y: 0.5}
+      - {particle: firework, count: 60, spread: 1.2, speed: 0.15, y: 6.0, delay: 8}
+      - {sound: entity.firework_rocket.launch, volume: 1.0, pitch: 1.0}
+      - {sound: entity.firework_rocket.twinkle, volume: 1.0, pitch: 1.0, delay: 10}
+  - id: boom_frost_charge
+    category: explosion
+    rarity: EPIC
+    price: 950
+    name: Frost Charge
+    description: The blast freezes the air.
+    icon: BLUE_ICE
+    steps:
+      - {particle: snowflake, count: 100, spread: 2.0, speed: 0.08, y: 1.0}
+      - {particle: dust, color: '#9FE4FF', shape: ring, count: 50, radius: 3.0, y: 0.2}
+      - {sound: block.glass.break, volume: 1.0, pitch: 0.7}
+  - id: boom_derailer
+    category: explosion
+    rarity: LEGENDARY
+    price: 2800
+    name: Derailer
+    description: The loudest stop on the line.
+    icon: TNT_MINECART
+    steps:
+      - {particle: sonic_boom, count: 1, spread: 0, y: 1.0}
+      - {particle: dust, color: '#FF0000', shape: ring, count: 72, radius: 4.5, y: 0.3, delay: 2}
+      - {particle: dust, color: '#FFC93C', shape: ring, count: 56, radius: 3.0, y: 0.3, delay: 4}
+      - {particle: explosion, count: 6, spread: 2.0, y: 1.0, delay: 4}
+      - {sound: entity.lightning_bolt.thunder, volume: 0.8, pitch: 1.2}
+
+  # ---------------- suffixes ----------------
+  - id: suffix_rookie
+    category: suffix
+    rarity: COMMON
+    price: 50
+    name: Rookie
+    icon: NAME_TAG
+    text: '<gray>[Rookie]'
+  - id: suffix_commuter
+    category: suffix
+    rarity: COMMON
+    price: 80
+    name: Commuter
+    icon: NAME_TAG
+    text: '<gray>[Commuter]'
+  - id: suffix_switchman
+    category: suffix
+    rarity: RARE
+    price: 220
+    name: Switchman
+    icon: NAME_TAG
+    text: '<aqua>[Switchman]'
+  - id: suffix_conductor
+    category: suffix
+    rarity: RARE
+    price: 400
+    name: Conductor
+    icon: NAME_TAG
+    text: '<blue>[Conductor]'
+  - id: suffix_fuse_lit
+    category: suffix
+    rarity: EPIC
+    price: 650
+    name: Fuse Lit
+    icon: NAME_TAG
+    text: '<light_purple>[Fuse Lit]'
+  - id: suffix_boom
+    category: suffix
+    rarity: EPIC
+    price: 1000
+    name: Boom
+    icon: NAME_TAG
+    text: '<#FF8A1F>[Boom]'
+  - id: suffix_last_cart
+    category: suffix
+    rarity: LEGENDARY
+    price: 3000
+    name: Last Cart
+    icon: NAME_TAG
+    text: '<#FFD700><b>[Last Cart]</b>'
