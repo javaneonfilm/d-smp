@@ -98,11 +98,14 @@ public final class Tickets {
             int spent = Integer.parseInt(r.reason());
             plugin.msg().send(by, "tickets.revoked", "n", n, "player", name(uuid), "count", r.count());
             if (spent > 0 && plugin.getConfig().getBoolean("host.revoke-cancels-game", true)) {
+                // Cancel the game the ticket paid for first, then clean up (cleanup skips anyone with a queued game).
                 plugin.store().latestQueuedBought(uuid).thenAccept(id -> Bukkit.getScheduler().runTask(plugin, () -> {
                     if (id > 0 && plugin.games().cancelQueued(id, "chargeback")) plugin.msg().send(by, "tickets.revoke-cancelled-game", "id", id);
+                    if (r.count() == 0) cleanup(uuid);
                 }));
+            } else if (r.count() == 0) {
+                cleanup(uuid);
             }
-            if (r.count() == 0) cleanup(uuid);
         }));
     }
 
