@@ -85,10 +85,6 @@ chat:
   format: '<tag><name><suffix><dark_gray>:</dark_gray> <white><message>'
   spectator-format: '<dark_gray>[Spectator]</dark_gray> <gray><name><dark_gray>:</dark_gray> <gray><message>'
 
-ranks:
-  vip-tag: '<#7DDC6A>[VIP]</#7DDC6A>'
-  vipplus-tag: '<#FFD700>[VIP+]</#FFD700>'
-  admin-tag: '<#FF0000>[Staff]</#FF0000>'
 
 ip-bar:
   plain: '<#FF0000><b>CartZone</b></#FF0000> <gray>|</gray> <white><ip>'
@@ -163,7 +159,7 @@ game:
   hosted: '<prefix><white>Game #<id> hosted by <yellow><hoster></yellow>: <mode>, <team_size>. Starts <start>.'
   window-open: '<prefix><white>Game #<id> starts at <yellow><start></yellow>. <gray><players> players online, cap <cap>.'
   purge-start: '<prefix><#FF0000>The purge is starting.</#FF0000> <gray><online> players for <cap> spots.'
-  purged-kick: "<#FF0000><b>You were purged</b>\n\n<white>The lobby for game #<id> was over the player cap.\n<gray>VIP makes it much less likely, VIP+ makes you immune."
+  purged-kick: "<#FF0000><b>You were purged</b>\n\n<white>The lobby for game #<id> was over the player cap.\n<gray>Some ranks make it much less likely or make you immune."
   purged-spectate: '<prefix><gray>You were purged from this game. You can watch it.'
   selected: '<prefix><#7DDC6A>You were selected for game #<id>. Good luck.'
   cancelled: '<prefix><gray>Game #<id> was cancelled: <white><reason>'
@@ -301,7 +297,7 @@ items:
     name: '<white>Wind Charge'
     lore: ['<gray>Only pushes you. Refills itself.', '<dark_gray>Lobby only.']
   lobby-elytra:
-    name: '<#FFD700>VIP+ Elytra'
+    name: '<#FFD700>Lobby Elytra'
     lore: ['<dark_gray>Lobby only.']
   temp-elytra:
     name: '<#FF0000>Drop Elytra'
@@ -309,6 +305,27 @@ items:
   one-time-shield:
     name: '<#FF8A1F>One Time Shield'
     lore: ['<gray>Hold in your offhand and block.', '<gray>Stops one hit of anything, even', '<gray>a cart explosion, then breaks.', '<dark_gray>Stacks to 16.']
+  books:
+    armor:
+      name: '<#C0C0C0><b>Armor Upgrade</b>'
+      lore: ['<gray>Upgrades all armor you wear', '<gray>one tier: iron > diamond > netherite.', '<dark_gray>Applies itself when you pick it up.']
+    sharpness:
+      name: '<#4FE3E8><b>Sharpness Book</b>'
+      lore: ['<gray>+1 Sharpness on your sword, axe or spear.', '<dark_gray>Applies itself when you pick it up.']
+    quickcharge:
+      name: '<#FFB020><b>Quick Charge Book</b>'
+      lore: ['<gray>+1 Quick Charge on your crossbow.', '<dark_gray>Applies itself when you pick it up.']
+
+books:
+  armor-applied: '<prefix><white>Armor Upgrade: your armor is now <yellow><item></yellow>.'
+  armor-waiting: '<prefix><gray>Armor Upgrade kept: wear armor below netherite and it applies.'
+  armor-tier: '<tier>'
+  kill-upgrade: '<prefix><white>Kill! Your armor upgraded to <yellow><item></yellow>.'
+  sharpness-applied: '<prefix><white>Sharpness Book: <yellow><item></yellow>.'
+  sharpness-waiting: '<prefix><gray>Sharpness Book kept: it applies when you have a sword, axe or spear below the max.'
+  quickcharge-applied: '<prefix><white>Quick Charge Book: <yellow><item></yellow>.'
+  quickcharge-waiting: '<prefix><gray>Quick Charge Book kept: it applies when you have a crossbow below the max.'
+  level: '<item> is now <enchant> <level>'
 
 # ------------------------------------------------------------------ chests
 chests:
@@ -363,6 +380,7 @@ admin:
   free-off: '<prefix><white>Free roam off.'
   coins: '<prefix><white><player> now has <#FFD700><balance></#FFD700> coins.'
   shield-given: '<prefix><white>Gave you <n> One Time Shield(s).'
+  book-given: '<prefix><white>Gave <player> <n> <book>. Books apply themselves in the arena only.'
   restarting: 'Game over. Restarting the server once to restore the arena.'
   map-swap-failed: 'Could not load map <map>: <error>'
   tick-error: 'The game loop hit an error in state <state>: <error>. See /cart diag.'
@@ -407,13 +425,14 @@ help:
     - '<white>/cart arena info|list|tp|load|save <name>|setspawn|setcenter|setborder <r>|setdeploy'
     - '<white>/cart zone info|start <r>|final|preview'
     - '<white>/cart chests info|include <r>|exclude <r>|clearzones|scan|test [players]|clear'
-    - '<white>/cart loot <gray>- loot table editor'
+    - '<white>/cart loot <gray>- loot tables, chest amount/spacing (Chest settings)'
+    - '<white>/cart book <armor|sharpness|quickcharge> [n] [player] <gray>- give upgrade books'
     - '<white>/cart ticket give|revoke|list <uuid|name> [n] [transaction]'
     - '<white>/cart coins give|take|set <player> <n>'
     - '<white>/cart play | build | spectate | free | shield [n] | shop | reload | setlobby'
     - '<white>/cart diag <gray>- everything that could be wrong, on one screen'
     - '<white>/cart selftest <gray>- blows up a TNT cart in the arena and checks the block rules'
-    - '<white>/cart test [player] <gray>- practice game now, solo is fine, no Discord/stats/restart'
+    - '<white>/cart test [player] [minutes] <gray>- practice game now (3-40 min, default 30), solo is fine, no Discord/stats/restart'
 
 schedule:
   today-head: "<prefix><white>Today's games (<count>):"
@@ -437,6 +456,8 @@ gui:
     squad-lore: ['<dark_gray>Click to change.']
     cap: '<white>Purge cap: <yellow><value>'
     cap-lore: ['<gray>Most players who get in.', '<gray>Limits: <min> to <max>.', '<dark_gray>Left +10, right -10, shift for 1.']
+    duration: '<white>Match length: <yellow><value> min'
+    duration-lore: ['<gray>The zone shrinks so the match lasts this long.', '<gray>Limits: <min> to <max> minutes.', '<dark_gray>Left +5, right -5, shift for 1.']
     map: '<white>Map: <yellow><value>'
     map-lore: ['<dark_gray>Left next, right previous.']
     time: '<white>Start: <yellow><value>'
@@ -445,7 +466,7 @@ gui:
     next-free: '<white>Next free slot'
     next-free-lore: ['<dark_gray>Jump to the next open time.']
     summary: '<white>Summary'
-    summary-lore: ['<gray>Mode: <white><mode>', '<gray>Team size: <white><team_size>', '<gray>Purge cap: <white><cap>', '<gray>Modifiers: <white><modifiers>', '<gray>Map: <white><map>', '<gray>Start: <white><time>', '<gray>About <duration> minutes']
+    summary-lore: ['<gray>Mode: <white><mode>', '<gray>Team size: <white><team_size>', '<gray>Purge cap: <white><cap>', '<gray>Modifiers: <white><modifiers>', '<gray>Map: <white><map>', '<gray>Start: <white><time>', '<gray>Length: <white><duration> minutes']
     cancel: '<#FF0000>Cancel'
     cancel-lore: ['<dark_gray>Nothing is spent.']
     finish: '<#7DDC6A><b>Finish</b>'
@@ -503,8 +524,28 @@ gui:
     tier-title: '<white><b>Loot: <tier></b> <dark_gray>(<page>/<pages>)'
     help: '<white>How to edit'
     help-lore: ['<gray>Click an item in your inventory to add it.', '<gray>Left / right: min / max +1', '<gray>Shift: -1 instead', '<gray>Q: rarity, F: pearl flag', '<gray>Ctrl+Q: remove']
-    shield: '<#FF8A1F>Add One Time Shield'
-    shield-lore: ['<dark_gray>Adds it as an Epic entry.']
+    specials: '<#FF8A1F>Add a CartZone item'
+    specials-lore: ['<gray>One Time Shield and the upgrade books.']
+    specials-title: '<white><b>Add to <tier></b> <dark_gray>(click one)'
+    settings: '<#FF8A1F><b>Chest settings'
+    settings-lore: ['<gray>How many chests, how close together,', '<gray>items per chest and the tier mix.']
+    settings-title: '<white><b>Chest settings'
+    set-base: '<white>Base chests: <yellow><value>'
+    set-base-lore: ['<gray>Chests every game has.', '<dark_gray><controls>']
+    set-per-player: '<white>Extra per player: <yellow><value>'
+    set-per-player-lore: ['<gray>Added for each player in the game.', '<dark_gray><controls>']
+    set-max: '<white>Max chests: <yellow><value>'
+    set-max-lore: ['<gray>Never more than this.', '<dark_gray><controls>']
+    set-spacing: '<white>Spacing: <yellow><value> blocks'
+    set-spacing-lore: ['<gray>Closest two chests can be.', '<gray>Lower = denser.', '<dark_gray><controls>']
+    set-slots-min: '<white>Items per chest, min: <yellow><value>'
+    set-slots-min-lore: ['<dark_gray><controls>']
+    set-slots-max: '<white>Items per chest, max: <yellow><value>'
+    set-slots-max-lore: ['<dark_gray><controls>']
+    share: '<white><tier> chests: <yellow><value>%'
+    share-lore: ['<gray>Share of chests that are this tier.', '<dark_gray>Left +5, right -5']
+    preview: '<white>Chests per game'
+    preview-lore: ['<gray>Solo: <white><solo>', '<gray>25 players: <white><p25>', '<gray>50 players: <white><p50>', '<gray>100 players: <white><p100>', '<dark_gray>Applies from the next game.']
     entry-rarity: '<gray>Rarity: <rarity>'
     entry-amount: '<gray>Amount: <white><min>-<max></white> <dark_gray>(max <cap>)'
     entry-pearl: '<light_purple>Counts as a pearl'

@@ -54,6 +54,8 @@ public final class Store {
         s.modifiers.addAll(Modifier.parseSet(rs.getString("modifiers")));
         s.squad = rs.getInt("squad");
         s.purgeCap = rs.getInt("purge_cap");
+        int mins = rs.getInt("minutes");
+        if (mins > 0) s.minutes = mins;
         s.map = rs.getString("map");
         s.startAt = rs.getLong("scheduled_at");
         String hu = rs.getString("hoster_uuid");
@@ -81,7 +83,7 @@ public final class Store {
             }
         }
         try (PreparedStatement ps = c.prepareStatement(
-            "INSERT OR IGNORE INTO games(hoster_uuid,hoster_name,mode,squad,purge_cap,modifiers,map,scheduled_at,status,source) VALUES(?,?,?,?,?,?,?,?,'QUEUED',?)",
+            "INSERT OR IGNORE INTO games(hoster_uuid,hoster_name,mode,squad,purge_cap,modifiers,map,scheduled_at,status,source,minutes) VALUES(?,?,?,?,?,?,?,?,'QUEUED',?,?)",
             Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, s.hosterUuid == null ? null : s.hosterUuid.toString());
             ps.setString(2, s.hosterName);
@@ -93,6 +95,7 @@ public final class Store {
             ps.setLong(8, s.startAt);
             if (source == null) ps.setNull(9, Types.VARCHAR);
             else ps.setString(9, source);
+            ps.setInt(10, s.minutes);
             if (ps.executeUpdate() == 0) return -1L;
             try (ResultSet k = ps.getGeneratedKeys()) {
                 return k.next() ? k.getLong(1) : -1L;

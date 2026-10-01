@@ -7,6 +7,7 @@ Contents, all original art drawn here:
   separate blocking pose, TNT-red face with a crack across it.
 - IP bar: the PINK boss bar is made invisible and its title draws a red rounded bar with a
   minecart icon (font cartzone:hud). Nothing else on the server uses a pink bar.
+- Upgrade books: armor / quickcharge / sharpness textures from resourcepack/books/ (his art).
 - Zone wall: the hexagon circle-border shader from the Mace.VIP pack, copied from
   resourcepack/zone-wall/ (see SOURCE.txt there). Item model lodestone:border.
 Output: resourcepack/pack/ (the files) and cartzone-pack.zip + SHA-1 in docs/RESOURCEPACK.md.
@@ -198,7 +199,7 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     write_json("pack.mcmeta", {"pack": {
-        "description": "CartZone - IP bar, One Time Shield, zone wall",
+        "description": "CartZone - IP bar, shield, books, zone wall",
         # 1.21.11 is format 75; 1.21.9+ reads the min/max range, older clients read pack_format.
         "pack_format": 75, "min_format": 64, "max_format": 99},
         # 26.x moved item rendering to core/item, so newer clients get the ported wall shader.
@@ -220,6 +221,12 @@ def main():
     write_json("assets/cartzone/font/hud.json", hud_font())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_progress.png", invisible_bar())
+
+    # Upgrade books: his 16x16 textures from resourcepack/books/, flat item models.
+    for name in ("armor_upgrade_book", "quickcharge_book", "sharpness_book"):
+        shutil.copyfile(os.path.join(ROOT, "books", name + ".png"), os.path.join(OUT, "assets", "cartzone", "textures", "item", name + ".png"))
+        write_json("assets/cartzone/models/item/" + name + ".json", {"parent": "minecraft:item/generated", "textures": {"layer0": "cartzone:item/" + name}})
+        write_json("assets/cartzone/items/" + name + ".json", {"model": {"type": "minecraft:model", "model": "cartzone:item/" + name}})
 
     for base, _, names in os.walk(ZONE_WALL):
         for n in names:

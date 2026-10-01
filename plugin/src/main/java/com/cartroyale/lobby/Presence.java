@@ -143,7 +143,8 @@ public final class Presence implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onChat(AsyncChatEvent e) {
         Player p = e.getPlayer();
-        Component tag = plugin.nametags().tag(p);
+        Component tag0 = plugin.nametags().tag(p);
+        Component tag = tag0.equals(Component.empty()) ? tag0 : tag0.append(Component.space());
         Component suffix = plugin.cosmetics().suffixComponent(p.getUniqueId());
         boolean spec = plugin.spectators().isWatcher(p);
         e.renderer((source, displayName, message, viewer) -> plugin.msg().get(spec ? "chat.spectator-format" : "chat.format",

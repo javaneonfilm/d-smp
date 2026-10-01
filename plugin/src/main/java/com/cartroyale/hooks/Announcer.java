@@ -50,8 +50,9 @@ public final class Announcer {
         return String.join(" ", tags);
     }
 
+    /** The default match length (hosted games carry their own, see GameSettings.minutes). */
     public int durationMinutes() {
-        return (int) Math.ceil((plugin.zone().plannedSeconds() + plugin.getConfig().getInt("deploy.planned-seconds", 60)) / 60.0);
+        return plugin.defaults().minutes;
     }
 
     /** HOOK-1: pings the events role. */
@@ -59,7 +60,7 @@ public final class Announcer {
         GameSettings s = g.s;
         String map = s.map == null ? plugin.msg().plain("discord.random-map") : s.map;
         String desc = plugin.msg().plain("discord.hosted",
-            "map", map, "team_size", teamSize(s.squad), "duration", durationMinutes(), "cap", s.purgeCap,
+            "map", map, "team_size", teamSize(s.squad), "duration", s.minutes, "cap", s.purgeCap,
             "mode", modeName(s), "modifiers", modifiers(s), "start_unix", s.startAt / 1000, "ip", ip());
         plugin.hooks().send(new Webhooks.Embed(title(g.id), desc, RED, plugin.msg().plain("discord.hosted-by", "hoster", s.hosterName)), true);
     }

@@ -92,6 +92,13 @@ public final class HostGui {
             render(p, s, admin, tickets);
         });
 
+        int minLo = plugin.getConfig().getInt("host.limits.min-minutes", 20), minHi = plugin.getConfig().getInt("host.limits.max-minutes", 40);
+        gui.set(29, button(Material.RECOVERY_COMPASS, "gui.host.duration", "gui.host.duration-lore", "value", s.minutes, "min", minLo, "max", minHi), e -> {
+            int step = e.isShiftClick() ? 1 : 5;
+            s.minutes = plugin.clampMinutes(s.minutes + (e.isRightClick() ? -step : step));
+            render(p, s, admin, tickets);
+        });
+
         gui.set(28, button(Material.IRON_BARS, "gui.host.cap", "gui.host.cap-lore", "value", s.purgeCap, "min", capMin, "max", capMax), e -> {
             int step = e.isShiftClick() ? 1 : 10;
             s.purgeCap += e.isRightClick() ? -step : step;
@@ -128,7 +135,7 @@ public final class HostGui {
             "mode", a.modeName(s), "team_size", a.teamSize(s.squad), "cap", s.purgeCap,
             "modifiers", s.modifiers.isEmpty() ? plugin.msg().plain("discord.no-modifiers") : a.modifiers(s).replace("`", ""),
             "map", s.map == null ? plugin.msg().plain("discord.random-map") : s.map, "time", Times.dayClock(s.startAt, plugin.zoneId()),
-            "duration", a.durationMinutes()));
+            "duration", s.minutes));
 
         gui.set(45, button(Material.BARRIER, "gui.host.cancel", "gui.host.cancel-lore"), e -> {
             drafts.remove(p.getUniqueId());

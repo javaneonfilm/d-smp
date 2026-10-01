@@ -25,9 +25,12 @@ join:
 purge:
   action: KICK              # KICK or SPECTATE
   weights:
-    default: 1.0
-    vip: 0.15               # lower = much less likely to be purged
-  vipplus-immune: true
+    default: 1.0            # everyone without a weight permission
+  # Permission -> purge weight. A player gets the LOWEST weight among the nodes they have; lower =
+  # much less likely to be purged. Add your own nodes and give them to LuckPerms groups.
+  # cartzone.perk.purge-immune makes a player immune outright.
+  weight-perms:
+    cartzone.perk.purge-low: 0.15
   hoster-immune: true
 
 teams:
@@ -44,6 +47,8 @@ host:
     min-cap: 10
     max-cap: 120            # ticket holders
     admin-max-cap: 200
+    min-minutes: 20         # match length a hoster can pick; the zone timings in zone.yml are stretched to fit
+    max-minutes: 40
   min-lead-minutes: 10      # ticket holders pick a start at least this far ahead
   slot-minutes: 30          # two games never start closer than this
   ticket-hours: 6           # length of the temporary LuckPerms host group
@@ -73,21 +78,24 @@ elytra:
   allow-fireworks: false
 
 match:
+  default-minutes: 30       # match length when nobody picks one (scheduled games, /cart start, /cart test)
   hard-timeout-extra-minutes: 5
   end-kick-seconds: 10
   restart-after: true       # END-5: shut down once after a game; the host restarts the server
   kill-credit-seconds: 15   # a death within this long of a player's hit counts as their kill
   pvp-during-deploy: false
 
-chests:
-  min-distance: 24
-  base: 20
-  per-player: 2.0
-  max: 300
-  tier-shares: [0.6, 0.3, 0.1]
+chests:                     # amount, spacing and tier mix moved to loot.yml (/cart loot -> Chest settings)
   hologram-height: 1.35
   place-per-tick: 20
   scan-chunks-per-tick: 8
+
+# Loot upgrade books (they apply themselves when picked up in the arena) and kill rewards.
+books:
+  sharpness-max: 5          # highest Sharpness a Sharpness Book can reach
+  quickcharge-max: 3        # Quick Charge above 3 makes crossbows unusable in vanilla
+upgrades:
+  armor-on-kill: true       # a kill upgrades the killer's worn armor one tier (iron > diamond > netherite)
 
 shield:
   item-model: cartzone:one_time_shield
@@ -107,7 +115,15 @@ cosmetics:
   max-particles-per-tick: 200
 
 ranks:
-  wind-charges: 16
+  wind-charges: 16          # lobby wind charges for cartzone.perk.lobby-wind
+
+# Chat and nametag tags. The FIRST entry whose permission a player has is shown, so put the
+# highest rank at the top. Make a rank in LuckPerms, give the group a node from here (or add a
+# new line with your own node, e.g. cartzone.tag.mvp) and it shows.
+tags:
+  - {permission: cartzone.tag.staff, tag: '<#FF0000>[Staff]</#FF0000>'}
+  - {permission: cartzone.tag.vipplus, tag: '<#FFD700>[VIP+]</#FFD700>'}
+  - {permission: cartzone.tag.vip, tag: '<#7DDC6A>[VIP]</#7DDC6A>'}
 
 lobby-items:
   grapple:

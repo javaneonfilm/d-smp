@@ -189,7 +189,10 @@ public final class MatchListener implements Listener {
             + (killer == null || m.get(killer) == null ? "" : ", credited to " + m.get(killer).name));
         if (killer != null) {
             Player kp = Bukkit.getPlayer(killer);
-            if (kp != null && !m.sameTeam(killer, p.getUniqueId())) plugin.cosmetics().playKill(kp, p.getLocation());
+            if (kp != null && !m.sameTeam(killer, p.getUniqueId())) {
+                plugin.cosmetics().playKill(kp, p.getLocation());
+                plugin.books().onKill(kp);
+            }
         }
         plugin.games().eliminate(p.getUniqueId(), killer, false);
     }

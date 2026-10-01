@@ -41,12 +41,14 @@ public final class Nametags {
         return "cr" + u.toString().replace("-", "").substring(0, 14);
     }
 
+    /** The first entry of config.yml `tags` whose permission the player has (top = highest rank). */
     public Component tag(Player p) {
-        return switch (Ranks.bought(p)) {
-            case VIPPLUS -> plugin.msg().get("ranks.vipplus-tag");
-            case VIP -> plugin.msg().get("ranks.vip-tag");
-            default -> Ranks.isAdmin(p) ? plugin.msg().get("ranks.admin-tag") : Component.empty();
-        };
+        for (java.util.Map<?, ?> m : plugin.getConfig().getMapList("tags")) {
+            Object perm = m.get("permission"), tag = m.get("tag");
+            if (perm == null || tag == null) continue;
+            if (Ranks.has(p, String.valueOf(perm))) return plugin.msg().parse(String.valueOf(tag));
+        }
+        return Component.empty();
     }
 
     public NamedTextColor color(UUID u) {

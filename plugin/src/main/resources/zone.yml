@@ -1,6 +1,8 @@
 # The zone (D11). Each phase waits, then shrinks to its radius. Damage is in half-hearts
 # (2 = one heart) every `interval` ticks (20 = 1 second) while outside.
 # The start circle and final centre are set per map: /cart zone start <radius>, /cart zone final.
+# The wait/shrink seconds below only set the proportions: every game stretches them so the whole
+# match (deploy + zone) lasts its chosen length (host GUI, 20-40 min; match.default-minutes otherwise).
 phases:
   - {wait: 180, shrink: 120, radius: 250, damage: 2, interval: 20}
   - {wait: 150, shrink: 100, radius: 160, damage: 2, interval: 20}

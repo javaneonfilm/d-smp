@@ -178,6 +178,13 @@ public final class Database {
             }
             setVersion(2);
         }
+        if (current < 3) {
+            // v3: per-game match length in minutes (0 = the config default).
+            try (Statement s = conn.createStatement()) {
+                s.execute("ALTER TABLE games ADD COLUMN minutes INTEGER NOT NULL DEFAULT 0");
+            }
+            setVersion(3);
+        }
     }
 
     private void setVersion(int v) throws SQLException {

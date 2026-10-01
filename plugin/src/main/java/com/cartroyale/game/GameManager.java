@@ -189,7 +189,7 @@ public final class GameManager {
     private final Set<UUID> testPlayers = new HashSet<>();
 
     /** /cart test: a solo-capable practice game that starts in a few seconds and includes {@code p}. */
-    public void startTest(org.bukkit.command.CommandSender by, Player p) {
+    public void startTest(org.bukkit.command.CommandSender by, Player p, int minutes) {
         if (match != null) {
             plugin.msg().send(by, "admin.already-running", "id", match.id(), "state", match.state.name());
             return;
@@ -197,6 +197,7 @@ public final class GameManager {
         adminsPlaying.add(p.getUniqueId());
         testPlayers.add(p.getUniqueId());
         GameSettings s = plugin.defaults().copy();
+        if (minutes > 0) s.minutes = minutes;
         s.startAt = System.currentTimeMillis() + plugin.getConfig().getInt("join.countdown-seconds", 10) * 1000L + 5000;
         s.hosterUuid = p.getUniqueId();
         s.hosterName = p.getName();
@@ -319,7 +320,7 @@ public final class GameManager {
                 if (left <= 0) finishTeaming();
             }
             case PLAYING -> {
-                long hard = (plugin.zone().plannedMinutes(match.row.test()) + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
+                long hard = (match.row.s.minutes + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
                 if (now - match.playingAt >= hard) end(true);
             }
             case ENDING -> {
@@ -392,13 +393,11 @@ public final class GameManager {
             return;
         }
         var cfg = plugin.getConfig();
-        double vipWeight = cfg.getDouble("purge.weights.vip", 0.15), defWeight = cfg.getDouble("purge.weights.default", 1.0);
-        boolean vipPlusImmune = cfg.getBoolean("purge.vipplus-immune", true), hosterImmune = cfg.getBoolean("purge.hoster-immune", true);
+        boolean hosterImmune = cfg.getBoolean("purge.hoster-immune", true);
         List<Purge.Candidate<Player>> cands = new ArrayList<>();
         for (Player p : el) {
-            Ranks.Rank r = Ranks.bought(p);
-            boolean immune = (vipPlusImmune && r == Ranks.Rank.VIPPLUS) || (hosterImmune && p.getUniqueId().equals(s.hosterUuid));
-            double w = r == Ranks.Rank.VIP ? vipWeight : defWeight;
+            boolean immune = Ranks.has(p, Ranks.PURGE_IMMUNE) || (hosterImmune && p.getUniqueId().equals(s.hosterUuid));
+            double w = Ranks.purgeWeight(p, cfg);
             cands.add(new Purge.Candidate<>(p, w, immune));
         }
         Purge.Result<Player> res = Purge.run(cands, s.purgeCap, new Random());
@@ -485,7 +484,7 @@ public final class GameManager {
         plugin.zone().start(match, plugin.arenas().world(), plugin.arenas().map());
         for (UUID u : match.players.keySet()) {
             Player p = Bukkit.getPlayer(u);
-            if (p != null) plugin.msg().send(p, "game.zone-start", "minutes", plugin.zone().plannedMinutes(match.row.test()));
+            if (p != null) plugin.msg().send(p, "game.zone-start", "minutes", match.row.s.minutes);
         }
         checkWin();
     }

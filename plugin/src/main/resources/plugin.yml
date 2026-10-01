@@ -24,19 +24,52 @@ commands:
     permission: cartzone.admin
 
 permissions:
+  # Build your own ranks: give a LuckPerms group the nodes it should have, e.g.
+  #   /lp group mvp permission set cartzone.perk.purge-immune true
+  #   /lp group mvp permission set cartzone.tag.mvp true   (and add that tag in config.yml)
   cartzone.admin:
-    description: Full control of CartZone.
+    description: Full control of CartZone (commands, build mode, spectating, loot editor).
     default: op
     children:
       cartzone.host: true
+      cartzone.tag.staff: true
   cartzone.host:
     description: Can open the Host GUI when holding a ticket.
     default: true
-  cartzone.rank.vip:
-    description: VIP perks (lower purge chance, lobby wind charges, tag).
+  cartzone.perk.purge-immune:
+    description: Never purged when a game is over its player cap.
     default: false
-  cartzone.rank.vipplus:
-    description: VIP+ perks (purge immune, lobby elytra and wind charges, tag).
+  cartzone.perk.purge-low:
+    description: Much less likely to be purged (weight in config.yml purge.weight-perms).
+    default: false
+  cartzone.perk.lobby-wind:
+    description: Wind charges in the lobby (they only push the thrower).
+    default: false
+  cartzone.perk.lobby-elytra:
+    description: An elytra in the lobby.
+    default: false
+  cartzone.tag.staff:
+    description: '[Staff] chat and nametag tag (config.yml tags).'
+    default: false
+  cartzone.tag.vipplus:
+    description: '[VIP+] chat and nametag tag.'
+    default: false
+  cartzone.tag.vip:
+    description: '[VIP] chat and nametag tag.'
+    default: false
+  # Ready-made bundles, kept so existing groups keep working. You don't have to use them.
+  cartzone.rank.vip:
+    description: 'Bundle: purge-low, lobby-wind, VIP tag.'
     default: false
     children:
-      cartzone.rank.vip: true
+      cartzone.perk.purge-low: true
+      cartzone.perk.lobby-wind: true
+      cartzone.tag.vip: true
+  cartzone.rank.vipplus:
+    description: 'Bundle: purge-immune, lobby-wind, lobby-elytra, VIP+ tag.'
+    default: false
+    children:
+      cartzone.perk.purge-immune: true
+      cartzone.perk.lobby-wind: true
+      cartzone.perk.lobby-elytra: true
+      cartzone.tag.vipplus: true

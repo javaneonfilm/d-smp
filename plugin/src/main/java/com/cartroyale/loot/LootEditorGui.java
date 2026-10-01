@@ -35,6 +35,7 @@ public final class LootEditorGui {
             gui.set(9 + t * 2, Items.make(icons[t - 1], plugin.msg().item("gui.loot.tier-" + t),
                 plugin.msg().lore("gui.loot.tier-lore", "entries", plugin.loot().tier(t).size())), e -> openTier(p, tier, 0));
         }
+        gui.set(22, Items.make(Material.CHEST, plugin.msg().item("gui.loot.settings"), plugin.msg().lore("gui.loot.settings-lore")), e -> openSettings(p));
         gui.fill(Items.make(Material.GRAY_STAINED_GLASS_PANE, plugin.msg().item("gui.filler"), List.of()));
         gui.open(p);
     }
@@ -72,8 +73,11 @@ public final class LootEditorGui {
             int amount = copy.getAmount();
             copy.setAmount(1);
             boolean shield = OneTimeShield.is(copy);
-            list.add(new LootTables.Entry(shield ? OneTimeShield.create(plugin, 1) : copy, Rarity.COMMON, 1, Math.max(1, Math.min(amount, copy.getMaxStackSize())),
-                copy.getType() == Material.ENDER_PEARL, shield ? OneTimeShield.ID : null));
+            UpgradeBooks.Kind book = UpgradeBooks.kind(copy);
+            String special = shield ? OneTimeShield.ID : book != null ? book.id : null;
+            ItemStack item = shield ? OneTimeShield.create(plugin, 1) : book != null ? UpgradeBooks.create(plugin, book, 1) : copy;
+            list.add(new LootTables.Entry(item, Rarity.COMMON, 1, Math.max(1, Math.min(amount, copy.getMaxStackSize())),
+                copy.getType() == Material.ENDER_PEARL, special));
             plugin.loot().save();
             plugin.msg().send(p, "loot.added", "item", copy.getType().name().toLowerCase(), "tier", tier);
             openTier(p, tier, (list.size() - 1) / per);
@@ -82,12 +86,98 @@ public final class LootEditorGui {
         if (pg > 0) gui.set(48, Items.make(Material.ARROW, plugin.msg().item("gui.prev"), List.of()), e -> openTier(p, tier, pg - 1));
         gui.set(49, Items.make(Material.BOOK, plugin.msg().item("gui.loot.help"), plugin.msg().lore("gui.loot.help-lore")));
         if (pg < pages - 1) gui.set(50, Items.make(Material.ARROW, plugin.msg().item("gui.next"), List.of()), e -> openTier(p, tier, pg + 1));
-        gui.set(53, Items.make(Material.SHIELD,plugin.msg().item("gui.loot.shield"), plugin.msg().lore("gui.loot.shield-lore")), e -> {
-            list.add(new LootTables.Entry(OneTimeShield.create(plugin, 1), Rarity.EPIC, 1, 1, false, OneTimeShield.ID));
-            plugin.loot().save();
-            openTier(p, tier, (list.size() - 1) / per);
-        });
+        gui.set(53, Items.make(Material.ENCHANTED_BOOK, plugin.msg().item("gui.loot.specials"), plugin.msg().lore("gui.loot.specials-lore")), e -> openSpecials(p, tier));
         gui.open(p);
+    }
+
+    /** The plugin's own items (shield, upgrade books): click one to add it to the tier. */
+    private void openSpecials(Player p, int tier) {
+        Gui gui = new Gui(3, plugin.msg().get("gui.loot.specials-title", "tier", plugin.msg().plain("gui.loot.tier-name-" + tier)));
+        List<LootTables.Entry> list = plugin.loot().tier(tier);
+        int slot = 10;
+        ItemStack shield = OneTimeShield.create(plugin, 1);
+        gui.set(slot++, shield, e -> {
+            list.add(new LootTables.Entry(OneTimeShield.create(plugin, 1), Rarity.EPIC, 1, 1, false, OneTimeShield.ID));
+            added(p, tier, list, "One Time Shield");
+        });
+        for (UpgradeBooks.Kind k : UpgradeBooks.Kind.values()) {
+            slot++;
+            gui.set(slot, UpgradeBooks.create(plugin, k, 1), e -> {
+                list.add(new LootTables.Entry(UpgradeBooks.create(plugin, k, 1), Rarity.RARE, 1, 1, false, k.id));
+                added(p, tier, list, k.id);
+            });
+        }
+        gui.set(18, Items.make(Material.OAK_DOOR, plugin.msg().item("gui.back"), List.of()), e -> openTier(p, tier, 0));
+        gui.fill(Items.make(Material.GRAY_STAINED_GLASS_PANE, plugin.msg().item("gui.filler"), List.of()));
+        gui.open(p);
+    }
+
+    private void added(Player p, int tier, List<LootTables.Entry> list, String what) {
+        plugin.loot().save();
+        plugin.msg().send(p, "loot.added", "item", what, "tier", tier);
+        openTier(p, tier, (list.size() - 1) / 45);
+    }
+
+    /** Chest amount, spacing, items per chest and the bronze/silver/gold mix. */
+    public void openSettings(Player p) {
+        LootTables lt = plugin.loot();
+        Gui gui = new Gui(4, plugin.msg().get("gui.loot.settings-title"));
+        gui.set(10, setting(Material.CHEST, "base", lt.chestBase(), "left +10, right -10, shift x5"), e -> {
+            int step = e.isShiftClick() ? 50 : 10;
+            lt.setSetting("chests.base", Math.max(0, lt.chestBase() + (e.isRightClick() ? -step : step)));
+            openSettings(p);
+        });
+        gui.set(11, setting(Material.PLAYER_HEAD, "per-player", lt.chestPerPlayer(), "left +0.5, right -0.5"), e -> {
+            double v = Math.max(0, lt.chestPerPlayer() + (e.isRightClick() ? -0.5 : 0.5));
+            lt.setSetting("chests.per-player", v);
+            openSettings(p);
+        });
+        gui.set(12, setting(Material.BARREL, "max", lt.chestMax(), "left +50, right -50"), e -> {
+            lt.setSetting("chests.max", Math.max(1, lt.chestMax() + (e.isRightClick() ? -50 : 50)));
+            openSettings(p);
+        });
+        gui.set(13, setting(Material.COMPASS, "spacing", lt.chestSpacing(), "left +1, right -1, shift x5"), e -> {
+            int step = e.isShiftClick() ? 5 : 1;
+            lt.setSetting("chests.min-distance", Math.max(3.0, lt.chestSpacing() + (e.isRightClick() ? -step : step)));
+            openSettings(p);
+        });
+        gui.set(15, setting(Material.HOPPER, "slots-min", lt.minSlots(), "left +1, right -1"), e -> {
+            int v = Math.max(1, Math.min(lt.maxSlots(), lt.minSlots() + (e.isRightClick() ? -1 : 1)));
+            lt.setSetting("slots.min", v);
+            openSettings(p);
+        });
+        gui.set(16, setting(Material.DROPPER, "slots-max", lt.maxSlots(), "left +1, right -1"), e -> {
+            int v = Math.max(lt.minSlots(), Math.min(27, lt.maxSlots() + (e.isRightClick() ? -1 : 1)));
+            lt.setSetting("slots.max", v);
+            openSettings(p);
+        });
+        int[] sh = lt.tierShares();
+        Material[] icons = {Material.COPPER_BLOCK, Material.IRON_BLOCK, Material.GOLD_BLOCK};
+        for (int t = 0; t < 3; t++) {
+            int idx = t;
+            gui.set(20 + t * 2, Items.make(icons[t], plugin.msg().item("gui.loot.share", "tier", plugin.msg().plain("gui.loot.tier-name-" + (t + 1)), "value", sh[t]),
+                plugin.msg().lore("gui.loot.share-lore")), e -> {
+                int[] now = lt.tierShares();
+                now[idx] = Math.max(0, Math.min(100, now[idx] + (e.isRightClick() ? -5 : 5)));
+                if (now[0] + now[1] + now[2] == 0) now[idx] = 5;
+                lt.setSetting("chests.tier-shares", List.of(now[0], now[1], now[2]));
+                openSettings(p);
+            });
+        }
+        gui.set(31, Items.make(Material.PAPER, plugin.msg().item("gui.loot.preview"), plugin.msg().lore("gui.loot.preview-lore",
+            "solo", ChestSpots.countFor(1, lt.chestBase(), lt.chestPerPlayer(), lt.chestMax()),
+            "p25", ChestSpots.countFor(25, lt.chestBase(), lt.chestPerPlayer(), lt.chestMax()),
+            "p50", ChestSpots.countFor(50, lt.chestBase(), lt.chestPerPlayer(), lt.chestMax()),
+            "p100", ChestSpots.countFor(100, lt.chestBase(), lt.chestPerPlayer(), lt.chestMax()))));
+        gui.set(27, Items.make(Material.OAK_DOOR, plugin.msg().item("gui.back"), List.of()), e -> openTiers(p));
+        gui.fill(Items.make(Material.GRAY_STAINED_GLASS_PANE, plugin.msg().item("gui.filler"), List.of()));
+        gui.open(p);
+    }
+
+    private ItemStack setting(Material icon, String key, Object value, String controls) {
+        String v = value instanceof Double d && d == Math.floor(d) ? String.valueOf(d.intValue()) : String.valueOf(value);
+        return Items.make(icon, plugin.msg().item("gui.loot.set-" + key, "value", v),
+            plugin.msg().lore("gui.loot.set-" + key + "-lore", "controls", controls));
     }
 
     private ItemStack icon(LootTables.Entry en) {

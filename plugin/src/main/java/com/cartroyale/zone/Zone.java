@@ -66,25 +66,32 @@ public final class Zone {
         return t;
     }
 
-    /** /cart test: about 3 minutes, so a practice game is quick. */
-    private static final List<ZoneMath.Phase> TEST_PHASES = List.of(
-        new ZoneMath.Phase(30, 30, 300, 2, 20), new ZoneMath.Phase(20, 25, 120, 2, 20),
-        new ZoneMath.Phase(20, 20, 40, 3, 20), new ZoneMath.Phase(15, 15, 5, 4, 20));
-
-    public int plannedMinutes(boolean test) {
-        double t = 0;
-        for (ZoneMath.Phase p : test ? TEST_PHASES : phases()) t += p.waitSeconds() + p.shrinkSeconds();
-        return (int) Math.ceil((t + plugin.getConfig().getInt("deploy.planned-seconds", 60)) / 60.0);
+    /**
+     * The phases from zone.yml with their wait and shrink times stretched (or squeezed) so that
+     * deploy + zone add up to {@code minutes}. Radii and damage stay as written.
+     */
+    public List<ZoneMath.Phase> phasesFor(int minutes) {
+        List<ZoneMath.Phase> base = phases();
+        double written = plannedSeconds();
+        double want = Math.max(60, minutes * 60.0 - plugin.getConfig().getInt("deploy.planned-seconds", 60));
+        if (written <= 0) return base;
+        double f = want / written;
+        List<ZoneMath.Phase> out = new ArrayList<>();
+        for (ZoneMath.Phase p : base) {
+            out.add(new ZoneMath.Phase((int) Math.round(p.waitSeconds() * f), (int) Math.round(p.shrinkSeconds() * f),
+                p.endRadius(), p.damageHp(), p.damageIntervalTicks()));
+        }
+        return out;
     }
 
     public ZoneMath.Plan planFor(MapConfig mc) {
-        return planFor(mc, false);
+        return planFor(mc, plugin.defaults().minutes);
     }
 
-    public ZoneMath.Plan planFor(MapConfig mc, boolean test) {
+    public ZoneMath.Plan planFor(MapConfig mc, int minutes) {
         double orbitR = yml.get().getDouble("orbit.radius", 100), speed = yml.get().getDouble("orbit.speed", 4.3);
         double[] oc = ZoneMath.orbitCenter(mc.finalX, mc.finalZ, mc.centerX, mc.centerZ, orbitR);
-        return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, test ? TEST_PHASES : phases(), orbitR, speed, oc[0], oc[1]);
+        return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, phasesFor(minutes), orbitR, speed, oc[0], oc[1]);
     }
 
     public boolean running() {
@@ -100,7 +107,7 @@ public final class Zone {
         stop();
         match = m;
         world = w;
-        plan = planFor(mc, m.row.test());
+        plan = planFor(mc, m.row.s.minutes);
         startedAt = System.currentTimeMillis();
         tick = 0;
         wall.model(yml.get().getString("wall.item-model", "lodestone:border"));

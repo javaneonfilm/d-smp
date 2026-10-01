@@ -11,6 +11,8 @@ public final class GameSettings {
     public final Set<Modifier> modifiers = EnumSet.noneOf(Modifier.class);
     public int squad = 1;
     public int purgeCap = 100;
+    /** Match length the zone is stretched to (host picks 20-40). */
+    public int minutes = 30;
     /** null means a random map. */
     public String map;
     public long startAt;
@@ -23,6 +25,7 @@ public final class GameSettings {
         g.modifiers.addAll(modifiers);
         g.squad = squad;
         g.purgeCap = purgeCap;
+        g.minutes = minutes;
         g.map = map;
         g.startAt = startAt;
         g.hosterUuid = hosterUuid;

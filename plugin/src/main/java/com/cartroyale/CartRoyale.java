@@ -66,6 +66,7 @@ public final class CartRoyale extends JavaPlugin {
     private Deployment deploy;
     private Zone zone;
     private Presence presence;
+    private com.cartroyale.loot.UpgradeBooks books;
     private TeamManager teams;
     private Spectators spectators;
     private Nametags nametags;
@@ -159,7 +160,8 @@ public final class CartRoyale extends JavaPlugin {
         }
 
         register(new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
-            presence = new Presence(this), new MatchListener(this), new ArenaRules(this));
+            presence = new Presence(this), new MatchListener(this), new ArenaRules(this),
+            books = new com.cartroyale.loot.UpgradeBooks(this));
         CartCommand cart = new CartCommand(this);
         bind("cart", cart);
         SmallCommands small = new SmallCommands(this);
@@ -234,6 +236,12 @@ public final class CartRoyale extends JavaPlugin {
         }
     }
 
+    /** Match length limits for hosted games (host.limits.min-minutes / max-minutes). */
+    public int clampMinutes(int m) {
+        int lo = getConfig().getInt("host.limits.min-minutes", 20), hi = getConfig().getInt("host.limits.max-minutes", 40);
+        return Math.max(lo, Math.min(hi, m));
+    }
+
     /** Default game settings from config.yml (used by /cart start and the Host GUI). */
     public GameSettings defaults() {
         GameSettings s = new GameSettings();
@@ -242,6 +250,7 @@ public final class CartRoyale extends JavaPlugin {
         s.modifiers.addAll(Modifier.parseSet(String.join(",", getConfig().getStringList("host.defaults.modifiers"))));
         s.squad = getConfig().getInt("host.defaults.squad", 1);
         s.purgeCap = getConfig().getInt("host.default-cap", 100);
+        s.minutes = clampMinutes(getConfig().getInt("match.default-minutes", 30));
         return s;
     }
 
@@ -270,6 +279,7 @@ public final class CartRoyale extends JavaPlugin {
     public Deployment deploy() { return deploy; }
     public Zone zone() { return zone; }
     public Presence presence() { return presence; }
+    public com.cartroyale.loot.UpgradeBooks books() { return books; }
     public TeamManager teams() { return teams; }
     public Spectators spectators() { return spectators; }
     public Nametags nametags() { return nametags; }

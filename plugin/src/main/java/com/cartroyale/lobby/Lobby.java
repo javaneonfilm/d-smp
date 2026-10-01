@@ -48,7 +48,8 @@ import java.util.UUID;
 /**
  * LOBBY-1..3 and RANK-2/3. The lobby is fully protected; everything opens from hotbar items.
  * Slot 1 grappling hook, slot 5 cosmetics, slot 9 stats, plus a host item for ticket holders and
- * admins. VIPs get wind charges (they only push the thrower) and VIP+ an elytra, lobby only.
+ * admins. cartzone.perk.lobby-wind gives wind charges (they only push the thrower) and
+ * cartzone.perk.lobby-elytra an elytra, lobby only.
  */
 public final class Lobby implements Listener {
 
@@ -152,13 +153,12 @@ public final class Lobby implements Listener {
         if (m != null && m.state == GameState.TEAMING && m.get(p.getUniqueId()) != null) {
             inv.setItem(cfg.getInt("lobby-items.team.slot", 2), plugin.teams().item());
         }
-        Ranks.Rank r = Ranks.bought(p);
-        if (r == Ranks.Rank.VIP || r == Ranks.Rank.VIPPLUS) {
+        if (Ranks.has(p, Ranks.LOBBY_WIND)) {
             ItemStack wind = lobbyItem(Items.make(Material.WIND_CHARGE, plugin.msg().item("items.lobby-wind.name"), plugin.msg().lore("items.lobby-wind.lore")), WIND);
             wind.setAmount(cfg.getInt("ranks.wind-charges", 16));
             inv.setItemInOffHand(wind);
         }
-        if (r == Ranks.Rank.VIPPLUS) {
+        if (Ranks.has(p, Ranks.LOBBY_ELYTRA)) {
             ItemStack ely = lobbyItem(Items.make(Material.ELYTRA, plugin.msg().item("items.lobby-elytra.name"), plugin.msg().lore("items.lobby-elytra.lore")), ELYTRA);
             ely.editMeta(m2 -> m2.setUnbreakable(true));
             inv.setChestplate(ely);

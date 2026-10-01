@@ -3,9 +3,19 @@
 # min/max: the amount rolled for that slot. pearl: true marks entries the Pearls modifier controls
 # (ender pearls are marked automatically).
 
+# How many chests and how close together. Easiest to change in game: /cart loot -> Chest settings.
+# Chests per game = base + per-player x players, capped at max. min-distance = blocks between chests.
+chests:
+  base: 200
+  per-player: 3.0
+  max: 600
+  min-distance: 10
+  tier-shares: [60, 30, 10]   # bronze / silver / gold, percent
+
+# Items per chest.
 slots:
-  min: 3
-  max: 8
+  min: 4
+  max: 9
 
 rarity-weights:
   COMMON: 60

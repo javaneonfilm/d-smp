@@ -55,6 +55,29 @@ public final class LootTables {
         this.plugin = plugin;
         this.yml = new Yml(plugin, "loot.yml", true);
         load();
+        addBooksOnce();
+    }
+
+    /**
+     * loot.yml files written before the upgrade books existed have tiers of their own, so the new
+     * default entries never show up there. Adds them once, then remembers it did.
+     */
+    private void addBooksOnce() {
+        YamlConfiguration c = yml.get();
+        if (c.getBoolean("migrations.books", false)) return;
+        boolean any = false;
+        for (List<Entry> list : tiers.values()) for (Entry e : list) if (e.special != null && UpgradeBooks.Kind.of(e.special) != null) any = true;
+        if (!any) {
+            Rarity[][] r = {{Rarity.RARE, Rarity.RARE, Rarity.EPIC}, {Rarity.RARE, Rarity.RARE, Rarity.RARE}, {Rarity.COMMON, Rarity.RARE, Rarity.RARE}};
+            for (int t = 1; t <= 3; t++) {
+                int i = 0;
+                for (UpgradeBooks.Kind k : UpgradeBooks.Kind.values()) {
+                    tier(t).add(new Entry(UpgradeBooks.create(plugin, k, 1), r[t - 1][i++], 1, 1, false, k.id));
+                }
+            }
+        }
+        c.set("migrations.books", true);
+        save();
     }
 
     public void reload() {
@@ -92,6 +115,9 @@ public final class LootTables {
         ItemStack item = null;
         if ("one_time_shield".equalsIgnoreCase(special)) {
             item = OneTimeShield.create(plugin, 1);
+        } else if (special != null && UpgradeBooks.Kind.of(special) != null) {
+            item = UpgradeBooks.create(plugin, UpgradeBooks.Kind.of(special), 1);
+            special = UpgradeBooks.Kind.of(special).id;
         } else if (m.get("item") != null) {
             item = Items.fromB64(str(m.get("item")));
             special = null;
@@ -146,6 +172,31 @@ public final class LootTables {
         for (Entry e : tier(tier)) table.add(new LootRoller.Entry<>(e.item, e.rarity, e.min, e.max, e.pearl));
         var opts = new LootRoller.Options(minSlots, maxSlots, 27, weights, luckier, lucky, pearls);
         return LootRoller.roll(table, opts, rng);
+    }
+
+    // ---- chest amount / spacing / fill, edited in the loot GUI (stored in loot.yml) ----
+
+    public int chestBase() { return yml.get().getInt("chests.base", 200); }
+    public double chestPerPlayer() { return yml.get().getDouble("chests.per-player", 3.0); }
+    public int chestMax() { return yml.get().getInt("chests.max", 600); }
+    public double chestSpacing() { return yml.get().getDouble("chests.min-distance", 10); }
+    public int minSlots() { return minSlots; }
+    public int maxSlots() { return maxSlots; }
+
+    /** Tier shares as whole percentages (bronze, silver, gold). */
+    public int[] tierShares() {
+        List<Double> sh = yml.get().getDoubleList("chests.tier-shares");
+        if (sh.size() != 3) return new int[]{60, 30, 10};
+        double sum = sh.get(0) + sh.get(1) + sh.get(2);
+        if (sum <= 0) return new int[]{60, 30, 10};
+        return new int[]{(int) Math.round(sh.get(0) * 100 / sum), (int) Math.round(sh.get(1) * 100 / sum), (int) Math.round(sh.get(2) * 100 / sum)};
+    }
+
+    public void setSetting(String path, Object value) {
+        yml.get().set(path, value);
+        if (path.equals("slots.min")) minSlots = ((Number) value).intValue();
+        if (path.equals("slots.max")) maxSlots = ((Number) value).intValue();
+        yml.save();
     }
 
     public Map<Rarity, Double> weights() {

@@ -1,45 +1,50 @@
 package com.cartroyale.rank;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
- * Ranks come from permission nodes, which LuckPerms grants through groups. The plugin never
- * links against the LuckPerms API: temporary groups are granted by dispatching LuckPerms' own
- * console command, so the jar also starts on a server without LuckPerms.
+ * Every perk is its own permission node, so ranks are built in LuckPerms (or any permissions
+ * plugin) by giving a group the nodes it should have. cartzone.rank.vip / vipplus in plugin.yml
+ * are only ready-made bundles of these nodes. The plugin never links against the LuckPerms API:
+ * temporary groups are granted by dispatching LuckPerms' own console command, so the jar also
+ * starts on a server without LuckPerms.
  */
 public final class Ranks {
 
-    public enum Rank { DEFAULT, VIP, VIPPLUS, ADMIN }
-
     public static final String ADMIN = "cartzone.admin";
-    public static final String VIP = "cartzone.rank.vip";
-    public static final String VIPPLUS = "cartzone.rank.vipplus";
+    public static final String PURGE_IMMUNE = "cartzone.perk.purge-immune";
+    public static final String LOBBY_WIND = "cartzone.perk.lobby-wind";
+    public static final String LOBBY_ELYTRA = "cartzone.perk.lobby-elytra";
 
     private Ranks() {
     }
 
-    public static Rank of(Player p) {
-        if (p.hasPermission(ADMIN)) return Rank.ADMIN;
-        if (p.hasPermission(VIPPLUS)) return Rank.VIPPLUS;
-        if (p.hasPermission(VIP)) return Rank.VIP;
-        return Rank.DEFAULT;
+    public static boolean isAdmin(Player p) {
+        return p.hasPermission(ADMIN);
+    }
+
+    /** Perk nodes default to false, so an op only has them when a group grants them. */
+    public static boolean has(Player p, String perk) {
+        return p.isPermissionSet(perk) && p.hasPermission(perk);
     }
 
     /**
-     * Bought rank ignoring admin, for tags and lobby perks. The rank nodes default to false in
-     * plugin.yml, so an op only has them when a group grants them.
+     * Purge weight: the lowest weight among the purge.weight-perms nodes the player has, else
+     * purge.weights.default. Lower = less likely to be purged.
      */
-    public static Rank bought(Player p) {
-        if (p.hasPermission(VIPPLUS)) return Rank.VIPPLUS;
-        if (p.hasPermission(VIP)) return Rank.VIP;
-        return Rank.DEFAULT;
-    }
-
-    public static boolean isAdmin(Player p) {
-        return p.hasPermission(ADMIN);
+    public static double purgeWeight(Player p, FileConfiguration cfg) {
+        double w = cfg.getDouble("purge.weights.default", 1.0);
+        var sec = cfg.getConfigurationSection("purge.weight-perms");
+        if (sec == null) return w;
+        for (Map.Entry<String, Object> e : sec.getValues(false).entrySet()) {
+            if (e.getValue() instanceof Number n && has(p, e.getKey())) w = Math.min(w, n.doubleValue());
+        }
+        return w;
     }
 
     public static boolean luckPerms() {

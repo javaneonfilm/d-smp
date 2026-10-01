@@ -75,10 +75,11 @@ public final class ChestManager {
         var cfg = plugin.getConfig();
         // Config is read here on the main thread; the picking (hundreds of thousands of candidates)
         // happens on the async thread that loaded the spots, never on the main thread (TECH-1).
-        int want = ChestSpots.countFor(players, cfg.getInt("chests.base", 20), cfg.getDouble("chests.per-player", 2.0), cfg.getInt("chests.max", 300));
-        double minDist = cfg.getDouble("chests.min-distance", 24);
-        List<Double> sh = cfg.getDoubleList("chests.tier-shares");
-        double[] shares = sh.size() == 3 ? new double[]{sh.get(0), sh.get(1), sh.get(2)} : new double[]{0.6, 0.3, 0.1};
+        LootTables lt = plugin.loot();
+        int want = ChestSpots.countFor(players, lt.chestBase(), lt.chestPerPlayer(), lt.chestMax());
+        double minDist = lt.chestSpacing();
+        int[] sh = lt.tierShares();
+        double[] shares = {sh[0], sh[1], sh[2]};
         Random rng = new Random();
         return plugin.scanner().spots(w, mc, plugin.arenas().spotsFile(mc.name)).thenApplyAsync(spots -> {
             List<ChestSpots.Spot> picked = ChestSpots.pick(spots, minDist, want, rng);

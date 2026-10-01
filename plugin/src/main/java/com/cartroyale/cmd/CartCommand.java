@@ -35,7 +35,7 @@ import java.util.UUID;
 public final class CartCommand implements TabExecutor {
 
     private static final List<String> SUBS = List.of("help", "host", "start", "stop", "queue", "cancel", "schedule", "kit", "arena", "zone",
-        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "test", "shield", "shop");
+        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "test", "shield", "shop", "book");
 
     private final CartRoyale plugin;
 
@@ -126,10 +126,17 @@ public final class CartCommand implements TabExecutor {
                 }
                 case "diag" -> diag(s);
                 case "test" -> {
-                    // /cart test [player]: a practice game on the live server, solo is fine.
-                    Player p = a.length > 1 ? Bukkit.getPlayerExact(a[1]) : s instanceof Player self ? self : null;
-                    if (p == null) return usage(s, "/cart test [player]");
-                    plugin.games().startTest(s, p);
+                    // /cart test [player] [minutes]: a practice game on the live server, solo is fine.
+                    // Minutes default to the normal match length; 3-40 so a quick check stays possible.
+                    int minutes = 0;
+                    String who = null;
+                    for (int i = 1; i < a.length; i++) {
+                        if (a[i].chars().allMatch(Character::isDigit)) minutes = Math.max(3, Math.min(40, Integer.parseInt(a[i])));
+                        else who = a[i];
+                    }
+                    Player p = who != null ? Bukkit.getPlayerExact(who) : s instanceof Player self ? self : null;
+                    if (p == null) return usage(s, "/cart test [player] [minutes]");
+                    plugin.games().startTest(s, p, minutes);
                 }
                 case "selftest" -> new SelfTest(plugin).run(s);
                 case "shield" -> {
@@ -140,6 +147,22 @@ public final class CartCommand implements TabExecutor {
                     if (a.length > 2) p.getInventory().setItemInOffHand(OneTimeShield.create(plugin, n));
                     else p.getInventory().addItem(OneTimeShield.create(plugin, n));
                     m(s, "admin.shield-given", "n", n);
+                }
+                case "book" -> {
+                    // /cart book <armor|sharpness|quickcharge> [n] [player]
+                    if (a.length < 2) return usage(s, "/cart book <armor|sharpness|quickcharge> [n] [player]");
+                    com.cartroyale.loot.UpgradeBooks.Kind k = switch (a[1].toLowerCase()) {
+                        case "armor" -> com.cartroyale.loot.UpgradeBooks.Kind.ARMOR;
+                        case "sharpness" -> com.cartroyale.loot.UpgradeBooks.Kind.SHARPNESS;
+                        case "quickcharge" -> com.cartroyale.loot.UpgradeBooks.Kind.QUICKCHARGE;
+                        default -> null;
+                    };
+                    int n = a.length > 2 ? Integer.parseInt(a[2]) : 1;
+                    Player p = a.length > 3 ? Bukkit.getPlayerExact(a[3]) : s instanceof Player self ? self : null;
+                    if (k == null || p == null) return usage(s, "/cart book <armor|sharpness|quickcharge> [n] [player]");
+                    p.getInventory().addItem(com.cartroyale.loot.UpgradeBooks.create(plugin, k, n));
+                    plugin.books().queue(p);
+                    m(s, "admin.book-given", "player", p.getName(), "n", n, "book", k.id.replace('_', ' '));
                 }
                 case "shop" -> {
                     if (!(s instanceof Player p)) return notPlayer(s);
@@ -537,6 +560,7 @@ public final class CartCommand implements TabExecutor {
             case "arena" -> a.length == 2 ? List.of("info", "list", "save", "load", "tp", "setspawn", "setcenter", "setborder", "setdeploy")
                 : a.length == 3 && a[1].equalsIgnoreCase("load") ? plugin.arenas().maps() : List.of();
             case "zone" -> a.length == 2 ? List.of("info", "start", "final", "preview") : List.of();
+            case "book" -> a.length == 2 ? List.of("armor", "sharpness", "quickcharge") : List.of();
             case "chests" -> a.length == 2 ? List.of("info", "include", "exclude", "clearzones", "scan", "test", "clear") : List.of();
             case "ticket" -> a.length == 2 ? List.of("give", "revoke", "list") : a.length == 3 ? names() : List.of();
             case "coins" -> a.length == 2 ? List.of("give", "take", "set") : a.length == 3 ? names() : List.of();
