@@ -5,7 +5,9 @@ Everything needed around the plugin and site. Tick these off in roughly this ord
 ## 1. Domain and DNS
 - [ ] Buy **cartzone.vip** (unregistered when checked on 2026-09-30). Turn on auto-renew and registrar 2FA.
 - [ ] Website: point the domain at the static host (follow the host's instructions).
-- [ ] Game address: an **A record** `play.cartzone.vip` → the Minecraft server's IP. If the server isn't on port 25565, also add an **SRV record** `_minecraft._tcp.play` → target `play.cartzone.vip`, port = your port.
+- [ ] Game address: players type plain **`cartzone.vip`**. The bare domain also serves the website, so the game uses an **SRV record** (Minecraft checks it first):
+  - an **A record** `mc.cartzone.vip` → the Minecraft server's IP (Purpify shows it; leave the proxy/orange cloud OFF if using Cloudflare),
+  - an **SRV record** name `_minecraft._tcp` (on `cartzone.vip`), priority 0, weight 5, port = the server's port, target `mc.cartzone.vip`.
 - [ ] Optional: the store on its own subdomain (`store.cartzone.vip`) via CraftingStore's custom-domain guide. HTTPS on a custom domain needs their Silver plan.
 
 ## 2. Minecraft server

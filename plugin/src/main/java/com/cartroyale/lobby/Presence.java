@@ -173,7 +173,7 @@ public final class Presence implements Listener {
 
     private void updateBar(Player p, BossBar bar) {
         boolean styled = hasPack(p.getUniqueId());
-        String ip = plugin.getConfig().getString("server-ip", "play.cartzone.vip");
+        String ip = plugin.getConfig().getString("server-ip", "cartzone.vip");
         bar.name(styled ? HudText.bar(plugin.msg().get("ip-bar.styled", "ip", ip), ip) : plugin.msg().get("ip-bar.plain", "ip", ip));
         bar.color(barColor());
     }

@@ -52,7 +52,7 @@ final class CartZoneExpansion extends PlaceholderExpansion {
                 return plugin.presence().stateLine();
             }
             case "ip" -> {
-                return plugin.getConfig().getString("server-ip", "play.cartzone.vip");
+                return plugin.getConfig().getString("server-ip", "cartzone.vip");
             }
             default -> {
             }

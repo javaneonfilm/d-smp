@@ -11,7 +11,7 @@ A static, dependency-free site: `site/index.html`, `site/assets/style.css`, `sit
 - **Look:** warm industrial "rail yard" theme (charcoal, TNT red, amber). Headings in Barlow Condensed, body in Barlow, data in JetBrains Mono (Google Fonts). The header's bottom edge is a rail with a cart that rides as you scroll. The hero has a clickable TNT cart with embers and an explosion effect.
 - **Sections:** Play (hero + status strip), How it works (ticket cards), News, Leaderboards (departure-board style: top riders + recent rounds), Store (VIP, VIP+, Game Ticket), Rules (accordions), Staff, Join.
 - **Config:** the first block of `assets/app.js` (`SITE`, `SHOP`, `DATA`, `DEMO`).
-  - `SITE.ip` = `play.cartzone.vip`, `SITE.discord` = `#`, `SITE.demo` = `true` (shows sample data).
+  - `SITE.ip` = `cartzone.vip`, `SITE.discord` = `#`, `SITE.demo` = `true` (shows sample data).
   - `SHOP` holds the three products. Each has a `url` that is empty, so buttons say "Coming soon".
 - **Live status:** the browser asks `api.mcsrvstat.us` for the server's online state and player count (`SITE.liveStatus`).
 - Works from `file://` or any static host. To preview: `python -m http.server 5173` inside `site/`.

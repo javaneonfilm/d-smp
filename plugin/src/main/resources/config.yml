@@ -1,7 +1,7 @@
 # CartZone - main config. Reload with /cart reload (worlds and the database need a restart).
 # Secrets (Discord webhook URL, stats token) do NOT go here. They live in secrets.yml.
 
-server-ip: play.cartzone.vip
+server-ip: cartzone.vip
 # Shown in the webhook title, e.g. "Game #12 (EU)". It is the server's region, not the domain.
 region: EU
 # Wall-clock times: schedule, Host GUI times, daily shop reset. Any Java zone id (UTC, Europe/Berlin...).

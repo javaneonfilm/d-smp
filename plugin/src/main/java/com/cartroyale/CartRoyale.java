@@ -106,6 +106,7 @@ public final class CartRoyale extends JavaPlugin {
             }
         }
         saveDefaultConfig();
+        migrateServerIp();
         getConfig().options().copyDefaults(true);
         saveConfig();
         writeSecretsExample();
@@ -247,6 +248,30 @@ public final class CartRoyale extends JavaPlugin {
         if (getConfig().getBoolean("resource-pack.enabled", false)) return true;
         String sp = getServer().getResourcePack();
         return sp != null && !sp.isBlank();
+    }
+
+    /**
+     * The address became plain cartzone.vip (2026-10-01). Existing config.yml files have the old one
+     * written in, so swap that single line in place (saveConfig would freeze every default into the file).
+     */
+    private void migrateServerIp() {
+        java.io.File f = new java.io.File(getDataFolder(), "config.yml");
+        try {
+            String txt = java.nio.file.Files.readString(f.toPath());
+            StringBuilder out = new StringBuilder();
+            for (String line : txt.split("\n", -1)) {
+                if (line.startsWith("server-ip:") && line.contains("play.cartzone.vip")) line = "server-ip: cartzone.vip";
+                out.append(line).append('\n');
+            }
+            String fixed = out.substring(0, out.length() - 1);
+            if (!fixed.equals(txt)) {
+                java.nio.file.Files.writeString(f.toPath(), fixed);
+                reloadConfig();
+                getLogger().info("config.yml: server-ip changed from play.cartzone.vip to cartzone.vip.");
+            }
+        } catch (java.io.IOException e) {
+            getLogger().warning("Could not update server-ip in config.yml: " + e.getMessage());
+        }
     }
 
     /** Match length limits for hosted games (host.limits.min-minutes / max-minutes). */

@@ -85,7 +85,7 @@ Send with `java.net.http.HttpClient` **asynchronously**. Retry on HTTP 429 using
 
 - **HOOK-1 Game hosted.** When a game is created. Message content: `<@&EVENTS_ROLE_ID>` with `allowed_mentions.roles` set. One embed:
   - Title: `Game #{id} ({region})`
-  - Description: `To be notified for games hosted, please go to <id:customize>` then a **Game Settings** list: Map, Team Size, Duration, Purge Cap, Mode, Modifiers (code-styled tags, or "None"), then an **Info** list: `Starting: <t:UNIX:R>` and `Server IP: \`play.cartzone.vip\``.
+  - Description: `To be notified for games hosted, please go to <id:customize>` then a **Game Settings** list: Map, Team Size, Duration, Purge Cap, Mode, Modifiers (code-styled tags, or "None"), then an **Info** list: `Starting: <t:UNIX:R>` and `Server IP: \`cartzone.vip\``.
   - No unicode emoji anywhere in webhook text (owner's rule). Custom server emojis only if the owner uploads them.
   - Footer: `Hosted by {hoster}`. Colour `#FF0000`.
 - **HOOK-2 5-minute warning.** 5 minutes before each game (including every queued game). Pings the role. Embed `5 minute warning!`, Server IP, "Hosted by".
@@ -212,7 +212,7 @@ Ranks come from LuckPerms groups/permissions (see `05_STORE-and-ranks.md`).
 
 ### 5.18 UI and branding (UI)
 - **UI-1** Primary colour **#FF0000**. MiniMessage everywhere. Prefix `<#FF0000><b>CartZone</b> <gray>»` (D22).
-- **UI-2 Top-centre IP bar.** A permanent boss-bar-style element for every player showing the IP (`play.cartzone.vip`, configurable). Build it with a custom boss-bar sprite plus a font glyph icon from the resource pack (see `reference/` image 3). Make it original: red, with the minecart icon. Choose a boss-bar colour slot no other bar uses, because a sprite override applies to every bar of that colour.
+- **UI-2 Top-centre IP bar.** A permanent boss-bar-style element for every player showing the IP (`cartzone.vip`, configurable). Build it with a custom boss-bar sprite plus a font glyph icon from the resource pack (see `reference/` image 3). Make it original: red, with the minecart icon. Choose a boss-bar colour slot no other bar uses, because a sprite override applies to every bar of that colour.
 - **UI-3 Resource pack** (D21). Generate `resourcepack/` and a zip with a stable SHA-1. Contents: One Time Shield item model (via `item_model`), the IP-bar sprites and font, and GUI icons if wanted. Set the correct `pack_format`, send the pack on join with a prompt, and handle declines with a clear message. The pack must not break vanilla visuals.
 - **UI-4** Every GUI title, button and message uses the brand style, with clear lore text. GUIs are safe: cancel all clicks and drags, and guard against dupe exploits.
 - **Acceptance:** with the pack applied, the shield has its model and the IP bar shows at the top centre. Without the pack, the game still works and shows a fallback boss bar with plain text.
