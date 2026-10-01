@@ -161,7 +161,7 @@ public final class CartRoyale extends JavaPlugin {
 
         register(new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
             presence = new Presence(this), new MatchListener(this), new ArenaRules(this),
-            books = new com.cartroyale.loot.UpgradeBooks(this));
+            books = new com.cartroyale.loot.UpgradeBooks(this), chests);
         CartCommand cart = new CartCommand(this);
         bind("cart", cart);
         SmallCommands small = new SmallCommands(this);

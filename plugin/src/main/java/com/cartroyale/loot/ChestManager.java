@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
  * LOOT-1/4/5/6/7: places tiered chests in small batches, fills them, floats a star hologram above
  * each, and removes every chest and hologram after the round.
  */
-public final class ChestManager {
+public final class ChestManager implements org.bukkit.event.Listener {
 
     private static final BlockFace[] FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 
@@ -38,6 +38,7 @@ public final class ChestManager {
     private final Set<Long> chestKeys = new HashSet<>();
     private final List<Location> chests = new ArrayList<>();
     private final List<UUID> holograms = new ArrayList<>();
+    private final java.util.Map<Long, UUID> holoAt = new java.util.HashMap<>();
     private String lastReport = "no chests placed yet";
 
     public ChestManager(CartRoyale plugin) {
@@ -140,6 +141,55 @@ public final class ChestManager {
             d.getPersistentDataContainer().set(Keys.ARENA_OBJECT, PersistentDataType.STRING, gameTag);
         });
         holograms.add(td.getUniqueId());
+        holoAt.put(key(b.getX(), b.getY(), b.getZ()), td.getUniqueId());
+    }
+
+    // ---------------- empty chests pop ----------------
+
+    @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTake(org.bukkit.event.inventory.InventoryClickEvent e) {
+        checkSoon(e.getView().getTopInventory());
+    }
+
+    @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDrag(org.bukkit.event.inventory.InventoryDragEvent e) {
+        checkSoon(e.getView().getTopInventory());
+    }
+
+    @org.bukkit.event.EventHandler
+    public void onClose(org.bukkit.event.inventory.InventoryCloseEvent e) {
+        checkSoon(e.getInventory());
+    }
+
+    /** After the click has landed: an emptied loot chest closes for everyone and pops. */
+    private void checkSoon(org.bukkit.inventory.Inventory inv) {
+        if (!(inv.getHolder() instanceof Chest)) return;
+        Location l = inv.getLocation();
+        if (l == null || !isLootChest(l.getBlock())) return;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            Block b = l.getBlock();
+            if (!isLootChest(b) || b.getType() != Material.CHEST || !(b.getState() instanceof Chest c) || !c.getBlockInventory().isEmpty()) return;
+            pop(b);
+        });
+    }
+
+    private void pop(Block b) {
+        long k = key(b.getX(), b.getY(), b.getZ());
+        if (b.getState() instanceof Chest c) {
+            for (var viewer : new ArrayList<>(c.getBlockInventory().getViewers())) viewer.closeInventory();
+        }
+        b.setType(Material.AIR, false);
+        chestKeys.remove(k);
+        chests.removeIf(l -> l.getBlockX() == b.getX() && l.getBlockY() == b.getY() && l.getBlockZ() == b.getZ());
+        UUID holo = holoAt.remove(k);
+        if (holo != null) {
+            Entity h = Bukkit.getEntity(holo);
+            if (h != null) h.remove();
+            holograms.remove(holo);
+        }
+        Location c = b.getLocation().add(0.5, 0.5, 0.5);
+        b.getWorld().spawnParticle(org.bukkit.Particle.POOF, c, 12, 0.25, 0.25, 0.25, 0.02);
+        b.getWorld().playSound(c, org.bukkit.Sound.ENTITY_ITEM_PICKUP, 1f, 0.8f);
     }
 
     private Component stars(int tier) {
@@ -162,6 +212,7 @@ public final class ChestManager {
         chests.clear();
         chestKeys.clear();
         holograms.clear();
+        holoAt.clear();
     }
 
     /** TECH-2: removes any plugin-tagged entity in the arena (holograms, ghasts) left by a crash. */

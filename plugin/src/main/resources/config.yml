@@ -97,6 +97,10 @@ books:
 upgrades:
   armor-on-kill: true       # a kill upgrades the killer's worn armor one tier (iron > diamond > netherite)
 
+sounds:
+  kill: cartzone:kill       # played to the killer (from the resource pack); '' turns it off
+  kill-volume: 1.0
+
 shield:
   item-model: cartzone:one_time_shield
 

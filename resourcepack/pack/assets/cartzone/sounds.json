@@ -1,0 +1,8 @@
+{
+  "kill": {
+    "category": "master",
+    "sounds": [
+      "cartzone:kill"
+    ]
+  }
+}

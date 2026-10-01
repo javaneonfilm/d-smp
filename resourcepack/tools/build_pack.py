@@ -8,6 +8,7 @@ Contents, all original art drawn here:
 - IP bar: the PINK boss bar is made invisible and its title draws a red rounded bar with a
   minecart icon (font cartzone:hud). Nothing else on the server uses a pink bar.
 - Upgrade books: armor / quickcharge / sharpness textures from resourcepack/books/ (his art).
+- Kill sound: resourcepack/sounds/kill.ogg (kill1 from the Mace.VIP pack), event cartzone:kill.
 - Zone wall: the hexagon circle-border shader from the Mace.VIP pack, copied from
   resourcepack/zone-wall/ (see SOURCE.txt there). Item model lodestone:border.
 Output: resourcepack/pack/ (the files) and cartzone-pack.zip + SHA-1 in docs/RESOURCEPACK.md.
@@ -227,6 +228,11 @@ def main():
         shutil.copyfile(os.path.join(ROOT, "books", name + ".png"), os.path.join(OUT, "assets", "cartzone", "textures", "item", name + ".png"))
         write_json("assets/cartzone/models/item/" + name + ".json", {"parent": "minecraft:item/generated", "textures": {"layer0": "cartzone:item/" + name}})
         write_json("assets/cartzone/items/" + name + ".json", {"model": {"type": "minecraft:model", "model": "cartzone:item/" + name}})
+
+    # Kill sound (kill1.ogg from the Mace.VIP pack), played to the killer as cartzone:kill.
+    os.makedirs(os.path.join(OUT, "assets", "cartzone", "sounds"), exist_ok=True)
+    shutil.copyfile(os.path.join(ROOT, "sounds", "kill.ogg"), os.path.join(OUT, "assets", "cartzone", "sounds", "kill.ogg"))
+    write_json("assets/cartzone/sounds.json", {"kill": {"category": "master", "sounds": ["cartzone:kill"]}})
 
     for base, _, names in os.walk(ZONE_WALL):
         for n in names:

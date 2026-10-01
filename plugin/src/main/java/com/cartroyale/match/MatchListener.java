@@ -192,6 +192,12 @@ public final class MatchListener implements Listener {
             if (kp != null && !m.sameTeam(killer, p.getUniqueId())) {
                 plugin.cosmetics().playKill(kp, p.getLocation());
                 plugin.books().onKill(kp);
+                // The kill sound from the pack, for the killer only.
+                String snd = plugin.getConfig().getString("sounds.kill", "cartzone:kill");
+                if (snd != null && !snd.isBlank()) {
+                    kp.playSound(net.kyori.adventure.sound.Sound.sound(net.kyori.adventure.key.Key.key(snd),
+                        net.kyori.adventure.sound.Sound.Source.MASTER, (float) plugin.getConfig().getDouble("sounds.kill-volume", 1.0), 1f));
+                }
             }
         }
         plugin.games().eliminate(p.getUniqueId(), killer, false);
