@@ -6,3 +6,5 @@ tools/bots/node_modules/
 *.db
 *.log
 CartZone.jar
+server-upload/
+CartZone-server-files.zip

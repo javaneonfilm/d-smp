@@ -124,7 +124,7 @@ public final class Deployment implements Listener {
         int perRow = Math.max(1, cfg.getInt("deploy.per-row", 8));
         double width = (Math.min(perRow, ghasts) - 1) * cfg.getDouble("deploy.spacing", 9) + 32;
         double depth = ((ghasts + perRow - 1) / perRow) * cfg.getDouble("deploy.row-gap", 12) + 16;
-        double dist = cfg.getDouble("deploy.distance", 300) + 32;
+        double dist = (mc.deployDistance > 0 ? mc.deployDistance : cfg.getDouble("deploy.distance", 300)) + 32;
         java.util.Set<Long> keys = new java.util.HashSet<>();
         for (double t = -depth; t <= dist; t += 8) {
             for (double s = -width / 2; s <= width / 2; s += 8) {
@@ -169,7 +169,7 @@ public final class Deployment implements Listener {
         dir = new Vector(-Math.sin(yaw), 0, Math.cos(yaw)).normalize();
         Vector side = new Vector(-dir.getZ(), 0, dir.getX());
         speed = cfg.getDouble("deploy.speed", 0.6);
-        distance = cfg.getDouble("deploy.distance", 300);
+        distance = mc.deployDistance > 0 ? mc.deployDistance : cfg.getDouble("deploy.distance", 300);
         int seats = Math.max(1, Math.min(4, cfg.getInt("deploy.riders-per-ghast", 4)));
         double spacing = cfg.getDouble("deploy.spacing", 9), rowGap = cfg.getDouble("deploy.row-gap", 12);
         int perRow = Math.max(1, cfg.getInt("deploy.per-row", 8));

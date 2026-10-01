@@ -88,7 +88,8 @@ function start(i) {
       if (!bot.entity || !landedLogged || bot.game.gameMode === 'spectator') return;
       const near = bot.nearestEntity(e => e.type === 'player' && e.username !== name && e.position.distanceTo(bot.entity.position) < 40);
       // No one close: head for the final zone centre (stand-in arena default 40,30), like a real player would.
-      const target = near || { position: bot.entity.position.clone().set(40, bot.entity.position.y, 30) };
+      const ctr = (process.argv.find(a => a.startsWith('--centre=')) || '--centre=40,30').slice(9).split(',').map(Number);
+      const target = near || { position: bot.entity.position.clone().set(ctr[0], bot.entity.position.y, ctr[1]) };
       bot.lookAt(target.position.offset(0, 1.5, 0), true);
       const d = target.position.distanceTo(bot.entity.position);
       if (!near && d < 3) { bot.clearControlStates(); return; }

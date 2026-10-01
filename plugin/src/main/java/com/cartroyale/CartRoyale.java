@@ -144,6 +144,7 @@ public final class CartRoyale extends JavaPlugin {
         hostGui = new HostGui(this);
         lootEditor = new LootEditorGui(this);
         lobby = new Lobby(this);
+        lobby.applyRules();
         games = new GameManager(this);
         scheduler = new Scheduler(this);
         scheduleGui = new ScheduleGui(this);

@@ -45,6 +45,8 @@ public final class MapConfig {
     public float spawnYaw;
     public double deployX = -250, deployZ, deployY = 140;
     public float deployYaw = -90;
+    /** Ghast route length for this map; 0 uses deploy.distance from config.yml. */
+    public double deployDistance;
     public double zoneX, zoneZ, zoneR = 300;
     public double finalX = 40, finalZ = 30;
     public int chestMinY = -64, chestMaxY = 320;
@@ -71,6 +73,7 @@ public final class MapConfig {
         deployZ = c.getDouble("deploy.z", deployZ);
         deployY = c.getDouble("deploy.y", deployY);
         deployYaw = (float) c.getDouble("deploy.yaw", deployYaw);
+        deployDistance = c.getDouble("deploy.distance", 0);
         zoneX = c.getDouble("zone.start.x", centerX);
         zoneZ = c.getDouble("zone.start.z", centerZ);
         zoneR = c.getDouble("zone.start.r", borderRadius);
@@ -108,6 +111,7 @@ public final class MapConfig {
         c.set("deploy.z", deployZ);
         c.set("deploy.y", deployY);
         c.set("deploy.yaw", deployYaw);
+        c.set("deploy.distance", deployDistance);
         c.set("zone.start.x", zoneX);
         c.set("zone.start.z", zoneZ);
         c.set("zone.start.r", zoneR);

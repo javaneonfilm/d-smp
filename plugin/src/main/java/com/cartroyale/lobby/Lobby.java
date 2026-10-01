@@ -69,6 +69,22 @@ public final class Lobby implements Listener {
         return w != null ? w : Bukkit.getWorlds().get(0);
     }
 
+    /** LOBBY-1: a calm lobby whatever the imported world's own settings are. */
+    public void applyRules() {
+        World w = world();
+        w.setGameRule(org.bukkit.GameRule.DO_MOB_SPAWNING, false);
+        w.setGameRule(org.bukkit.GameRule.DO_PATROL_SPAWNING, false);
+        w.setGameRule(org.bukkit.GameRule.DO_TRADER_SPAWNING, false);
+        w.setGameRule(org.bukkit.GameRule.DO_WEATHER_CYCLE, false);
+        w.setGameRule(org.bukkit.GameRule.DO_FIRE_TICK, false);
+        w.setGameRule(org.bukkit.GameRule.MOB_GRIEFING, false);
+        w.setGameRule(org.bukkit.GameRule.ANNOUNCE_ADVANCEMENTS, false);
+        w.setGameRule(org.bukkit.GameRule.DO_IMMEDIATE_RESPAWN, true);
+        w.setGameRule(org.bukkit.GameRule.SPAWN_RADIUS, 0);
+        w.setStorm(false);
+        w.setThundering(false);
+    }
+
     public boolean isLobby(World w) {
         return w != null && w.equals(world());
     }

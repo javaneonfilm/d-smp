@@ -67,3 +67,14 @@ TPS stayed at 19.8-20 in the final run. The bots and the server ran on the same 
 - LuckPerms (not installed on the dev server): the `host` group grant and the `[VIP]` / `[VIP+]` tags from real groups.
 - A real Discord channel and a real CraftingStore purchase.
 - The real arena map.
+
+## The Lost Island and the Cubrix lobby (2026-10-01)
+
+- Island world (1.21.4) force-upgraded to 1.21.11 (41,655 chunks). Build measured from the height maps:
+  x -921..-35, z -968..-9, top y 208, flat ocean around it at y 71. Template trimmed to 9 region files (79 MB).
+- Lobby world trimmed from 974 MB to 28 MB (only the 4 region files that hold the build).
+- Chest scan: 529,182 spots in 24 s; 140 chests for 60 players placed without lag. Self-test: all PASS.
+- 8-bot match on the island: route at y 236, drops and landings on terrain between y 83 and 126, chestplates
+  restored, average tick 2 ms. The first route ended near the east shore and two auto-dropped bots glided into
+  the sea; the route now ends over the middle (x -800 to -280) and a rerun landed everyone on the island.
+- A fresh server built only from `CartZone-server-files.zip` booted into the island and passed the self-test.
