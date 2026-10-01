@@ -167,7 +167,7 @@ game:
   test-started: '<prefix><yellow>Test game #<id></yellow> <white>for <player> starts in a few seconds. <gray>Solo is fine. No Discord, no stats, no restart. /cart stop ends it.'
   reason-stopped: 'stopped by <by>'
   reason-cancelled: 'cancelled by <by>'
-  zone-start: '<prefix><white>Everyone has dropped. The zone is live, about <minutes> minutes to the final circle.'
+  zone-start: '<prefix><white>Everyone has dropped. The zone is live and fully closes <minutes> minutes after the start.'
   elim: '<gray><victim> <dark_gray>was eliminated. <gray><left> left.'
   elim-by: '<gray><victim> <dark_gray>was eliminated by</dark_gray> <#FF0000><killer></#FF0000><dark_gray>. <gray><left> left.'
   elim-quit: '<gray><victim> <dark_gray>left the game. <gray><left> left.'
@@ -213,6 +213,7 @@ zone:
   previewing: '<prefix><white>Drawing every phase circle around you for 15 seconds.'
   info-head: '<prefix><white><phases> phases, about <minutes> minutes in total:'
   info-line: '<gray> <n>. wait <wait>s, shrink <shrink>s to r<r> at <x>,<z> <dark_gray>|</dark_gray> <gray><dmg> dmg <dark_gray>|</dark_gray> <gray>done at <at>'
+  info-closed: '<gray> Then the zone is fully closed: everyone left takes zone damage until one is left.'
   info-orbit: '<gray> Then the circle orbits <x>,<z> at radius <r>, <speed> blocks/s.'
 
 spectate:
@@ -433,7 +434,7 @@ help:
     - '<white>/cart play | build | spectate | free | shield [n] | shop | reload | setlobby'
     - '<white>/cart diag <gray>- everything that could be wrong, on one screen'
     - '<white>/cart selftest <gray>- blows up a TNT cart in the arena and checks the block rules'
-    - '<white>/cart test [player] [minutes] <gray>- practice game now (3-40 min, default 30), solo is fine, no Discord/stats/restart'
+    - '<white>/cart test [player] [minutes] <gray>- practice game now (zone closes after 3-40 min, default 20), solo is fine, no Discord/stats/restart'
 
 schedule:
   today-head: "<prefix><white>Today's games (<count>):"
@@ -457,8 +458,8 @@ gui:
     squad-lore: ['<dark_gray>Click to change.']
     cap: '<white>Purge cap: <yellow><value>'
     cap-lore: ['<gray>Most players who get in.', '<gray>Limits: <min> to <max>.', '<dark_gray>Left +10, right -10, shift for 1.']
-    duration: '<white>Match length: <yellow><value> min'
-    duration-lore: ['<gray>The zone shrinks so the match lasts this long.', '<gray>Limits: <min> to <max> minutes.', '<dark_gray>Left +5, right -5, shift for 1.']
+    duration: '<white>Zone fully closed after: <yellow><value> min'
+    duration-lore: ['<gray>The zone shrinks to nothing by then.', '<gray>Limits: <min> to <max> minutes.', '<dark_gray>Left +5, right -5, shift for 1.']
     map: '<white>Map: <yellow><value>'
     map-lore: ['<dark_gray>Left next, right previous.']
     time: '<white>Start: <yellow><value>'
@@ -467,7 +468,7 @@ gui:
     next-free: '<white>Next free slot'
     next-free-lore: ['<dark_gray>Jump to the next open time.']
     summary: '<white>Summary'
-    summary-lore: ['<gray>Mode: <white><mode>', '<gray>Team size: <white><team_size>', '<gray>Purge cap: <white><cap>', '<gray>Modifiers: <white><modifiers>', '<gray>Map: <white><map>', '<gray>Start: <white><time>', '<gray>Length: <white><duration> minutes']
+    summary-lore: ['<gray>Mode: <white><mode>', '<gray>Team size: <white><team_size>', '<gray>Purge cap: <white><cap>', '<gray>Modifiers: <white><modifiers>', '<gray>Map: <white><map>', '<gray>Start: <white><time>', '<gray>Zone closed after: <white><duration> min']
     cancel: '<#FF0000>Cancel'
     cancel-lore: ['<dark_gray>Nothing is spent.']
     finish: '<#7DDC6A><b>Finish</b>'

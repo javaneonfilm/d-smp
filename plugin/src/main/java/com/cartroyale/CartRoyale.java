@@ -260,7 +260,7 @@ public final class CartRoyale extends JavaPlugin {
         s.modifiers.addAll(Modifier.parseSet(String.join(",", getConfig().getStringList("host.defaults.modifiers"))));
         s.squad = getConfig().getInt("host.defaults.squad", 1);
         s.purgeCap = getConfig().getInt("host.default-cap", 100);
-        s.minutes = clampMinutes(getConfig().getInt("match.default-minutes", 30));
+        s.minutes = clampMinutes(getConfig().getInt("match.zone-close-minutes", 20));
         return s;
     }
 

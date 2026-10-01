@@ -67,19 +67,50 @@ public final class Zone {
     }
 
     /**
-     * The phases from zone.yml with their wait and shrink times stretched (or squeezed) so that
-     * deploy + zone add up to {@code minutes}. Radii and damage stay as written.
+     * The phases from zone.yml, timed so the zone is fully closed {@code minutes} after the game
+     * starts (deploy included). zone.yml's seconds only set the proportions. With close-fully the
+     * last circle shrinks to nothing. No shrink is faster than max-speed blocks/s: a phase that
+     * would be takes the time out of its own wait instead.
      */
-    public List<ZoneMath.Phase> phasesFor(int minutes) {
+    public List<ZoneMath.Phase> phasesFor(int minutes, double startR) {
         List<ZoneMath.Phase> base = phases();
         double written = plannedSeconds();
         double want = Math.max(60, minutes * 60.0 - plugin.getConfig().getInt("deploy.planned-seconds", 60));
-        if (written <= 0) return base;
+        if (written <= 0 || base.isEmpty()) return base;
         double f = want / written;
+        boolean closeFully = yml.get().getBoolean("close-fully", true);
+        double maxSpeed = Math.max(0.1, yml.get().getDouble("max-speed", 1.5));
+        double minWait = 10;
+        int n = base.size();
+        double[] w = new double[n], sh = new double[n], r = new double[n];
+        double prev = startR;
+        for (int i = 0; i < n; i++) {
+            ZoneMath.Phase p = base.get(i);
+            r[i] = closeFully && i == n - 1 ? 0 : Math.min(p.endRadius(), prev);
+            w[i] = p.waitSeconds() * f;
+            sh[i] = p.shrinkSeconds() * f;
+            double need = (prev - r[i]) / maxSpeed;
+            if (sh[i] < need) {
+                double extra = need - sh[i];
+                sh[i] = need;
+                w[i] = Math.max(minWait, w[i] - extra);
+            }
+            prev = r[i];
+        }
+        // Taking time from waits can't always cover it; squeeze the waits so the total still fits.
+        double total = 0, waits = 0;
+        for (int i = 0; i < n; i++) {
+            total += w[i] + sh[i];
+            waits += w[i];
+        }
+        if (total > want && waits > 0) {
+            double k = Math.max(0, (waits - (total - want)) / waits);
+            for (int i = 0; i < n; i++) w[i] *= k;
+        }
         List<ZoneMath.Phase> out = new ArrayList<>();
-        for (ZoneMath.Phase p : base) {
-            out.add(new ZoneMath.Phase((int) Math.round(p.waitSeconds() * f), (int) Math.round(p.shrinkSeconds() * f),
-                p.endRadius(), p.damageHp(), p.damageIntervalTicks()));
+        for (int i = 0; i < n; i++) {
+            ZoneMath.Phase p = base.get(i);
+            out.add(new ZoneMath.Phase((int) Math.round(w[i]), (int) Math.round(sh[i]), r[i], p.damageHp(), p.damageIntervalTicks()));
         }
         return out;
     }
@@ -89,9 +120,11 @@ public final class Zone {
     }
 
     public ZoneMath.Plan planFor(MapConfig mc, int minutes) {
-        double orbitR = yml.get().getDouble("orbit.radius", 100), speed = yml.get().getDouble("orbit.speed", 4.3);
-        double[] oc = ZoneMath.orbitCenter(mc.finalX, mc.finalZ, mc.centerX, mc.centerZ, orbitR);
-        return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, phasesFor(minutes), orbitR, speed, oc[0], oc[1]);
+        boolean closeFully = yml.get().getBoolean("close-fully", true);
+        // A circle of nothing has nowhere to orbit to.
+        double orbitR = closeFully ? 0 : yml.get().getDouble("orbit.radius", 100), speed = yml.get().getDouble("orbit.speed", 4.3);
+        double[] oc = ZoneMath.orbitCenter(mc.finalX, mc.finalZ, mc.centerX, mc.centerZ, Math.max(1, orbitR));
+        return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, phasesFor(minutes, mc.zoneR), orbitR, speed, oc[0], oc[1]);
     }
 
     public boolean running() {

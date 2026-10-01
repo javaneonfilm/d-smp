@@ -1,8 +1,8 @@
 # The zone (D11). Each phase waits, then shrinks to its radius. Damage is in half-hearts
 # (2 = one heart) every `interval` ticks (20 = 1 second) while outside.
 # The start circle and final centre are set per map: /cart zone start <radius>, /cart zone final.
-# The wait/shrink seconds below only set the proportions: every game stretches them so the whole
-# match (deploy + zone) lasts its chosen length (host GUI, 20-40 min; match.default-minutes otherwise).
+# The wait/shrink seconds below only set the proportions: every game stretches them so the zone is
+# fully closed at the game's length (config.yml match.zone-close-minutes = 20, or the host's 20-40).
 phases:
   - {wait: 180, shrink: 120, radius: 250, damage: 2, interval: 20}
   - {wait: 150, shrink: 100, radius: 160, damage: 2, interval: 20}
@@ -10,7 +10,12 @@ phases:
   - {wait: 90, shrink: 75, radius: 40, damage: 4, interval: 20}
   - {wait: 60, shrink: 60, radius: 5, damage: 6, interval: 20}
 
-# After the last phase the 5-block circle orbits on a ring of this radius at walking speed.
+# close-fully: the last circle shrinks to nothing (radius 0), so the zone is fully closed at the end.
+# max-speed: no shrink is faster than this many blocks per second; the time comes out of the wait.
+close-fully: true
+max-speed: 1.5
+
+# Only without close-fully: after the last phase the final circle orbits on a ring of this radius at walking speed.
 orbit:
   radius: 100
   speed: 4.3        # blocks per second

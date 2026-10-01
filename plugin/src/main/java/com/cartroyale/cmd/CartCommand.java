@@ -372,7 +372,8 @@ public final class CartCommand implements TabExecutor {
                     m(s, "zone.info-line", "n", i + 1, "wait", ph.waitSeconds(), "shrink", ph.shrinkSeconds(), "r", (int) c.r(),
                         "x", (int) c.x(), "z", (int) c.z(), "dmg", ph.damageHp(), "at", Times.mmss(t));
                 }
-                m(s, "zone.info-orbit", "x", (int) plan.orbitCenterX(), "z", (int) plan.orbitCenterZ(), "r", (int) plan.orbitRadius(), "speed", plan.orbitSpeed());
+                if (plan.orbitRadius() <= 0) m(s, "zone.info-closed");
+                else m(s, "zone.info-orbit", "x", (int) plan.orbitCenterX(), "z", (int) plan.orbitCenterZ(), "r", (int) plan.orbitRadius(), "speed", plan.orbitSpeed());
             }
         }
         return true;

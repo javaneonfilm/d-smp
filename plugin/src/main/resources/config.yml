@@ -78,7 +78,7 @@ elytra:
   allow-fireworks: false
 
 match:
-  default-minutes: 30       # match length when nobody picks one (scheduled games, /cart start, /cart test)
+  zone-close-minutes: 20    # the zone is fully closed this long after the game starts (unless the host picks 20-40)
   hard-timeout-extra-minutes: 5
   end-kick-seconds: 10
   restart-after: true       # END-5: shut down once after a game; the host restarts the server
