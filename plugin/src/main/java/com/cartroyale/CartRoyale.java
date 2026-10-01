@@ -236,6 +236,16 @@ public final class CartRoyale extends JavaPlugin {
         }
     }
 
+    /**
+     * Whether players get the CartZone pack at all: through resource-pack.* here, or through
+     * server.properties (resource-pack=...), which the host panel may set instead.
+     */
+    public boolean packOn() {
+        if (getConfig().getBoolean("resource-pack.enabled", false)) return true;
+        String sp = getServer().getResourcePack();
+        return sp != null && !sp.isBlank();
+    }
+
     /** Match length limits for hosted games (host.limits.min-minutes / max-minutes). */
     public int clampMinutes(int m) {
         int lo = getConfig().getInt("host.limits.min-minutes", 20), hi = getConfig().getInt("host.limits.max-minutes", 40);

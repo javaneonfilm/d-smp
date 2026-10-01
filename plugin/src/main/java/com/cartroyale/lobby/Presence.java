@@ -50,6 +50,7 @@ public final class Presence implements Listener {
     private final CartRoyale plugin;
     private final Map<UUID, BossBar> bars = new HashMap<>();
     private final Set<UUID> packLoaded = new HashSet<>();
+    private final Set<UUID> packFailed = new HashSet<>();
     private final UUID packId = UUID.nameUUIDFromBytes("cartzone-pack".getBytes());
 
     public Presence(CartRoyale plugin) {
@@ -129,6 +130,7 @@ public final class Presence implements Listener {
         BossBar bar = bars.remove(p.getUniqueId());
         if (bar != null) p.hideBossBar(bar);
         packLoaded.remove(p.getUniqueId());
+        packFailed.remove(p.getUniqueId());
         plugin.nametags().remove(p);
     }
 
@@ -170,7 +172,7 @@ public final class Presence implements Listener {
     }
 
     private void updateBar(Player p, BossBar bar) {
-        boolean styled = packLoaded.contains(p.getUniqueId()) && plugin.getConfig().getBoolean("resource-pack.enabled", false);
+        boolean styled = hasPack(p.getUniqueId());
         String ip = plugin.getConfig().getString("server-ip", "play.cartzone.vip");
         bar.name(styled ? HudText.bar(plugin.msg().get("ip-bar.styled", "ip", ip), ip) : plugin.msg().get("ip-bar.plain", "ip", ip));
         bar.color(barColor());
@@ -203,11 +205,13 @@ public final class Presence implements Listener {
         switch (e.getStatus()) {
             case SUCCESSFULLY_LOADED -> {
                 packLoaded.add(p.getUniqueId());
+                packFailed.remove(p.getUniqueId());
                 BossBar bar = bars.get(p.getUniqueId());
                 if (bar != null) updateBar(p, bar);
             }
             case DECLINED, FAILED_DOWNLOAD, INVALID_URL, FAILED_RELOAD, DISCARDED -> {
                 packLoaded.remove(p.getUniqueId());
+                packFailed.add(p.getUniqueId());
                 if (plugin.getConfig().getBoolean("resource-pack.required", true) && e.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED) {
                     p.kick(plugin.msg().get("pack.declined-kick"));
                 } else {
@@ -277,6 +281,18 @@ public final class Presence implements Listener {
 
     public boolean packLoaded(UUID u) {
         return packLoaded.contains(u);
+    }
+
+    /**
+     * Whether this player can be assumed to have the CartZone pack. A pack set in server.properties
+     * is applied before the player joins, so no status event ever reaches the plugin for it; then
+     * everyone counts as having it unless their pack later failed.
+     */
+    public boolean hasPack(UUID u) {
+        if (packLoaded.contains(u)) return true;
+        if (packFailed.contains(u)) return false;
+        String sp = plugin.getServer().getResourcePack();
+        return sp != null && !sp.isBlank();
     }
 
     public static boolean inGame(GameState s) {

@@ -131,7 +131,8 @@ public final class Zone {
         ZoneMath.Circle c = s.circle();
         int interval = Math.max(1, s.damageIntervalTicks());
         boolean drawTick = tick % Math.max(1, yml.get().getInt("particles.every-ticks", 4)) == 0;
-        boolean shader = !"particles".equalsIgnoreCase(yml.get().getString("wall.mode", "shader"));
+        String mode = yml.get().getString("wall.mode", "shader");
+        boolean shader = !"particles".equalsIgnoreCase(mode), all = "shader-all".equalsIgnoreCase(mode);
         double baseY = yml.get().getDouble("wall.base-y", 0), reanchor = yml.get().getDouble("wall.reanchor-distance", 48);
         wall.beginTick();
         Set<UUID> walled = new HashSet<>();
@@ -139,7 +140,7 @@ public final class Zone {
             Location l = p.getLocation();
             boolean playing = match.isAlive(p.getUniqueId()) && p.getGameMode() != GameMode.SPECTATOR;
             boolean outside = !c.contains(l.getX(), l.getZ());
-            if (shader && wall.update(p, c, baseY, reanchor)) walled.add(p.getUniqueId());
+            if (shader && wall.update(p, c, baseY, reanchor, all)) walled.add(p.getUniqueId());
             else if (drawTick) draw(p, c);
             if (tick % 10 == 0) updateBar(p, s);
             if (!playing) continue;

@@ -55,8 +55,8 @@ final class ZoneWall {
     }
 
     /** Draws the wall for one player. False when they can't see shader walls (no pack), so the caller falls back to particles. */
-    boolean update(Player p, ZoneMath.Circle c, double baseY, double reanchor) {
-        if (!plugin.presence().packLoaded(p.getUniqueId())) {
+    boolean update(Player p, ZoneMath.Circle c, double baseY, double reanchor, boolean all) {
+        if (!all && !plugin.presence().hasPack(p.getUniqueId())) {
             remove(p.getUniqueId());
             return false;
         }

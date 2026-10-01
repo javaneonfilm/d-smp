@@ -400,6 +400,7 @@ diag:
   webhook: '<gray>Discord: <white><status></white>, events role <white><role>'
   stats: '<gray>Website stats: <white><status>'
   pack: '<gray>Resource pack: <white><enabled></white>, <white><url>'
+  pack-you: '<gray>Your pack, as CartZone sees it: <white><state>'
   perms: '<gray>Permissions: <white><lp></white>, database <white><db>'
   time: '<gray>Time zone <white><zone></white>, now <white><now>'
   shop: '<gray>Daily shop today: <white><items>'

@@ -73,7 +73,7 @@ public final class UpgradeBooks implements Listener {
     public static ItemStack create(CartRoyale plugin, Kind k, int amount) {
         ItemStack it = new ItemStack(Material.BOOK);
         it.setData(DataComponentTypes.MAX_STACK_SIZE, 16);
-        if (plugin.getConfig().getBoolean("resource-pack.enabled", false)) it.setData(DataComponentTypes.ITEM_MODEL, Key.key("cartzone", k.id));
+        if (plugin.packOn()) it.setData(DataComponentTypes.ITEM_MODEL, Key.key("cartzone", k.id));
         it.setData(DataComponentTypes.ITEM_NAME, plugin.msg().item("items.books." + k.msg + ".name"));
         it.setData(DataComponentTypes.LORE, ItemLore.lore(plugin.msg().lore("items.books." + k.msg + ".lore")));
         it.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);

@@ -533,8 +533,11 @@ public final class CartCommand implements TabExecutor {
         lines.add(plugin.msg().plain("diag.webhook", "status", plugin.hooks().status(),
             "role", plugin.getConfig().getString("webhooks.events-role-id", "").isBlank() ? "NOT SET" : "set"));
         lines.add(plugin.msg().plain("diag.stats", "status", plugin.stats().status()));
-        lines.add(plugin.msg().plain("diag.pack", "enabled", plugin.getConfig().getBoolean("resource-pack.enabled") ? "on" : "off",
-            "url", plugin.getConfig().getString("resource-pack.url", "").isBlank() ? "no url" : "url set"));
+        String sp = plugin.getServer().getResourcePack();
+        boolean spSet = sp != null && !sp.isBlank();
+        lines.add(plugin.msg().plain("diag.pack", "enabled", plugin.getConfig().getBoolean("resource-pack.enabled") ? "on" : spSet ? "via server.properties" : "off",
+            "url", plugin.getConfig().getBoolean("resource-pack.enabled") ? (plugin.getConfig().getString("resource-pack.url", "").isBlank() ? "no url" : "url set") : spSet ? "url set" : "no url"));
+        if (s instanceof Player self) lines.add(plugin.msg().plain("diag.pack-you", "state", plugin.presence().hasPack(self.getUniqueId()) ? "yes (shader wall)" : "no (particles)"));
         lines.add(plugin.msg().plain("diag.perms", "lp", Ranks.luckPerms() ? "LuckPerms found" : "LuckPerms NOT installed", "db", plugin.db().healthy() ? "ok" : "FAILED"));
         lines.add(plugin.msg().plain("diag.shop", "items", String.join(", ", plugin.cosmetics().shop())));
         lines.add(plugin.msg().plain("diag.time","zone", plugin.zoneId().getId(), "now", Times.dayClock(System.currentTimeMillis(), plugin.zoneId())));
