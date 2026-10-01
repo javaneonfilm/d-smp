@@ -46,10 +46,7 @@ public final class OneTimeShield implements Listener {
         it.unsetData(DataComponentTypes.DAMAGE);
         it.setData(DataComponentTypes.MAX_STACK_SIZE, 16);
         if (blocking != null) it.setData(DataComponentTypes.BLOCKS_ATTACKS, blocking);
-        String model = plugin.getConfig().getString("shield.item-model", "cartzone:one_time_shield");
-        if (plugin.packOn() && model != null && !model.isBlank()) {
-            it.setData(DataComponentTypes.ITEM_MODEL, Key.key(model));
-        }
+        // Vanilla shield look (no custom model); the stack count shows on the slot as usual.
         it.setData(DataComponentTypes.ITEM_NAME, plugin.msg().item("items.one-time-shield.name"));
         it.setData(DataComponentTypes.LORE, io.papermc.paper.datacomponent.item.ItemLore.lore(plugin.msg().lore("items.one-time-shield.lore")));
         Items.tagged(it, ID);

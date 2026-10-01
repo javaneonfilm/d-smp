@@ -71,7 +71,7 @@ public final class ChestManager implements org.bukkit.event.Listener {
     }
 
     /** Finds spots (cached or scanned), then places and fills chests over the next ticks. */
-    public CompletableFuture<Integer> spawn(World w, MapConfig mc, int players, boolean luckier, boolean pearls, String gameTag) {
+    public CompletableFuture<Integer> spawn(World w, MapConfig mc, com.cartroyale.game.Mode mode, int players, boolean luckier, boolean pearls, String gameTag) {
         clear(w);
         var cfg = plugin.getConfig();
         // Config is read here on the main thread; the picking (hundreds of thousands of candidates)
@@ -98,7 +98,7 @@ public final class ChestManager implements org.bukkit.event.Listener {
                 if (placed.isEmpty()) done.complete(0);
                 for (ChestSpots.Placed p : placed) {
                     w.getChunkAtAsync(p.spot().x() >> 4, p.spot().z() >> 4, true).whenComplete((c, t) -> {
-                        if (t == null) place(w, p, luckier, pearls, rng, gameTag);
+                        if (t == null) place(w, p, mode, luckier, pearls, rng, gameTag);
                         if (left.decrementAndGet() == 0) done.complete(chests.size());
                     });
                 }
@@ -107,7 +107,7 @@ public final class ChestManager implements org.bukkit.event.Listener {
         });
     }
 
-    private void place(World w, ChestSpots.Placed p, boolean luckier, boolean pearls, Random rng, String gameTag) {
+    private void place(World w, ChestSpots.Placed p, com.cartroyale.game.Mode mode, boolean luckier, boolean pearls, Random rng, String gameTag) {
         Block b = w.getBlockAt(p.spot().x(), p.spot().y(), p.spot().z());
         if (!b.getType().isAir()) return;
         b.setType(Material.CHEST, false);
@@ -120,7 +120,7 @@ public final class ChestManager implements org.bukkit.event.Listener {
             chest.customName(plugin.msg().get("chests.name-" + p.tier()));
             chest.update(true, false);
             var inv = ((Chest) b.getState()).getBlockInventory();
-            for (var slot : plugin.loot().roll(p.tier(), luckier, pearls, rng)) {
+            for (var slot : plugin.loot().roll(mode, p.tier(), luckier, pearls, rng)) {
                 ItemStack it = slot.item().clone();
                 it.setAmount(slot.amount());
                 inv.setItem(slot.slot(), it);

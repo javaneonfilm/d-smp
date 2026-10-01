@@ -320,7 +320,7 @@ public final class GameManager {
                 if (left <= 0) finishTeaming();
             }
             case PLAYING -> {
-                long hard = (match.row.s.minutes + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
+                long hard = (match.row.s.minutes + plugin.getConfig().getInt("match.grace-minutes", 5) + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
                 if (now - match.playingAt >= hard) end(true);
             }
             case ENDING -> {
@@ -459,7 +459,7 @@ public final class GameManager {
         w.setGameRule(GameRule.FALL_DAMAGE, !s.has(Modifier.NO_FALL_DAMAGE));
         long id = match.id();
         long t0 = System.nanoTime();
-        plugin.chests().spawn(w, mc, match.players.size(), s.has(Modifier.LUCKIER_LOOT), s.has(Modifier.PEARLS), "game-" + id)
+        plugin.chests().spawn(w, mc, s.mode, match.players.size(), s.has(Modifier.LUCKIER_LOOT), s.has(Modifier.PEARLS), "game-" + id)
             .thenAccept(n -> plugin.getLogger().info("Game #" + id + ": " + plugin.chests().report()))
             .exceptionally(t -> {
                 plugin.getLogger().log(Level.WARNING, "Chest placement failed", t);
@@ -484,7 +484,7 @@ public final class GameManager {
         plugin.zone().start(match, plugin.arenas().world(), plugin.arenas().map());
         for (UUID u : match.players.keySet()) {
             Player p = Bukkit.getPlayer(u);
-            if (p != null) plugin.msg().send(p, "game.zone-start", "minutes", match.row.s.minutes);
+            if (p != null) plugin.msg().send(p, "game.zone-start-grace", "minutes", match.row.s.minutes, "grace", plugin.getConfig().getInt("match.grace-minutes", 5));
         }
         checkWin();
     }

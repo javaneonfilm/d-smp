@@ -5,6 +5,7 @@ import com.cartroyale.game.Match;
 import com.cartroyale.rank.Ranks;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -15,9 +16,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * One scoreboard team per player on the main scoreboard carries the rank tag (prefix), the
- * equipped suffix, and in a match the team colour (TEAM-2), so every name shows the same thing
- * in chat, the tab list and above the head.
+ * One scoreboard team per player on the main scoreboard carries the rank badge (prefix), the
+ * equipped suffix, and the name colour (rank colour, or the team colour in a match, TEAM-2), so
+ * every name shows the same thing in chat, the tab list and above the head. When the TAB plugin
+ * is installed it draws the tab list and nametags instead, from the cartzone_* placeholders.
  */
 public final class Nametags {
 
@@ -41,23 +43,57 @@ public final class Nametags {
         return "cr" + u.toString().replace("-", "").substring(0, 14);
     }
 
-    /** The first entry of config.yml `tags` whose permission the player has (top = highest rank). */
-    public Component tag(Player p) {
-        for (java.util.Map<?, ?> m : plugin.getConfig().getMapList("tags")) {
-            Object perm = m.get("permission"), tag = m.get("tag");
-            if (perm == null || tag == null) continue;
-            if (Ranks.has(p, String.valueOf(perm))) return plugin.msg().parse(String.valueOf(tag));
-        }
-        return Component.empty();
+    /** A rank from config.yml rank-tags: the badge glyph and the name colour that goes with it. */
+    public record RankTag(String id, String tag, TextColor color) {
     }
 
-    public NamedTextColor color(UUID u) {
+    private static final RankTag NONE = new RankTag("default", "", null);
+
+    /** The first entry of config.yml `rank-tags` whose permission the player has (top = highest rank). */
+    public RankTag rank(Player p) {
+        for (java.util.Map<?, ?> m : plugin.getConfig().getMapList("rank-tags")) {
+            Object perm = m.get("permission");
+            if (perm == null || !Ranks.has(p, String.valueOf(perm))) continue;
+            Object id = m.get("id"), tag = m.get("tag"), col = m.get("name-color");
+            TextColor c = col == null ? null : TextColor.fromHexString(String.valueOf(col));
+            return new RankTag(id == null ? String.valueOf(perm) : String.valueOf(id), tag == null ? "" : String.valueOf(tag), c);
+        }
+        return NONE;
+    }
+
+    public Component tag(Player p) {
+        String t = rank(p).tag();
+        return t.isEmpty() ? Component.empty() : plugin.msg().parse(t);
+    }
+
+    /** Name colour: the match team colour in a team game, otherwise the rank's colour, otherwise white. */
+    public TextColor color(Player p) {
+        Integer t = matchTeam.get(p.getUniqueId());
+        if (t != null) return COLORS[t % COLORS.length];
+        TextColor c = rank(p).color();
+        return c == null ? NamedTextColor.WHITE : c;
+    }
+
+    public TextColor color(UUID u) {
+        Player p = Bukkit.getPlayer(u);
+        if (p != null) return color(p);
         Integer t = matchTeam.get(u);
         return t == null ? NamedTextColor.WHITE : COLORS[t % COLORS.length];
     }
 
-    /** Rebuilds a player's tag, suffix and colour everywhere. */
+    /** The TAB plugin draws the tab list and nametags itself (from our PlaceholderAPI placeholders). */
+    public static boolean tabPlugin(CartRoyale plugin) {
+        String mode = plugin.getConfig().getString("tab-plugin", "auto");
+        if ("off".equalsIgnoreCase(mode)) return false;
+        return "on".equalsIgnoreCase(mode) || Bukkit.getPluginManager().isPluginEnabled("TAB");
+    }
+
+    /** Rebuilds a player's tag, colour and suffix in the tab list and above the head. */
     public void refresh(Player p) {
+        if (tabPlugin(plugin)) {
+            remove(p);
+            return;
+        }
         Scoreboard b = board();
         String name = teamName(p.getUniqueId());
         Team t = b.getTeam(name);
@@ -67,9 +103,11 @@ public final class Nametags {
         t.prefix(prefix.equals(Component.empty()) ? Component.empty() : prefix.append(Component.space()));
         Component suffix = plugin.cosmetics().suffixComponent(p.getUniqueId());
         t.suffix(suffix == null ? Component.empty() : Component.space().append(suffix));
-        t.color(color(p.getUniqueId()));
+        TextColor c = color(p);
+        // Names above the head can only take the 16 team colours; the tab list and chat get the exact one.
+        t.color(NamedTextColor.nearestTo(c));
         t.setAllowFriendlyFire(true);
-        Component list = Component.empty().append(t.prefix()).append(Component.text(p.getName(), color(p.getUniqueId()))).append(t.suffix());
+        Component list = Component.empty().append(t.prefix()).append(Component.text(p.getName(), c)).append(t.suffix());
         p.playerListName(list);
     }
 

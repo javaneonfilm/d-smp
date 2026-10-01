@@ -170,6 +170,9 @@ public final class CartRoyale extends JavaPlugin {
         bind("spectate", small);
 
         stats = new Stats(this);
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            getLogger().info(com.cartroyale.hooks.papi.PapiHook.register(this) ? "PlaceholderAPI: %cartzone_*% placeholders registered." : "PlaceholderAPI: could not register %cartzone_*%.");
+        }
         games.startTicking();
         started = true;
         for (Player p : Bukkit.getOnlinePlayers()) lobby.send(p);

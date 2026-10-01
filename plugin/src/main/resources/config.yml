@@ -78,7 +78,8 @@ elytra:
   allow-fireworks: false
 
 match:
-  zone-close-minutes: 20    # the zone is fully closed this long after the game starts (unless the host picks 20-40)
+  grace-minutes: 5          # after everyone lands: no PvP and the zone holds still for this long
+  zone-close-minutes: 20    # then the zone is fully closed this long later (unless the host picks 20-40)
   hard-timeout-extra-minutes: 5
   end-kick-seconds: 10
   restart-after: true       # END-5: shut down once after a game; the host restarts the server
@@ -121,13 +122,21 @@ cosmetics:
 ranks:
   wind-charges: 16          # lobby wind charges for cartzone.perk.lobby-wind
 
-# Chat and nametag tags. The FIRST entry whose permission a player has is shown, so put the
-# highest rank at the top. Make a rank in LuckPerms, give the group a node from here (or add a
-# new line with your own node, e.g. cartzone.tag.mvp) and it shows.
-tags:
-  - {permission: cartzone.tag.staff, tag: '<#FF0000>[Staff]</#FF0000>'}
-  - {permission: cartzone.tag.vipplus, tag: '<#FFD700>[VIP+]</#FFD700>'}
-  - {permission: cartzone.tag.vip, tag: '<#7DDC6A>[VIP]</#7DDC6A>'}
+# Rank badges and name colours, shown in chat, the tab list and above the head (and in the TAB
+# plugin through %cartzone_tag% / %cartzone_namecolor%). The FIRST entry whose permission a player
+# has wins, so the highest rank goes on top. The badges are pictures from the resource pack:
+#  VIP,  VIP+,  HOST,  MOD,  ADMIN. A tag can also be plain text,
+# e.g. tag: '<gold>[MVP]'. To use one, give a LuckPerms group the permission.
+rank-tags:
+  - {id: admin, permission: cartzone.tag.admin, tag: "", name-color: '#FF3333'}
+  - {id: mod, permission: cartzone.tag.mod, tag: "", name-color: '#2E9BFF'}
+  - {id: host, permission: cartzone.tag.host, tag: "", name-color: '#33CC33'}
+  - {id: vipplus, permission: cartzone.tag.vipplus, tag: "", name-color: '#E01B1B'}
+  - {id: vip, permission: cartzone.tag.vip, tag: "", name-color: '#FF6B6B'}
+
+# auto = if the TAB plugin is installed, TAB draws the tab list, header and nametags (see
+# plugins/TAB in the upload folder); on/off force it.
+tab-plugin: auto
 
 lobby-items:
   grapple:

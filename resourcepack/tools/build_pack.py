@@ -3,8 +3,7 @@
     py resourcepack/tools/build_pack.py
 
 Contents, all original art drawn here:
-- One Time Shield: a 3D shield model (item_model cartzone:one_time_shield) with a
-  separate blocking pose, TNT-red face with a crack across it.
+- Rank badges (resourcepack/ranks/, his art) as U+E100-E104 in the default font.
 - IP bar: the PINK boss bar is made invisible and its title draws a red rounded bar with a
   minecart icon (font cartzone:hud). Nothing else on the server uses a pink bar.
 - Upgrade books: armor / quickcharge / sharpness textures from resourcepack/books/ (his art).
@@ -146,33 +145,18 @@ def shield_blocking_model():
 # ---------------------------------------------------------------- HUD
 
 def bar_background():
+    """Black at 50% opacity, corners cut by one pixel."""
     img = Image.new("RGBA", (BAR_W, BAR_H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     w, h = BAR_W - 1, BAR_H - 1
-    # pixel-rounded outline (corners cut by one pixel), dark rim, red body, highlight row
-    d.rectangle([1, 0, w - 1, h], fill=DEEP)
-    d.rectangle([0, 1, w, h - 1], fill=DEEP)
-    d.rectangle([2, 1, w - 2, h - 1], fill=DARK_RED)
-    d.rectangle([1, 2, w - 1, h - 2], fill=DARK_RED)
-    d.rectangle([2, 2, w - 2, h - 3], fill=(205, 16, 8, 255))
-    d.line([3, 2, w - 3, 2], fill=(255, 84, 60, 255))
-    d.line([3, h - 2, w - 3, h - 2], fill=(120, 10, 4, 255))
-    # small hazard ticks on both ends, a nod to the site's stripes
-    for x in (4, 6, w - 6, w - 4):
-        d.line([x, 4, x, h - 4], fill=(255, 150, 60, 110))
+    d.rectangle([1, 0, w - 1, h], fill=(0, 0, 0, 128))
+    d.point([(0, y) for y in range(1, h)] + [(w, y) for y in range(1, h)], fill=(0, 0, 0, 128))
     return img
 
 
 def cart_icon():
-    img = Image.new("RGBA", (ICON_W, ICON_H + 1), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.rectangle([0, 1, 8, 5], fill=CHAR)           # cart body outline
-    d.rectangle([1, 2, 7, 4], fill=IRON_LIGHT)     # body
-    d.rectangle([2, 0, 6, 1], fill=TNT)            # TNT load
-    d.point([(4, 0)], fill=WHITE)                  # fuse spark
-    d.rectangle([1, 6, 2, 7], fill=CHAR)           # wheels
-    d.rectangle([6, 6, 7, 7], fill=CHAR)
-    return img
+    """His TNT minecart picture, kept at 4x (42x40) so the font scales it down cleanly to 10 px."""
+    return Image.open(os.path.join(ROOT, "ranks", "cart_icon.png")).convert("RGBA")
 
 
 def invisible_bar():
@@ -187,7 +171,7 @@ def hud_font():
         advances[chr(0xF821 + i)] = 1 << i
     return {
         "providers": [
-            {"type": "bitmap", "file": "cartzone:font/cart.png", "ascent": ICON_ASCENT, "height": ICON_H + 1, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/cart.png", "ascent": 8, "height": 10, "chars": [""]},
             {"type": "bitmap", "file": "cartzone:font/bar.png", "ascent": BAR_ASCENT, "height": BAR_H, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
@@ -209,21 +193,24 @@ def main():
             {"min_format": 88, "max_format": 1000, "directory": "overlay_26"}]}})
     save_png("pack.png", Image.open(os.path.join(PROJECT, "site", "assets", "logo.png")).convert("RGBA").resize((128, 128), Image.LANCZOS))
 
-    save_png("assets/cartzone/textures/item/one_time_shield.png", shield_texture())
-    write_json("assets/cartzone/models/item/one_time_shield.json", shield_model())
-    write_json("assets/cartzone/models/item/one_time_shield_blocking.json", shield_blocking_model())
-    write_json("assets/cartzone/items/one_time_shield.json", {"model": {
-        "type": "minecraft:condition", "property": "minecraft:using_item",
-        "on_false": {"type": "minecraft:model", "model": "cartzone:item/one_time_shield"},
-        "on_true": {"type": "minecraft:model", "model": "cartzone:item/one_time_shield_blocking"}}})
+    # The One Time Shield uses the vanilla shield look again (his call), so no shield model here.
 
     save_png("assets/cartzone/textures/font/bar.png", bar_background())
+
+    # Rank badges in the DEFAULT font, so they work as plain characters anywhere: chat,
+    # nametags, the tab list and the TAB plugin. Keep the chars in sync with config.yml rank-tags.
+    for name, ch in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", "")]:
+        shutil.copyfile(os.path.join(ROOT, "ranks", name + ".png"), os.path.join(OUT, "assets", "cartzone", "textures", "font", "rank_" + name + ".png"))
+    write_json("assets/minecraft/font/default.json", {"providers": [
+        {"type": "bitmap", "file": "cartzone:font/rank_" + n + ".png", "ascent": 8, "height": 9, "chars": [c]}
+        for n, c in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", "")]]})
     save_png("assets/cartzone/textures/font/cart.png", cart_icon())
     write_json("assets/cartzone/font/hud.json", hud_font())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_progress.png", invisible_bar())
 
     # Upgrade books: his 16x16 textures from resourcepack/books/, flat item models.
+    os.makedirs(os.path.join(OUT, "assets", "cartzone", "textures", "item"), exist_ok=True)
     for name in ("armor_upgrade_book", "quickcharge_book", "sharpness_book"):
         shutil.copyfile(os.path.join(ROOT, "books", name + ".png"), os.path.join(OUT, "assets", "cartzone", "textures", "item", name + ".png"))
         write_json("assets/cartzone/models/item/" + name + ".json", {"parent": "minecraft:item/generated", "textures": {"layer0": "cartzone:item/" + name}})

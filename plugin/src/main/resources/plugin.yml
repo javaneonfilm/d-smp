@@ -5,7 +5,7 @@ api-version: '1.21.11'
 author: Cuda
 website: https://cartzone.vip
 description: Minecart PvP battle royale - hosted games, purge, ghast drops, loot, zone, cosmetics.
-softdepend: [LuckPerms]
+softdepend: [LuckPerms, PlaceholderAPI, TAB]
 load: POSTWORLD
 
 commands:
@@ -32,7 +32,7 @@ permissions:
     default: op
     children:
       cartzone.host: true
-      cartzone.tag.staff: true
+      cartzone.tag.admin: true
   cartzone.host:
     description: Can open the Host GUI when holding a ticket.
     default: true
@@ -48,14 +48,20 @@ permissions:
   cartzone.perk.lobby-elytra:
     description: An elytra in the lobby.
     default: false
-  cartzone.tag.staff:
-    description: '[Staff] chat and nametag tag (config.yml tags).'
+  cartzone.tag.admin:
+    description: ADMIN badge and red name (config.yml rank-tags).
+    default: false
+  cartzone.tag.mod:
+    description: MOD badge and blue name.
+    default: false
+  cartzone.tag.host:
+    description: HOST badge and green name (give it to the LuckPerms group tickets grant).
     default: false
   cartzone.tag.vipplus:
-    description: '[VIP+] chat and nametag tag.'
+    description: VIP+ badge and dark red name.
     default: false
   cartzone.tag.vip:
-    description: '[VIP] chat and nametag tag.'
+    description: VIP badge and light red name.
     default: false
   # Ready-made bundles, kept so existing groups keep working. You don't have to use them.
   cartzone.rank.vip:

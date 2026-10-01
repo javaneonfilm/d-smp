@@ -379,6 +379,11 @@ public final class CartCommand implements TabExecutor {
         return true;
     }
 
+    /** Entry count of one tier in both pools, "lt|ht". */
+    private String pools(int t) {
+        return plugin.loot().tier(com.cartroyale.game.Mode.LT, t).size() + "|" + plugin.loot().tier(com.cartroyale.game.Mode.HT, t).size();
+    }
+
     /** ZONE-4 preview: draws every phase circle around the admin for 15 seconds. */
     private void preview(Player p, MapConfig mc) {
         ZoneMath.Plan plan = plugin.zone().planFor(mc);
@@ -456,7 +461,7 @@ public final class CartCommand implements TabExecutor {
                 }
                 int players = a.length > 2 ? Integer.parseInt(a[2]) : 20;
                 m(s, "chests.testing", "players", players);
-                plugin.chests().spawn(w, mc, players, false, true, "test").thenAccept(n ->
+                plugin.chests().spawn(w, mc, com.cartroyale.game.Mode.LT, players, false, true, "test").thenAccept(n ->
                     Bukkit.getScheduler().runTask(plugin, () -> m(s, "chests.tested", "report", plugin.chests().report())));
             }
             case "clear" -> {
@@ -526,7 +531,7 @@ public final class CartCommand implements TabExecutor {
             "map", String.valueOf(plugin.arenas().loadedMap()), "template", mc != null && plugin.arenas().hasTemplate(mc.name) ? "yes" : "no",
             "spots", mc != null && plugin.arenas().spotsFile(mc.name).exists() ? "cached" : "not scanned"));
         lines.add(plugin.msg().plain("diag.kits", "lt", plugin.kits().has(Mode.LT) ? "set" : "MISSING", "ht", plugin.kits().has(Mode.HT) ? "set" : "MISSING"));
-        lines.add(plugin.msg().plain("diag.loot", "t1", plugin.loot().tier(1).size(), "t2", plugin.loot().tier(2).size(), "t3", plugin.loot().tier(3).size(),
+        lines.add(plugin.msg().plain("diag.loot", "t1", pools(1), "t2", pools(2), "t3", pools(3),
             "chests", plugin.chests().report()));
         lines.add(plugin.msg().plain("diag.deploy", "report", plugin.deploy().report()));
         lines.add(plugin.msg().plain("diag.zone", "running", plugin.zone().running() ? "running" : "idle", "minutes", plugin.announcer().durationMinutes()));

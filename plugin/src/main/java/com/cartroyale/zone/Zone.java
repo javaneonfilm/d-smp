@@ -38,6 +38,7 @@ public final class Zone {
     private World world;
     private Match match;
     private long tick;
+    private boolean wasGrace;
     private final ZoneWall wall;
     private final BossBar bar = BossBar.bossBar(net.kyori.adventure.text.Component.empty(), 1f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10);
 
@@ -131,9 +132,23 @@ public final class Zone {
         return task != null;
     }
 
+    /** Grace period at the start (match.grace-minutes): no PvP and the zone holds still. Added on top of the zone time. */
+    public long graceMs() {
+        return Math.max(0, plugin.getConfig().getInt("match.grace-minutes", 5)) * 60_000L;
+    }
+
+    public boolean inGrace() {
+        return task != null && System.currentTimeMillis() - startedAt < graceMs();
+    }
+
+    public int graceSecondsLeft() {
+        return (int) Math.max(0, Math.ceil((graceMs() - (System.currentTimeMillis() - startedAt)) / 1000.0));
+    }
+
     public ZoneMath.State now() {
         if (plan == null) return null;
-        return ZoneMath.at(plan, (System.currentTimeMillis() - startedAt) / 1000.0);
+        // During the grace period the clock is negative, which ZoneMath reads as a longer first wait.
+        return ZoneMath.at(plan, (System.currentTimeMillis() - startedAt - graceMs()) / 1000.0);
     }
 
     public void start(Match m, World w, MapConfig mc) {
@@ -144,6 +159,7 @@ public final class Zone {
         startedAt = System.currentTimeMillis();
         tick = 0;
         wall.model(yml.get().getString("wall.item-model", "lodestone:border"));
+        wasGrace = graceMs() > 0;
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
     }
 
@@ -157,6 +173,15 @@ public final class Zone {
 
     private void tick() {
         tick++;
+        boolean grace = inGrace();
+        if (wasGrace && !grace && match != null) {
+            for (Player p : world.getPlayers()) {
+                plugin.msg().send(p, "zone.grace-over");
+                p.showTitle(net.kyori.adventure.title.Title.title(plugin.msg().get("zone.grace-over-title"), plugin.msg().get("zone.grace-over-sub")));
+                p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ENDER_DRAGON_GROWL, 0.6f, 1.2f);
+            }
+        }
+        wasGrace = grace;
         // Local copy: a zone kill can end the match (and null the field) halfway through the loop.
         Match match = this.match;
         if (world == null || match == null) return;
@@ -193,10 +218,11 @@ public final class Zone {
     }
 
     private void updateBar(Player p, ZoneMath.State s) {
-        String key = s.orbiting() ? "zone.bar-orbit" : s.shrinking() ? "zone.bar-shrinking" : "zone.bar-waiting";
-        bar.name(plugin.msg().get(key, "seconds", (int) Math.ceil(s.secondsLeftInStep()), "phase", s.phase() + 1,
+        String key = inGrace() ? "zone.bar-grace" : s.orbiting() ? "zone.bar-orbit" : s.shrinking() ? "zone.bar-shrinking" : "zone.bar-waiting";
+        int secs = inGrace() ? graceSecondsLeft() : (int) Math.ceil(s.secondsLeftInStep());
+        bar.name(plugin.msg().get(key, "seconds", secs, "time", String.format("%d:%02d", secs / 60, secs % 60), "phase", s.phase() + 1,
             "phases", plan.phases().size(), "radius", (int) Math.round(s.circle().r())));
-        double total = ZoneMath.totalSeconds(plan);
+        double total = ZoneMath.totalSeconds(plan) + graceMs() / 1000.0;
         float prog = total <= 0 ? 0 : (float) Math.max(0, Math.min(1, 1 - ((System.currentTimeMillis() - startedAt) / 1000.0) / total));
         bar.progress(prog);
         p.showBossBar(bar);

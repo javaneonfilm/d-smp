@@ -2,6 +2,7 @@ package com.cartroyale.loot;
 
 import com.cartroyale.CartRoyale;
 import com.cartroyale.core.Yml;
+import com.cartroyale.game.Mode;
 import com.cartroyale.shield.OneTimeShield;
 import com.cartroyale.util.Items;
 import org.bukkit.Material;
@@ -46,7 +47,8 @@ public final class LootTables {
 
     private final CartRoyale plugin;
     private final Yml yml;
-    private final Map<Integer, List<Entry>> tiers = new LinkedHashMap<>();
+    /** Keyed "lt.1" .. "ht.3": one pool per game mode, three tiers each. */
+    private final Map<String, List<Entry>> tiers = new LinkedHashMap<>();
     private final Map<Rarity, Double> weights = new EnumMap<>(Rarity.class);
     private final Map<Rarity, Double> lucky = new EnumMap<>(Rarity.class);
     private int minSlots = 3, maxSlots = 8;
@@ -72,7 +74,8 @@ public final class LootTables {
             for (int t = 1; t <= 3; t++) {
                 int i = 0;
                 for (UpgradeBooks.Kind k : UpgradeBooks.Kind.values()) {
-                    tier(t).add(new Entry(UpgradeBooks.create(plugin, k, 1), r[t - 1][i++], 1, 1, false, k.id));
+                    for (Mode md : Mode.values()) tier(md, t).add(new Entry(UpgradeBooks.create(plugin, k, 1), r[t - 1][i], 1, 1, false, k.id));
+                    i++;
                 }
             }
         }
@@ -98,14 +101,26 @@ public final class LootTables {
         minSlots = c.getInt("slots.min", 3);
         maxSlots = c.getInt("slots.max", 8);
         tiers.clear();
-        for (int t = 1; t <= 3; t++) {
-            List<Entry> list = new ArrayList<>();
-            for (Map<?, ?> m : c.getMapList("tiers." + t)) {
-                Entry e = parse(m);
-                if (e != null) list.add(e);
+        // Older loot.yml files have one set of tiers; both pools start as a copy of it.
+        boolean legacy = !c.contains("pools");
+        for (Mode md : Mode.values()) {
+            for (int t = 1; t <= 3; t++) {
+                List<Entry> list = new ArrayList<>();
+                for (Map<?, ?> m : c.getMapList(legacy ? "tiers." + t : "pools." + key(md, t))) {
+                    Entry e = parse(m);
+                    if (e != null) list.add(e);
+                }
+                tiers.put(key(md, t), list);
             }
-            tiers.put(t, list);
         }
+        if (legacy) {
+            c.set("tiers", null);
+            save();
+        }
+    }
+
+    private static String key(Mode m, int t) {
+        return m.name().toLowerCase() + "." + t;
     }
 
     private Entry parse(Map<?, ?> m) {
@@ -153,7 +168,7 @@ public final class LootTables {
                 if (e.pearl != (e.item.getType() == Material.ENDER_PEARL)) m.put("pearl", e.pearl);
                 out.add(m);
             }
-            c.set("tiers." + t.getKey(), out);
+            c.set("pools." + t.getKey(), out);
         }
         yml.save();
     }
@@ -162,14 +177,14 @@ public final class LootTables {
         return it.isSimilar(new ItemStack(it.getType()));
     }
 
-    public List<Entry> tier(int t) {
-        return tiers.computeIfAbsent(t, k -> new ArrayList<>());
+    public List<Entry> tier(Mode m, int t) {
+        return tiers.computeIfAbsent(key(m, t), k -> new ArrayList<>());
     }
 
-    /** Rolls one chest of the given tier into slot/item pairs. */
-    public List<LootRoller.Slot<ItemStack>> roll(int tier, boolean luckier, boolean pearls, Random rng) {
+    /** Rolls one chest of the given pool (game mode) and tier into slot/item pairs. */
+    public List<LootRoller.Slot<ItemStack>> roll(Mode mode, int tier, boolean luckier, boolean pearls, Random rng) {
         List<LootRoller.Entry<ItemStack>> table = new ArrayList<>();
-        for (Entry e : tier(tier)) table.add(new LootRoller.Entry<>(e.item, e.rarity, e.min, e.max, e.pearl));
+        for (Entry e : tier(mode, tier)) table.add(new LootRoller.Entry<>(e.item, e.rarity, e.min, e.max, e.pearl));
         var opts = new LootRoller.Options(minSlots, maxSlots, 27, weights, luckier, lucky, pearls);
         return LootRoller.roll(table, opts, rng);
     }

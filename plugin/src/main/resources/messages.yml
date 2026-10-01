@@ -167,7 +167,8 @@ game:
   test-started: '<prefix><yellow>Test game #<id></yellow> <white>for <player> starts in a few seconds. <gray>Solo is fine. No Discord, no stats, no restart. /cart stop ends it.'
   reason-stopped: 'stopped by <by>'
   reason-cancelled: 'cancelled by <by>'
-  zone-start: '<prefix><white>Everyone has dropped. The zone is live and fully closes <minutes> minutes after the start.'
+  zone-start: '<prefix><white>Everyone has dropped. The zone is live.'
+  zone-start-grace: '<prefix><white>Everyone has dropped. Grace period: <yellow><grace> min</yellow>, no PvP. Then the zone fully closes over <minutes> minutes.'
   elim: '<gray><victim> <dark_gray>was eliminated. <gray><left> left.'
   elim-by: '<gray><victim> <dark_gray>was eliminated by</dark_gray> <#FF0000><killer></#FF0000><dark_gray>. <gray><left> left.'
   elim-quit: '<gray><victim> <dark_gray>left the game. <gray><left> left.'
@@ -205,6 +206,11 @@ deploy:
 
 zone:
   outside: '<#FF0000><b>OUTSIDE THE ZONE</b></#FF0000> <gray><distance> blocks out'
+  bar-grace: '<#7DDC6A>Grace period <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP, zone holds'
+  grace-over: '<prefix><#FF0000><b>Grace period over.</b> <white>PvP is on and the zone starts moving.'
+  grace-over-title: '<#FF0000><b>PVP ON'
+  grace-over-sub: '<gray>Grace period over'
+  grace-no-pvp: '<#7DDC6A>Grace period: no PvP for <white><seconds>s'
   bar-waiting: '<white>Zone <phase>/<phases> <gray>shrinks in <yellow><seconds>s</yellow> <dark_gray>|</dark_gray> <gray>r <radius>'
   bar-shrinking: '<#FF0000>Zone shrinking <gray><seconds>s <dark_gray>|</dark_gray> <gray>r <radius>'
   bar-orbit: '<#FF0000>Final zone moving <dark_gray>|</dark_gray> <gray>r <radius>'
@@ -516,6 +522,8 @@ gui:
     empty-lore: ['<gray>Buy cosmetics in the Daily Shop.']
   loot:
     title: '<white><b>Loot tables'
+    pool: '<white><b><pool> loot'
+    pool-lore: ['<gray>Chests in <pool> games roll from', '<gray>the three tiers on this row.']
     tier-1: '<#CD7F32><b>★ Bronze'
     tier-2: '<#C0C0C0><b>★★ Silver'
     tier-3: '<#FFD700><b>★★★ Gold'

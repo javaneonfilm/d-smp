@@ -1,0 +1,49 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_vip.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue100"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_vipplus.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue101"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_host.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue102"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_mod.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue103"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_admin.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue104"
+      ]
+    }
+  ]
+}

@@ -98,6 +98,12 @@ public final class MatchListener implements Listener {
                 return;
             }
         }
+        if (m.state == GameState.PLAYING && plugin.zone().inGrace()) {
+            e.setCancelled(true);
+            Player ap = org.bukkit.Bukkit.getPlayer(attacker);
+            if (ap != null) plugin.msg().actionbar(ap, "zone.grace-no-pvp", "seconds", plugin.zone().graceSecondsLeft());
+            return;
+        }
         if (m.sameTeam(attacker, victim.getUniqueId())) {
             e.setCancelled(true);
             return;

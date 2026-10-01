@@ -12,7 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public final class HudText {
 
     private static final Key FONT = Key.key("cartzone", "hud");
-    private static final int BAR_W = 150, ICON_ADVANCE = 10, SPACE = 4;
+    private static final int BAR_W = 150, ICON_ADVANCE = 11, SPACE = 4;
     private static final char ICON = '\uE000', BAR = '\uE001';
 
     private HudText() {

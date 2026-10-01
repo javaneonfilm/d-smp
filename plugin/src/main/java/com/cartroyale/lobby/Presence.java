@@ -150,7 +150,7 @@ public final class Presence implements Listener {
         Component suffix = plugin.cosmetics().suffixComponent(p.getUniqueId());
         boolean spec = plugin.spectators().isWatcher(p);
         e.renderer((source, displayName, message, viewer) -> plugin.msg().get(spec ? "chat.spectator-format" : "chat.format",
-            "tag", tag, "name", Component.text(source.getName(), plugin.nametags().color(source.getUniqueId())),
+            "tag", tag, "name", Component.text(source.getName(), plugin.nametags().color(source)),
             "suffix", suffix == null ? Component.empty() : Component.space().append(suffix), "message", message));
     }
 
@@ -226,11 +226,12 @@ public final class Presence implements Listener {
     // ---------------- sidebar + tab (LOBBY-4) ----------------
 
     private void tabHeader(Player p) {
+        if (com.cartroyale.match.Nametags.tabPlugin(plugin)) return; // TAB draws the header and footer
         p.sendPlayerListHeaderAndFooter(plugin.msg().get("tab.header", "ip", plugin.getConfig().getString("server-ip")),
             plugin.msg().get("tab.footer", "online", Bukkit.getOnlinePlayers().size(), "state", stateLine()));
     }
 
-    private String stateLine() {
+    public String stateLine() {
         Match m = plugin.games().match();
         if (m != null) return plugin.msg().plain("states." + m.state.name().toLowerCase(), "id", m.id(), "alive", m.aliveCount());
         GameRow next = plugin.games().next();

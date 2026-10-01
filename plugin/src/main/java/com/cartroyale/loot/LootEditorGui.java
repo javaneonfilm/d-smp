@@ -1,6 +1,7 @@
 package com.cartroyale.loot;
 
 import com.cartroyale.CartRoyale;
+import com.cartroyale.game.Mode;
 import com.cartroyale.gui.Gui;
 import com.cartroyale.shield.OneTimeShield;
 import com.cartroyale.util.Items;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * LOOT-2/3. /cart loot: pick a tier, then edit its entries. Click an item in your own inventory
+ * LOOT-2/3. /cart loot: pick a pool (LT or HT, the game mode) and a tier, then edit its entries. Click an item in your own inventory
  * to add it. On an entry: left/right click raise min/max (shift lowers), Q cycles the rarity,
  * F toggles the pearl flag, Ctrl+Q removes it. Every change is saved to loot.yml at once. Items
  * are copied, never moved, so nothing can be duplicated through the editor.
@@ -27,25 +28,33 @@ public final class LootEditorGui {
         this.plugin = plugin;
     }
 
+    /** Two pools, one per game mode (LT row, HT row), each with bronze/silver/gold, plus chest settings. */
     public void openTiers(Player p) {
-        Gui gui = new Gui(3, plugin.msg().get("gui.loot.title"));
+        Gui gui = new Gui(4, plugin.msg().get("gui.loot.title"));
         Material[] icons = {Material.COPPER_BLOCK, Material.IRON_BLOCK, Material.GOLD_BLOCK};
-        for (int t = 1; t <= 3; t++) {
-            int tier = t;
-            gui.set(9 + t * 2, Items.make(icons[t - 1], plugin.msg().item("gui.loot.tier-" + t),
-                plugin.msg().lore("gui.loot.tier-lore", "entries", plugin.loot().tier(t).size())), e -> openTier(p, tier, 0));
+        Mode[] modes = Mode.values();
+        for (int r = 0; r < modes.length; r++) {
+            Mode md = modes[r];
+            int row = 9 + r * 9;
+            gui.set(row + 1, Items.make(md == Mode.LT ? Material.MINECART : Material.TNT_MINECART,
+                plugin.msg().item("gui.loot.pool", "pool", md.name()), plugin.msg().lore("gui.loot.pool-lore", "pool", md.name())));
+            for (int t = 1; t <= 3; t++) {
+                int tier = t;
+                gui.set(row + 2 + t, Items.make(icons[t - 1], plugin.msg().item("gui.loot.tier-" + t),
+                    plugin.msg().lore("gui.loot.tier-lore", "entries", plugin.loot().tier(md, t).size())), e -> openTier(p, md, tier, 0));
+            }
         }
-        gui.set(22, Items.make(Material.CHEST, plugin.msg().item("gui.loot.settings"), plugin.msg().lore("gui.loot.settings-lore")), e -> openSettings(p));
+        gui.set(16, Items.make(Material.CHEST, plugin.msg().item("gui.loot.settings"), plugin.msg().lore("gui.loot.settings-lore")), e -> openSettings(p));
         gui.fill(Items.make(Material.GRAY_STAINED_GLASS_PANE, plugin.msg().item("gui.filler"), List.of()));
         gui.open(p);
     }
 
-    public void openTier(Player p, int tier, int page) {
-        List<LootTables.Entry> list = plugin.loot().tier(tier);
+    public void openTier(Player p, Mode mode, int tier, int page) {
+        List<LootTables.Entry> list = plugin.loot().tier(mode, tier);
         int per = 45;
         int pages = Math.max(1, (list.size() + per - 1) / per);
         int pg = Math.max(0, Math.min(page, pages - 1));
-        Gui gui = new Gui(6, plugin.msg().get("gui.loot.tier-title", "tier", plugin.msg().plain("gui.loot.tier-name-" + tier), "page", pg + 1, "pages", pages));
+        Gui gui = new Gui(6, plugin.msg().get("gui.loot.tier-title", "tier", mode.name() + " " + plugin.msg().plain("gui.loot.tier-name-" + tier), "page", pg + 1, "pages", pages));
         for (int i = 0; i < per && pg * per + i < list.size(); i++) {
             LootTables.Entry en = list.get(pg * per + i);
             gui.set(i, icon(en), e -> {
@@ -63,7 +72,7 @@ public final class LootEditorGui {
                     }
                 }
                 plugin.loot().save();
-                openTier(p, tier, pg);
+                openTier(p, mode, tier, pg);
             });
         }
         gui.onBottomClick(e -> {
@@ -79,43 +88,43 @@ public final class LootEditorGui {
             list.add(new LootTables.Entry(item, Rarity.COMMON, 1, Math.max(1, Math.min(amount, copy.getMaxStackSize())),
                 copy.getType() == Material.ENDER_PEARL, special));
             plugin.loot().save();
-            plugin.msg().send(p, "loot.added", "item", copy.getType().name().toLowerCase(), "tier", tier);
-            openTier(p, tier, (list.size() - 1) / per);
+            plugin.msg().send(p, "loot.added", "item", copy.getType().name().toLowerCase(), "tier", mode.name() + " " + tier);
+            openTier(p, mode, tier, (list.size() - 1) / per);
         });
         gui.set(45, Items.make(Material.OAK_DOOR, plugin.msg().item("gui.back"), List.of()), e -> openTiers(p));
-        if (pg > 0) gui.set(48, Items.make(Material.ARROW, plugin.msg().item("gui.prev"), List.of()), e -> openTier(p, tier, pg - 1));
+        if (pg > 0) gui.set(48, Items.make(Material.ARROW, plugin.msg().item("gui.prev"), List.of()), e -> openTier(p, mode, tier, pg - 1));
         gui.set(49, Items.make(Material.BOOK, plugin.msg().item("gui.loot.help"), plugin.msg().lore("gui.loot.help-lore")));
-        if (pg < pages - 1) gui.set(50, Items.make(Material.ARROW, plugin.msg().item("gui.next"), List.of()), e -> openTier(p, tier, pg + 1));
-        gui.set(53, Items.make(Material.ENCHANTED_BOOK, plugin.msg().item("gui.loot.specials"), plugin.msg().lore("gui.loot.specials-lore")), e -> openSpecials(p, tier));
+        if (pg < pages - 1) gui.set(50, Items.make(Material.ARROW, plugin.msg().item("gui.next"), List.of()), e -> openTier(p, mode, tier, pg + 1));
+        gui.set(53, Items.make(Material.ENCHANTED_BOOK, plugin.msg().item("gui.loot.specials"), plugin.msg().lore("gui.loot.specials-lore")), e -> openSpecials(p, mode, tier));
         gui.open(p);
     }
 
     /** The plugin's own items (shield, upgrade books): click one to add it to the tier. */
-    private void openSpecials(Player p, int tier) {
-        Gui gui = new Gui(3, plugin.msg().get("gui.loot.specials-title", "tier", plugin.msg().plain("gui.loot.tier-name-" + tier)));
-        List<LootTables.Entry> list = plugin.loot().tier(tier);
+    private void openSpecials(Player p, Mode mode, int tier) {
+        Gui gui = new Gui(3, plugin.msg().get("gui.loot.specials-title", "tier", mode.name() + " " + plugin.msg().plain("gui.loot.tier-name-" + tier)));
+        List<LootTables.Entry> list = plugin.loot().tier(mode, tier);
         int slot = 10;
         ItemStack shield = OneTimeShield.create(plugin, 1);
         gui.set(slot++, shield, e -> {
             list.add(new LootTables.Entry(OneTimeShield.create(plugin, 1), Rarity.EPIC, 1, 1, false, OneTimeShield.ID));
-            added(p, tier, list, "One Time Shield");
+            added(p, mode, tier, list, "One Time Shield");
         });
         for (UpgradeBooks.Kind k : UpgradeBooks.Kind.values()) {
             slot++;
             gui.set(slot, UpgradeBooks.create(plugin, k, 1), e -> {
                 list.add(new LootTables.Entry(UpgradeBooks.create(plugin, k, 1), Rarity.RARE, 1, 1, false, k.id));
-                added(p, tier, list, k.id);
+                added(p, mode, tier, list, k.id);
             });
         }
-        gui.set(18, Items.make(Material.OAK_DOOR, plugin.msg().item("gui.back"), List.of()), e -> openTier(p, tier, 0));
+        gui.set(18, Items.make(Material.OAK_DOOR, plugin.msg().item("gui.back"), List.of()), e -> openTier(p, mode, tier, 0));
         gui.fill(Items.make(Material.GRAY_STAINED_GLASS_PANE, plugin.msg().item("gui.filler"), List.of()));
         gui.open(p);
     }
 
-    private void added(Player p, int tier, List<LootTables.Entry> list, String what) {
+    private void added(Player p, Mode mode, int tier, List<LootTables.Entry> list, String what) {
         plugin.loot().save();
-        plugin.msg().send(p, "loot.added", "item", what, "tier", tier);
-        openTier(p, tier, (list.size() - 1) / 45);
+        plugin.msg().send(p, "loot.added", "item", what, "tier", mode.name() + " " + tier);
+        openTier(p, mode, tier, (list.size() - 1) / 45);
     }
 
     /** Chest amount, spacing, items per chest and the bronze/silver/gold mix. */
