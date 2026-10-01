@@ -113,11 +113,11 @@ lobby-items:
   grapple:
     slot: 0
     cooldown-ms: 500
-    range: 40
-    base: 0.45
-    per-block: 0.075
-    lift: 0.35
-    max-velocity: 2.6
+    pull-range: 50          # max distance to the bobber, blocks
+    pull-base: 0.5          # speed = base + per-block x distance (blocks/tick), capped; carries you ~5 blocks past the bobber
+    pull-per-block: 0.11
+    pull-lift: 0.7          # extra upward kick
+    pull-max-velocity: 5.0
   team:
     slot: 2
   host:

@@ -19,3 +19,11 @@ particles:
   height: 10
   every-ticks: 4
   max-per-player: 180
+
+# The wall players see. 'shader' = the hexagon wall from the resource pack (players who haven't
+# loaded the pack get the particles below instead); 'particles' = particles for everyone.
+wall:
+  mode: shader
+  base-y: 0                 # the wall starts here and runs 350 blocks up (fades out ~50 above you)
+  reanchor-distance: 48     # each player's wall entity follows them in jumps of this many blocks
+  item-model: lodestone:border

@@ -506,6 +506,7 @@ public final class CartCommand implements TabExecutor {
             "chests", plugin.chests().report()));
         lines.add(plugin.msg().plain("diag.deploy", "report", plugin.deploy().report()));
         lines.add(plugin.msg().plain("diag.zone", "running", plugin.zone().running() ? "running" : "idle", "minutes", plugin.announcer().durationMinutes()));
+        if (plugin.zone().running()) lines.add(plugin.msg().plain("diag.zone-wall", "walls", plugin.zone().wallViewers()));
         lines.add(plugin.msg().plain("diag.webhook", "status", plugin.hooks().status(),
             "role", plugin.getConfig().getString("webhooks.events-role-id", "").isBlank() ? "NOT SET" : "set"));
         lines.add(plugin.msg().plain("diag.stats", "status", plugin.stats().status()));

@@ -7,6 +7,8 @@ Contents, all original art drawn here:
   separate blocking pose, TNT-red face with a crack across it.
 - IP bar: the PINK boss bar is made invisible and its title draws a red rounded bar with a
   minecart icon (font cartzone:hud). Nothing else on the server uses a pink bar.
+- Zone wall: the hexagon circle-border shader from the Mace.VIP pack, copied from
+  resourcepack/zone-wall/ (see SOURCE.txt there). Item model lodestone:border.
 Output: resourcepack/pack/ (the files) and cartzone-pack.zip + SHA-1 in docs/RESOURCEPACK.md.
 """
 import hashlib
@@ -22,6 +24,7 @@ ROOT = os.path.dirname(HERE)                 # cartroyale/resourcepack
 PROJECT = os.path.dirname(ROOT)              # cartroyale
 OUT = os.path.join(ROOT, "pack")
 ZIP = os.path.join(ROOT, "cartzone-pack.zip")
+ZONE_WALL = os.path.join(ROOT, "zone-wall")
 
 # Keep in sync with plugin/src/main/java/com/cartroyale/lobby/HudText.java
 BAR_W, BAR_H, BAR_ASCENT = 150, 13, 9
@@ -195,24 +198,36 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     write_json("pack.mcmeta", {"pack": {
-        "description": "CartZone - IP bar and One Time Shield",
+        "description": "CartZone - IP bar, One Time Shield, zone wall",
         # 1.21.11 is format 75; 1.21.9+ reads the min/max range, older clients read pack_format.
-        "pack_format": 75, "min_format": 64, "max_format": 99}})
+        "pack_format": 75, "min_format": 64, "max_format": 99},
+        # 26.x moved item rendering to core/item, so newer clients get the ported wall shader.
+        "overlays": {"entries": [
+            {"min_format": 84, "max_format": 87, "directory": "overlay_26_1"},
+            {"min_format": 88, "max_format": 1000, "directory": "overlay_26"}]}})
     save_png("pack.png", Image.open(os.path.join(PROJECT, "site", "assets", "logo.png")).convert("RGBA").resize((128, 128), Image.LANCZOS))
 
-    save_png("assets/cartroyale/textures/item/one_time_shield.png", shield_texture())
-    write_json("assets/cartroyale/models/item/one_time_shield.json", shield_model())
-    write_json("assets/cartroyale/models/item/one_time_shield_blocking.json", shield_blocking_model())
-    write_json("assets/cartroyale/items/one_time_shield.json", {"model": {
+    save_png("assets/cartzone/textures/item/one_time_shield.png", shield_texture())
+    write_json("assets/cartzone/models/item/one_time_shield.json", shield_model())
+    write_json("assets/cartzone/models/item/one_time_shield_blocking.json", shield_blocking_model())
+    write_json("assets/cartzone/items/one_time_shield.json", {"model": {
         "type": "minecraft:condition", "property": "minecraft:using_item",
         "on_false": {"type": "minecraft:model", "model": "cartzone:item/one_time_shield"},
         "on_true": {"type": "minecraft:model", "model": "cartzone:item/one_time_shield_blocking"}}})
 
-    save_png("assets/cartroyale/textures/font/bar.png", bar_background())
-    save_png("assets/cartroyale/textures/font/cart.png", cart_icon())
-    write_json("assets/cartroyale/font/hud.json", hud_font())
+    save_png("assets/cartzone/textures/font/bar.png", bar_background())
+    save_png("assets/cartzone/textures/font/cart.png", cart_icon())
+    write_json("assets/cartzone/font/hud.json", hud_font())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_progress.png", invisible_bar())
+
+    for base, _, names in os.walk(ZONE_WALL):
+        for n in names:
+            if n == "SOURCE.txt":
+                continue
+            rel = os.path.relpath(os.path.join(base, n), ZONE_WALL)
+            os.makedirs(os.path.dirname(os.path.join(OUT, rel)), exist_ok=True)
+            shutil.copyfile(os.path.join(base, n), os.path.join(OUT, rel))
 
     # Deterministic zip (fixed timestamps, sorted) so the SHA-1 only changes when content does.
     if os.path.exists(ZIP):

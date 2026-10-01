@@ -378,6 +378,7 @@ diag:
   loot: '<gray>Loot entries: <white><t1>/<t2>/<t3></white> <gray>chests: <white><chests>'
   deploy: '<gray>Deploy: <white><report>'
   zone: '<gray>Zone: <white><running></white>, planned <white><minutes> min'
+  zone-wall: '<gray>Zone wall: shader for <white><walls></white> players, particles for the rest (no pack)'
   webhook: '<gray>Discord: <white><status></white>, events role <white><role>'
   stats: '<gray>Website stats: <white><status>'
   pack: '<gray>Resource pack: <white><enabled></white>, <white><url>'

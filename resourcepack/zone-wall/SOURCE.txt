@@ -1,0 +1,8 @@
+Zone wall shader, copied unchanged from the Mace.VIP texture pack (maceviptxt.rar, "lodestone" border).
+build_pack.py copies everything in this folder except this file into the pack.
+
+How it is driven (plugin side, com.cartroyale.zone.ZoneWall):
+- An item display holding an item with item_model lodestone:border.
+- The model is one flat 1x1 quad; the shader turns it into a cylinder wall.
+- Quad centre = circle centre, quad side length (display scale x/z) = radius.
+- The wall runs 350 blocks up from the quad (HEIGHT in config.glsl) and fades out ~50 above the camera.

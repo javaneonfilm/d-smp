@@ -229,6 +229,9 @@ public final class Lobby implements Listener {
 
     // ---------------- grappling hook (LOBBY-3) ----------------
 
+    /** Where each grapple bobber first struck a block; vanilla bobbers slide off walls, so this is the real latch point. */
+    private final java.util.Map<UUID, Location> latched = new java.util.HashMap<>();
+
     @EventHandler(ignoreCancelled = true)
     public void onFish(PlayerFishEvent e) {
         Player p = e.getPlayer();
@@ -240,29 +243,51 @@ public final class Lobby implements Listener {
             return;
         }
         if (e.getState() == PlayerFishEvent.State.FISHING) {
+            latched.remove(p.getUniqueId());
             if (p.hasCooldown(Material.FISHING_ROD)) e.setCancelled(true);
             return;
         }
+        if (e.getState() == PlayerFishEvent.State.BITE || e.getState() == PlayerFishEvent.State.LURED) return;
+        // Every way of reeling in pulls: latched on a wall, lying on the ground, in water, or still
+        // in the air. It used to need the bobber on the ground, so walls and long casts did nothing.
         FishHook hook = e.getHook();
-        boolean anchored = e.getState() == PlayerFishEvent.State.IN_GROUND
-            || (e.getState() == PlayerFishEvent.State.REEL_IN && (hook.isOnGround() || !hook.getLocation().clone().subtract(0, 0.3, 0).getBlock().isPassable()));
-        if (!anchored) return;
-        Location from = p.getLocation(), to = hook.getLocation();
-        double range = plugin.getConfig().getDouble("lobby-items.grapple.range", 40);
+        Location to = latched.remove(p.getUniqueId());
+        if (to == null || !to.getWorld().equals(p.getWorld())) to = hook.getLocation();
+        Location from = p.getLocation();
+        double range = plugin.getConfig().getDouble("lobby-items.grapple.pull-range", 50);
         double dist = from.distance(to);
         if (dist > range || dist < 1.5) return;
-        // Speed grows with distance so short and long pulls both land near the hook; a small lift
-        // clears the ground. Clamped so it can't fling anyone across the map.
-        double max = plugin.getConfig().getDouble("lobby-items.grapple.max-velocity", 2.6);
-        double speed = Math.min(max, plugin.getConfig().getDouble("lobby-items.grapple.base", 0.45)
-            + dist * plugin.getConfig().getDouble("lobby-items.grapple.per-block", 0.075));
+        // Speed grows with distance so short and long pulls both reach the hook; the lift clears
+        // the ground and arcs over ledges. Clamped so it can't fling anyone across the map.
+        double max = plugin.getConfig().getDouble("lobby-items.grapple.pull-max-velocity", 5.0);
+        double speed = Math.min(max, plugin.getConfig().getDouble("lobby-items.grapple.pull-base", 0.5)
+            + dist * plugin.getConfig().getDouble("lobby-items.grapple.pull-per-block", 0.11));
         Vector v = to.toVector().subtract(from.toVector()).normalize().multiply(speed);
-        v.setY(v.getY() + plugin.getConfig().getDouble("lobby-items.grapple.lift", 0.35));
+        v.setY(v.getY() + plugin.getConfig().getDouble("lobby-items.grapple.pull-lift", 0.7));
         if (v.length() > max) v.normalize().multiply(max);
         p.setVelocity(v);
         p.setFallDistance(0);
+        p.getWorld().playSound(from, org.bukkit.Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1f, 0.7f);
         int cd = (int) Math.round(plugin.getConfig().getInt("lobby-items.grapple.cooldown-ms", 500) / 50.0);
         p.setCooldown(Material.FISHING_ROD, cd);
+    }
+
+    @EventHandler
+    public void onHookHit(ProjectileHitEvent e) {
+        if (!(e.getEntity() instanceof FishHook hook) || !(hook.getShooter() instanceof Player p) || e.getHitBlock() == null) return;
+        if (!isLobby(hook.getWorld()) || latched.containsKey(p.getUniqueId())) return;
+        if (!Items.is(p.getInventory().getItemInMainHand(), GRAPPLE) && !Items.is(p.getInventory().getItemInOffHand(), GRAPPLE)) return;
+        // The event fires a step before the hook touches the block; trace the rest of the way.
+        Vector vel = hook.getVelocity();
+        Location at = hook.getLocation();
+        if (vel.lengthSquared() > 1.0E-4) {
+            var hit = hook.getWorld().rayTraceBlocks(at, vel.clone().normalize(), vel.length() + 1.5, org.bukkit.FluidCollisionMode.NEVER, true);
+            if (hit != null) at = hit.getHitPosition().toLocation(hook.getWorld());
+        }
+        latched.put(p.getUniqueId(), at);
+        // Freeze the bobber where it struck so what the player sees matches where they'll fly.
+        hook.setVelocity(new Vector());
+        hook.setGravity(false);
     }
 
     // ---------------- wind charges push only the thrower (RANK-3) ----------------

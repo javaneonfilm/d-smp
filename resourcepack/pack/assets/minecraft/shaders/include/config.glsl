@@ -1,0 +1,33 @@
+// Height of the border in blocks
+const float HEIGHT = 350;
+// How many blocks the border fades off from the top
+const float FADEOFF = 40;
+
+const float PLAYER_HEIGHT = 50;
+
+const float HEX_SIZE = 2.5;
+const float HEX_FAR_SIZE = 1;
+
+const float FAR_DISTANCE = 60;
+const float FAR_FADE_DISTANCE = 50;
+
+const float SEPARATORS = 12.0; // integer
+
+//colors
+const vec4 ORANGE           = vec4(vec3(0.9490196078431372, 0.47058823529411764, 0.29411764705882354), 0.3); 
+const vec4 ORANGE_ACCENT    = vec4(vec3(0.9490196078431372, 0.6392156862745098, 0.3686274509803922), 0.6);
+const vec4 ORANGE_DARK_GLOW = vec4(0.6509803921568628, 0.35294117647058826, 0.28627450980392155, 0.5);
+const vec3 ORANGE_OUTLINE   = vec3(0.24705882352941178, 0.5764705882352941, 0.6509803921568628);
+
+const vec4 RED           = vec4(vec3(0.9490196078431372, 0.34901960784313724, 0.29411764705882354), 0.3); 
+const vec4 RED_ACCENT    = vec4(vec3(0.9490196078431372, 0.3137254901960784, 0.3196078431372549)*0.9, 0.6);
+const vec4 RED_DARK_GLOW = vec4(vec3(0.803921568627451, 0.17254901960784313, 0.1411764705882353), 0.5);
+const vec3 RED_OUTLINE   = vec3(0.38823529411764707, 0.6509803921568628, 0.6235294117647059);
+
+const vec4[] BGS        = vec4[](ORANGE, RED);
+const vec4[] ACCENTS    = vec4[](ORANGE_ACCENT, RED_ACCENT);
+const vec4[] DARK_GLOWS = vec4[](ORANGE_DARK_GLOW, RED_DARK_GLOW);
+const vec3[] OUTLINES   = vec3[](ORANGE_OUTLINE, RED_OUTLINE);
+
+
+const float FALLBACK_BORDER_DISTANCE = 200; // If we don't know the render distance, we use this value

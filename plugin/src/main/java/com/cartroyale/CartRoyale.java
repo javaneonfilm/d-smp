@@ -65,6 +65,7 @@ public final class CartRoyale extends JavaPlugin {
     private KitManager kits;
     private Deployment deploy;
     private Zone zone;
+    private Presence presence;
     private TeamManager teams;
     private Spectators spectators;
     private Nametags nametags;
@@ -158,7 +159,7 @@ public final class CartRoyale extends JavaPlugin {
         }
 
         register(new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
-            new Presence(this), new MatchListener(this), new ArenaRules(this));
+            presence = new Presence(this), new MatchListener(this), new ArenaRules(this));
         CartCommand cart = new CartCommand(this);
         bind("cart", cart);
         SmallCommands small = new SmallCommands(this);
@@ -268,6 +269,7 @@ public final class CartRoyale extends JavaPlugin {
     public KitManager kits() { return kits; }
     public Deployment deploy() { return deploy; }
     public Zone zone() { return zone; }
+    public Presence presence() { return presence; }
     public TeamManager teams() { return teams; }
     public Spectators spectators() { return spectators; }
     public Nametags nametags() { return nametags; }

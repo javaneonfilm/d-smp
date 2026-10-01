@@ -17,13 +17,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * ZONE-1..6. A custom circle (the vanilla border only marks the map edge). Players can always
- * walk through the edge; outside it they take damage attributed to the zone. The wall is drawn
- * with particles only near each player.
+ * walk through the edge; outside it they take damage attributed to the zone. The wall is the
+ * resource pack's hexagon shader (ZoneWall); players without the pack get particles near them.
  */
 public final class Zone {
 
@@ -35,11 +38,13 @@ public final class Zone {
     private World world;
     private Match match;
     private long tick;
+    private final ZoneWall wall;
     private final BossBar bar = BossBar.bossBar(net.kyori.adventure.text.Component.empty(), 1f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10);
 
     public Zone(CartRoyale plugin) {
         this.plugin = plugin;
         this.yml = new Yml(plugin, "zone.yml", true);
+        this.wall = new ZoneWall(plugin);
     }
 
     public void reload() {
@@ -98,12 +103,14 @@ public final class Zone {
         plan = planFor(mc, m.row.test());
         startedAt = System.currentTimeMillis();
         tick = 0;
+        wall.model(yml.get().getString("wall.item-model", "lodestone:border"));
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
     }
 
     public void stop() {
         if (task != null) task.cancel();
         task = null;
+        wall.clear();
         for (Player p : Bukkit.getOnlinePlayers()) p.hideBossBar(bar);
         match = null;
     }
@@ -117,11 +124,16 @@ public final class Zone {
         ZoneMath.Circle c = s.circle();
         int interval = Math.max(1, s.damageIntervalTicks());
         boolean drawTick = tick % Math.max(1, yml.get().getInt("particles.every-ticks", 4)) == 0;
+        boolean shader = !"particles".equalsIgnoreCase(yml.get().getString("wall.mode", "shader"));
+        double baseY = yml.get().getDouble("wall.base-y", 0), reanchor = yml.get().getDouble("wall.reanchor-distance", 48);
+        wall.beginTick();
+        Set<UUID> walled = new HashSet<>();
         for (Player p : world.getPlayers()) {
             Location l = p.getLocation();
             boolean playing = match.isAlive(p.getUniqueId()) && p.getGameMode() != GameMode.SPECTATOR;
             boolean outside = !c.contains(l.getX(), l.getZ());
-            if (drawTick) draw(p, c);
+            if (shader && wall.update(p, c, baseY, reanchor)) walled.add(p.getUniqueId());
+            else if (drawTick) draw(p, c);
             if (tick % 10 == 0) updateBar(p, s);
             if (!playing) continue;
             if (outside) {
@@ -131,6 +143,12 @@ public final class Zone {
                 }
             }
         }
+        wall.retain(walled);
+    }
+
+    /** For /cart diag: how many players are seeing the shader wall right now. */
+    public int wallViewers() {
+        return wall.count();
     }
 
     private void updateBar(Player p, ZoneMath.State s) {
