@@ -134,6 +134,10 @@ public final class ArenaManager {
                 mc.generator = "standin";
                 mc.save();
             }
+        } else {
+            // Real maps: anything outside the saved template is open sea, never vanilla terrain.
+            wc.generator(new OceanGenerator(mc.raw().getInt("ocean.water-top", 71), mc.raw().getInt("ocean.floor", 62)))
+                .generateStructures(false);
         }
         World w = wc.createWorld();
         if (w == null) {
@@ -143,6 +147,14 @@ public final class ArenaManager {
         loaded = name;
         config = mc;
         if (!mc.raw().contains("border-radius")) mc.save();
+        // 2026-10-02: The Lost Island's border moved from 500 to 700 so it can't be seen from the
+        // island (the sea past the saved map comes from OceanGenerator). Once, and only if untouched.
+        if ("lostisland".equals(name) && mc.borderRadius == 500 && !mc.raw().getBoolean("migrations.border-700", false)) {
+            mc.borderRadius = 700;
+            mc.raw().set("migrations.border-700", true);
+            mc.save();
+            plugin.getLogger().info("Map lostisland: border radius 500 -> 700.");
+        }
         applyRules(w, mc);
         plugin.db().kvSet("arena.map", name);
     }

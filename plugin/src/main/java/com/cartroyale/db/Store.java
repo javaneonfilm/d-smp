@@ -277,6 +277,23 @@ public final class Store {
         });
     }
 
+    public record Winner(UUID uuid, String name, int wins) {
+    }
+
+    /** Most wins first, for the lobby leaderboard NPCs. */
+    public CompletableFuture<List<Winner>> topWins(int limit) {
+        return db.submit(c -> {
+            List<Winner> out = new ArrayList<>();
+            try (PreparedStatement ps = c.prepareStatement("SELECT uuid,name,wins FROM players WHERE wins>0 ORDER BY wins DESC, name LIMIT ?")) {
+                ps.setInt(1, limit);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) out.add(new Winner(UUID.fromString(rs.getString(1)), rs.getString(2), rs.getInt(3)));
+                }
+            }
+            return out;
+        });
+    }
+
     public CompletableFuture<List<Round>> recentRounds(int limit) {
         return db.submit(c -> {
             List<Round> out = new ArrayList<>();

@@ -65,7 +65,56 @@ public final class Webhooks {
         queue.execute(() -> post(url, body));
     }
 
-    private void post(String url, String body) {
+    /**
+     * /cart webhook test: posts one embed and tells {@code to} exactly what Discord answered,
+     * without the role ping unless asked.
+     */
+    public void test(org.bukkit.command.CommandSender to, boolean ping) {
+        String url = plugin.secret("discord-webhook-url");
+        if (url == null || url.isBlank()) {
+            plugin.msg().send(to, "webhook.test-no-url");
+            return;
+        }
+        if (!plugin.getConfig().getBoolean("webhooks.enabled", true)) {
+            plugin.msg().send(to, "webhook.test-disabled");
+            return;
+        }
+        if (!configured()) {
+            plugin.msg().send(to, "webhook.test-bad-url");
+            return;
+        }
+        Embed e = new Embed(plugin.msg().plain("webhook.test-title"), plugin.msg().plain("webhook.test-body", "who", to.getName()), 0xFF0000,
+            plugin.getConfig().getString("server-ip", "cartzone.vip"));
+        String role = plugin.getConfig().getString("webhooks.events-role-id", "").trim();
+        boolean roleOk = role.matches("\\d{5,25}");
+        StringBuilder json = new StringBuilder("{");
+        json.append("\"username\":").append(q(plugin.getConfig().getString("webhooks.username", "CartZone"))).append(',');
+        if (ping && roleOk) {
+            json.append("\"content\":").append(q("<@&" + role + ">")).append(',');
+            json.append("\"allowed_mentions\":{\"parse\":[],\"roles\":[").append(q(role)).append("]},");
+        } else {
+            json.append("\"allowed_mentions\":{\"parse\":[]},");
+        }
+        json.append("\"embeds\":[").append(e.json()).append("]}");
+        String body = json.toString();
+        plugin.msg().send(to, "webhook.test-sending");
+        queue.execute(() -> {
+            String result = post(url, body);
+            org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
+                if (result == null) plugin.msg().send(to, ping && !roleOk ? "webhook.test-ok-no-role" : "webhook.test-ok");
+                else plugin.msg().send(to, "webhook.test-failed", "error", result, "hint", plugin.msg().plain(hint(result)));
+            });
+        });
+    }
+
+    private static String hint(String result) {
+        if (result.startsWith("HTTP 401") || result.startsWith("HTTP 403") || result.startsWith("HTTP 404")) return "webhook.hint-url";
+        if (result.startsWith("HTTP 400")) return "webhook.hint-400";
+        return "webhook.hint-network";
+    }
+
+    /** Posts with retries; null on success, otherwise what went wrong. */
+    private String post(String url, String body) {
         for (int attempt = 0; attempt < 5; attempt++) {
             try {
                 HttpRequest req = HttpRequest.newBuilder(URI.create(url + (url.contains("?") ? "&" : "?") + "wait=true"))
@@ -77,7 +126,7 @@ public final class Webhooks {
                 int code = res.statusCode();
                 if (code >= 200 && code < 300) {
                     sent++;
-                    return;
+                    return null;
                 }
                 if (code == 429) {
                     Matcher m = RETRY.matcher(res.body());
@@ -91,10 +140,10 @@ public final class Webhooks {
                     Thread.sleep(2000L * (attempt + 1));
                     continue;
                 }
-                return;
+                return "HTTP " + code;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                return;
+                return "interrupted";
             } catch (Exception e) {
                 lastError = e.getClass().getSimpleName();
                 plugin.getLogger().warning("Discord webhook failed (" + e.getClass().getSimpleName() + "), retrying");
@@ -102,10 +151,11 @@ public final class Webhooks {
                     Thread.sleep(2000L * (attempt + 1));
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    return;
+                    return "interrupted";
                 }
             }
         }
+        return lastError;
     }
 
     public void shutdown() {

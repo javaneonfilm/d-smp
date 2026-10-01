@@ -384,6 +384,9 @@ public final class Deployment implements Listener {
     private void dropped(Player p, Glider gl) {
         gl.riding = false;
         gl.droppedAt = System.currentTimeMillis();
+        // A happy ghast is solid to any player above it, and that check runs in the client, so the
+        // only way to stop dropping players landing on (or bumping) ghasts is to unshow them.
+        for (Ride r : rides) if (r.ghast.isValid()) p.hideEntity(plugin, r.ghast);
         plugin.debug("dropped " + p.getName() + " at " + com.cartroyale.util.Locs.pretty(p.getLocation()));
         p.setFallDistance(0);
         Bukkit.getScheduler().runTask(plugin, () -> {

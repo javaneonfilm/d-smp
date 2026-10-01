@@ -384,7 +384,12 @@ public final class GameManager {
         plugin.getLogger().info("Game #" + match.id() + " purge starting with " + el.size() + " eligible players (cap " + match.s().purgeCap + ")");
     }
 
+    /** The match whose purge is playing out one by one, so the tick loop doesn't start it twice. */
+    private Match purging;
+
     private void doPurge() {
+        if (purging == match) return;
+        purging = match;
         GameSettings s = match.s();
         List<Player> el = eligible();
         int min = match.row.test() ? 1 : plugin.getConfig().getInt("join.min-players", 2);
@@ -403,11 +408,52 @@ public final class GameManager {
         Purge.Result<Player> res = Purge.run(cands, s.purgeCap, new Random());
         if (res.immuneOverflow()) plugin.getLogger().warning("Game #" + match.id() + ": immune players alone exceeded the purge cap; picked among them.");
         boolean spectate = "SPECTATE".equalsIgnoreCase(cfg.getString("purge.action", "KICK"));
-        for (Player p : res.purged()) {
-            match.removed.add(p.getUniqueId());
-            if (spectate) plugin.msg().send(p, "game.purged-spectate");
-            else p.kick(plugin.msg().get("game.purged-kick", "id", match.id()));
+        for (Player p : res.purged()) match.removed.add(p.getUniqueId());
+        if (res.purged().isEmpty()) {
+            finishPurge(res);
+            return;
         }
+        // One at a time with a sound, so the purge is something to watch. The whole thing takes
+        // about 15 seconds however many get cut (a few ticks each when it's a lot).
+        Match mm = match;
+        List<Player> queue = new ArrayList<>(res.purged());
+        java.util.Collections.shuffle(queue);
+        int every = (int) Math.max(3, Math.min(12, Math.round(300.0 / queue.size())));
+        broadcastLobby("game.purge-cutting", "count", queue.size(), "players", el.size(), "cap", s.purgeCap);
+        new org.bukkit.scheduler.BukkitRunnable() {
+            int i = 0;
+
+            @Override
+            public void run() {
+                if (match != mm) {
+                    cancel();
+                    return;
+                }
+                if (i >= queue.size()) {
+                    cancel();
+                    finishPurge(res);
+                    return;
+                }
+                Player p = queue.get(i++);
+                if (p.isOnline()) {
+                    broadcastLobby("game.purged-one", "player", p.getName(), "n", i, "of", queue.size());
+                    for (Player o : Bukkit.getOnlinePlayers()) {
+                        o.playSound(net.kyori.adventure.sound.Sound.sound(net.kyori.adventure.key.Key.key("cartzone", "purge"),
+                            net.kyori.adventure.sound.Sound.Source.MASTER, 0.7f, 1f));
+                    }
+                    if (spectate) plugin.msg().send(p, "game.purged-spectate");
+                    else p.kick(plugin.msg().get("game.purged-kick", "id", mm.id()));
+                }
+            }
+        }.runTaskTimer(plugin, 20, every);
+    }
+
+    private void broadcastLobby(String key, Object... kv) {
+        for (Player p : Bukkit.getOnlinePlayers()) plugin.msg().send(p, key, kv);
+    }
+
+    private void finishPurge(Purge.Result<Player> res) {
+        GameSettings s = match.s();
         for (Player p : res.kept()) {
             match.add(p.getUniqueId(), p.getName());
             plugin.msg().send(p, "game.selected", "id", match.id());
@@ -419,6 +465,7 @@ public final class GameManager {
         plugin.store().markStarted(match.id(), match.startedAt, res.kept().size() + "/" + s.purgeCap);
         plugin.getLogger().info("Game #" + match.id() + " purge done: " + res.kept().size() + " selected, " + res.purged().size() + " purged");
         match.purged = true;
+        match.enter(GameState.PURGE);
         if (s.squad > 1) {
             match.enter(GameState.TEAMING);
             plugin.teams().begin(match);
@@ -557,7 +604,10 @@ public final class GameManager {
         if (match.row.test()) plugin.store().setStatus(match.id(), GameRow.Status.CANCELLED);
         else plugin.store().finish(match.id(), endedAt, String.join(", ", winnerNames), mvp == null ? null : mvp.uuid,
                 mvp == null ? null : mvp.name, mvp == null ? 0 : mvp.kills, results)
-            .thenRun(() -> plugin.stats().pushSoon());
+            .thenRun(() -> {
+                plugin.stats().pushSoon();
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.leaderboard().refresh());
+            });
         if (!match.row.test()) plugin.announcer().results(match.row, winnerNames, winnerKills, mvp == null ? null : mvp.name, mvp == null ? 0 : mvp.kills);
         Component winLine = plugin.msg().get(winnerNames.isEmpty() ? "game.end-none" : timeout ? "game.end-timeout" : "game.end",
             "winners", String.join(", ", winnerNames), "kills", winnerKills, "mvp", mvp == null ? "-" : mvp.name, "mvp_kills", mvp == null ? 0 : mvp.kills);

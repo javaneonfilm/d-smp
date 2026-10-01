@@ -56,6 +56,8 @@ public final class Presence implements Listener {
     public Presence(CartRoyale plugin) {
         this.plugin = plugin;
         Bukkit.getScheduler().runTaskTimer(plugin, this::refreshBoards, 40, 20);
+        // Squad health colours want to keep up, so the sidebar runs twice a second.
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> plugin.sidebar().updateAll(), 40, 10);
     }
 
     // ---------------- access gate ----------------
@@ -104,7 +106,7 @@ public final class Presence implements Listener {
         showBar(p);
         sendPack(p);
         tabHeader(p);
-        p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        plugin.sidebar().join(p);
         Match m = plugin.games().match();
         if (m != null && m.state.inArena() && m.get(p.getUniqueId()) != null) {
             // Back after leaving mid-game: they were eliminated, so they watch.
@@ -132,6 +134,7 @@ public final class Presence implements Listener {
         packLoaded.remove(p.getUniqueId());
         packFailed.remove(p.getUniqueId());
         plugin.nametags().remove(p);
+        plugin.sidebar().quit(p);
     }
 
     @EventHandler
@@ -240,39 +243,9 @@ public final class Presence implements Listener {
     }
 
     private void refreshBoards() {
-        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
-        Objective o = board.getObjective("cr_side");
-        if (!plugin.getConfig().getBoolean("sidebar.enabled", true)) {
-            if (o != null) o.unregister();
-            return;
-        }
-        if (o == null) {
-            o = board.registerNewObjective("cr_side", Criteria.DUMMY, plugin.msg().get("sidebar.title"));
-            o.setDisplaySlot(DisplaySlot.SIDEBAR);
-            o.numberFormat(NumberFormat.blank());
-        }
-        o.displayName(plugin.msg().get("sidebar.title"));
-        Match m = plugin.games().match();
-        GameRow next = plugin.games().next();
-        List<String> lines = plugin.msg().rawList(m != null && m.state.inArena() ? "sidebar.match" : "sidebar.lobby");
-        // Entries are only keys; the client shows each score's custom name instead.
-        for (String entry : board.getEntries()) if (entry.startsWith("crline")) board.resetScores(entry);
-        int score = lines.size();
-        int i = 0;
-        for (String line : lines) {
-            String entry = "crline" + i++;
-            var sc = o.getScore(entry);
-            sc.setScore(score--);
-            sc.customName(plugin.msg().parse(line,
-                "online", Bukkit.getOnlinePlayers().size(),
-                "ip", plugin.getConfig().getString("server-ip"),
-                "state", stateLine(),
-                "next", next == null ? plugin.msg().plain("states.none-short") : "#" + next.id + " " + Times.clock(next.s.startAt, plugin.zoneId()),
-                "next_rel", next == null ? "" : Times.relative(next.s.startAt),
-                "alive", m == null ? 0 : m.aliveCount(),
-                "game", m == null ? "-" : "#" + m.id(),
-                "phase", m == null ? "-" : plugin.msg().plain("phases." + m.state.name().toLowerCase())));
-        }
+        // The sidebar moved to per-player boards (Sidebar); drop the old shared one if it is still there.
+        Objective old = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("cr_side");
+        if (old != null) old.unregister();
         for (Player p : Bukkit.getOnlinePlayers()) {
             tabHeader(p);
             BossBar bar = bars.get(p.getUniqueId());

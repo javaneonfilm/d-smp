@@ -67,6 +67,8 @@ public final class CartRoyale extends JavaPlugin {
     private Zone zone;
     private Presence presence;
     private com.cartroyale.mod.Offences offences;
+    private com.cartroyale.lobby.Sidebar sidebar;
+    private com.cartroyale.lobby.Leaderboard leaderboard;
     private com.cartroyale.mod.ChatFilter chatFilter;
     private com.cartroyale.loot.UpgradeBooks books;
     private TeamManager teams;
@@ -164,6 +166,7 @@ public final class CartRoyale extends JavaPlugin {
         }
 
         offences = new com.cartroyale.mod.Offences(this);
+        sidebar = new com.cartroyale.lobby.Sidebar(this);
         chatFilter = new com.cartroyale.mod.ChatFilter(this);
         register(offences, chatFilter, new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
             presence = new Presence(this), new MatchListener(this), new ArenaRules(this),
@@ -177,6 +180,7 @@ public final class CartRoyale extends JavaPlugin {
         bind("offence", new com.cartroyale.mod.OffenceGui(this));
 
         stats = new Stats(this);
+        leaderboard = new com.cartroyale.lobby.Leaderboard(this);
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             getLogger().info(com.cartroyale.hooks.papi.PapiHook.register(this) ? "PlaceholderAPI: %cartzone_*% placeholders registered." : "PlaceholderAPI: could not register %cartzone_*%.");
         }
@@ -356,6 +360,8 @@ public final class CartRoyale extends JavaPlugin {
     public Zone zone() { return zone; }
     public Presence presence() { return presence; }
     public com.cartroyale.mod.Offences offences() { return offences; }
+    public com.cartroyale.lobby.Sidebar sidebar() { return sidebar; }
+    public com.cartroyale.lobby.Leaderboard leaderboard() { return leaderboard; }
     public com.cartroyale.mod.ChatFilter chatFilter() { return chatFilter; }
     public com.cartroyale.loot.UpgradeBooks books() { return books; }
     public TeamManager teams() { return teams; }

@@ -1,47 +1,49 @@
 # CartZone messages. MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
 # Placeholders look like <name>. <prefix> inserts the prefix below.
 # The discord.* entries are plain Discord markdown, not MiniMessage.
+#
+# When a plugin update raises messages-version, this file is replaced and your old one is kept
+# as messages-old-<n>.yml, so copy your edits back over from there.
+messages-version: 2
 
-prefix: '<#FF0000><b>CartZone</b> <gray>»</gray> '
+prefix: '<#FF2B2B><b>CartZone</b> <dark_gray>|</dark_gray> '
 
-# ------------------------------------------------------------------ Discord (HOOK-1..4)
+# ------------------------------------------------------------------ Discord
 discord:
   title: 'Game #<id> (<region>)'
   hosted: |-
-    To be notified for games hosted, please go to <id:customize>
+    Get pinged for games in <id:customize>
 
-    **Game Settings**
+    **Settings**
     - Map: **<map>**
-    - Team Size: **<team_size>**
-    - Duration: **<duration> minutes**
-    - Purge Cap: **<cap>**
+    - Team size: **<team_size>**
+    - Length: **<duration> min**
+    - Player cap: **<cap>**
     - Mode: **<mode>**
     - Modifiers: <modifiers>
 
-    **Info**
-    - Starting: <t:<start_unix>:R>
-    - Server IP: `<ip>`
+    Starts <t:<start_unix>:R> on `<ip>`
   hosted-by: 'Hosted by <hoster>'
   random-map: 'Random'
   no-modifiers: 'None'
-  warning-title: '5 minute warning!'
+  warning-title: 'Starting in 5 minutes'
   warning: |-
-    The game starts <t:<start_unix>:R>. Log in now.
-    - Server IP: `<ip>`
-  purge-title: 'Purge is starting!'
+    Game starts <t:<start_unix>:R>, hop on now.
+    `<ip>`
+  purge-title: 'Purge is happening'
   purge: |-
-    Players are being selected into the game.
-    - Players Online: **<online>**
-  results-title: 'Game #<id> Results'
+    Picking who gets in.
+    Online: **<online>**
+  results-title: 'Game #<id> results'
   results: |-
-    - Winner(s): <winners> (**<winner_kills> Kills**)
-    - MVP: `<mvp>` (**<mvp_kills> Kills**)
+    Winner: <winners> (**<winner_kills>** kills)
+    MVP: `<mvp>` (**<mvp_kills>** kills)
   results-none: |-
-    - Nobody survived.
-    - MVP: `<mvp>` (**<mvp_kills> Kills**)
+    Nobody made it out.
+    MVP: `<mvp>` (**<mvp_kills>** kills)
   daily-title: "Today's games (<date>)"
   daily-line: '**Game <n>:** <t:<start_unix>:t> *<team_size>* <emoji>'
-  daily-footer: 'Server IP: <ip>'
+  daily-footer: '<ip>'
 
 team-size:
   '1': 'Solos'
@@ -58,284 +60,307 @@ modes:
 modifiers:
   no_fall_damage:
     name: 'No Fall Damage'
-    desc: 'Nobody takes fall damage.'
+    desc: 'No fall damage for anyone.'
   luckier_loot:
     name: 'Luckier Loot'
-    desc: 'Rare, epic and legendary loot shows up more.'
+    desc: 'Better stuff in chests.'
   pearls:
     name: 'Pearls'
-    desc: 'Ender pearls can be found in chests.'
+    desc: 'Ender pearls show up in chests.'
 
 categories:
   kill: 'Kill Effects'
-  explosion: 'Cart Explosion Effects'
+  explosion: 'Cart Explosions'
   suffix: 'Suffixes'
 
-# ------------------------------------------------------------------ access / lobby
+# ------------------------------------------------------------------ joining / lobby
 access:
-  no-game: "<#FF0000><b>CartZone</b>\n\n<white>No game is being hosted right now.\n<gray>See our Discord for the next one."
-  next-game: "<#FF0000><b>CartZone</b>\n\n<white>Game #<id> starts at <yellow><start></yellow>.\n<gray>Logins open <minutes> minutes before the start. See you there."
-  in-progress: "<#FF0000><b>CartZone</b>\n\n<white>Game #<id> is already running.\n<gray>Watch Discord for the next one."
+  no-game: "<#FF2B2B><b>CartZone</b>\n\n<white>No game right now.\n<gray>Next one gets posted on our Discord."
+  next-game: "<#FF2B2B><b>CartZone</b>\n\n<white>Next game is #<id> at <yellow><start></yellow>.\n<gray>You can join <minutes> minutes before it starts."
+  in-progress: "<#FF2B2B><b>CartZone</b>\n\n<white>Game #<id> already started.\n<gray>Check Discord for the next one."
 
 lobby:
-  welcome: '<prefix><white>Welcome, <yellow><player></yellow>. Last cart standing wins.'
-  window-open: '<prefix><white>Game #<id> starts at <yellow><start></yellow>. Stay online to be selected.'
+  welcome: '<prefix><gray>Hey <white><player></white>, welcome back.'
+  window-open: '<prefix><white>Game #<id> starts at <yellow><start></yellow>, stay online to get in.'
 
 chat:
   format: '<tag><name><suffix><dark_gray>:</dark_gray> <white><message>'
-  spectator-format: '<dark_gray>[Spectator]</dark_gray> <gray><name><dark_gray>:</dark_gray> <gray><message>'
-
+  spectator-format: '<dark_gray>[Spec]</dark_gray> <gray><name><dark_gray>:</dark_gray> <gray><message>'
 
 ip-bar:
-  plain: '<#FF0000><b>CartZone</b></#FF0000> <gray>|</gray> <white><ip>'
-  # With the resource pack the plugin draws the red bar and minecart icon; this is the text on it.
+  plain: '<#FF2B2B><b>CartZone</b></#FF2B2B> <dark_gray>|</dark_gray> <white><ip>'
   styled: "<white><ip>"
 
 tab:
-  header: "\n<#FF0000><b>CARTZONE</b></#FF0000>\n<gray><ip>\n"
-  footer: "\n<gray>Online: <white><online></white>   <gray><state>\n<dark_gray>Last cart standing wins.\n"
+  header: "\n<#FF2B2B><b>CARTZONE</b></#FF2B2B>\n<gray><ip>\n"
+  footer: "\n<gray>Online <white><online></white> <dark_gray>|</dark_gray> <gray><state>\n"
 
-sidebar:
-  title: '<#FF0000><b>CARTZONE</b>'
+# The sidebar. board.game: a line that is only <squad> becomes your squad list (team games).
+board:
+  title: '<#FF2B2B><b>CARTZONE'
   lobby:
-    - '<dark_gray>----------------'
-    - '<gray>Online: <white><online>'
     - ''
-    - '<gray>Next game:'
-    - ' <white><next>'
-    - ' <gray><next_rel>'
+    - ' <gray>Online <white><online>'
     - ''
-    - '<#FF0000><ip>'
-  match:
-    - '<dark_gray>----------------'
-    - '<gray>Game: <white><game>'
-    - '<gray>Phase: <white><phase>'
-    - '<gray>Alive: <white><alive>'
+    - ' <gray>Wins <white><wins>'
+    - ' <gray>Kills <white><kills>'
+    - ' <gray>Coins <#FFD24A><coins>'
     - ''
-    - '<#FF0000><ip>'
+    - ' <gray>Next game'
+    - '  <white><next>'
+    - '  <dark_gray><next_rel>'
+    - ''
+    - ' <#FF2B2B><ip>'
+  game:
+    - ''
+    - ' <gray>Game <white>#<id> <dark_gray>|</dark_gray> <white><phase>'
+    - ''
+    - ' <gray>Alive <white><alive>'
+    - ' <gray>Kills <white><kills>'
+    - ' <gray>Zone <white><zone>'
+    - ''
+    - '<squad>'
+    - ''
+    - ' <#FF2B2B><ip>'
+  squad-title: ' <gray>Squad'
+  no-game: 'nothing planned'
+  zone-off: '-'
+  zone-grace: 'grace <time>'
+  zone-waiting: 'moves in <time>'
+  zone-shrinking: 'shrinking <time>'
+  zone-closed: 'closed'
 
 states:
-  none: 'No game queued'
+  none: 'No game planned'
   none-short: 'none'
   next: 'Next: #<id> at <time> (<rel>)'
-  join_open: 'Game #<id>: join window open'
-  countdown: 'Game #<id>: starting'
-  purge: 'Game #<id>: purge'
-  teaming: 'Game #<id>: teaming up'
-  boarding: 'Game #<id>: boarding'
-  deploy: 'Game #<id>: dropping in (<alive> alive)'
-  playing: 'Game #<id>: <alive> alive'
-  ending: 'Game #<id>: over'
-  resetting: 'Game #<id>: resetting'
+  join_open: 'Game #<id> opening'
+  countdown: 'Game #<id> starting'
+  purge: 'Game #<id> purge'
+  teaming: 'Game #<id> teaming up'
+  boarding: 'Game #<id> boarding'
+  deploy: 'Game #<id> dropping, <alive> alive'
+  playing: 'Game #<id>, <alive> alive'
+  ending: 'Game #<id> over'
+  resetting: 'Game #<id> resetting'
   idle: 'Idle'
   announced: 'Queued'
 
 phases:
-  join_open: 'Join window'
+  join_open: 'Lobby'
   countdown: 'Countdown'
   purge: 'Purge'
-  teaming: 'Team up'
+  teaming: 'Teams'
   boarding: 'Boarding'
   deploy: 'Drop'
   playing: 'Fight'
-  ending: 'Results'
+  ending: 'Over'
   resetting: 'Reset'
   idle: '-'
   announced: '-'
 
+leaderboard:
+  line: "<#FFD24A><b>#<place></b></#FFD24A> <white><player>\n<gray><wins> win<s>"
+  empty: "<#FFD24A><b>#<place></b></#FFD24A>\n<gray>nobody yet"
+  set: '<prefix><white>Leaderboard spot #<place> set where you''re standing.'
+  removed: '<prefix><white>Leaderboard spot #<place> removed.'
+  refreshed: '<prefix><white>Leaderboard refreshed.'
+
 # ------------------------------------------------------------------ game flow
 titles:
-  countdown: '<#FF0000><b><seconds>'
-  countdown-sub: '<gray>Game #<id> - purge next'
-  purge: '<#FF0000><b>PURGE'
-  purge-sub: '<gray>Selecting players...'
-  board: '<#FF0000><b>ALL ABOARD'
-  board-sub: '<gray>The ghasts are coming for you...'
-  victory: '<#FFD700><b>LAST CART STANDING'
-  game-over: '<#FF0000><b>GAME OVER'
-  end-sub: '<gray>Winner: <white><winners>'
+  countdown: '<#FF2B2B><b><seconds>'
+  countdown-sub: '<gray>purge next'
+  purge: '<#FF2B2B><b>PURGE'
+  purge-sub: '<gray>picking players'
+  board: '<#FF2B2B><b>GET ON'
+  board-sub: '<gray>ghasts incoming'
+  victory: '<#FFD24A><b>YOU WON'
+  game-over: '<#FF2B2B><b>GAME OVER'
+  end-sub: '<gray><winners> won'
 
 game:
-  hosted: '<prefix><white>Game #<id> hosted by <yellow><hoster></yellow>: <mode>, <team_size>. Starts <start>.'
-  window-open: '<prefix><white>Game #<id> starts at <yellow><start></yellow>. <gray><players> players online, cap <cap>.'
-  purge-start: '<prefix><#FF0000>The purge is starting.</#FF0000> <gray><online> players for <cap> spots.'
-  purged-kick: "<#FF0000><b>You were purged</b>\n\n<white>The lobby for game #<id> was over the player cap.\n<gray>Some ranks make it much less likely or make you immune."
-  purged-spectate: '<prefix><gray>You were purged from this game. You can watch it.'
-  selected: '<prefix><#7DDC6A>You were selected for game #<id>. Good luck.'
-  cancelled: '<prefix><gray>Game #<id> was cancelled: <white><reason>'
-  reason-not-enough: 'not enough players (need <min>)'
-  test-started: '<prefix><yellow>Test game #<id></yellow> <white>for <player> starts in a few seconds. <gray>Solo is fine. No Discord, no stats, no restart. /cart stop ends it.'
+  hosted: '<prefix><yellow><hoster></yellow> <white>is hosting game #<id>: <mode>, <team_size>, <start>.'
+  window-open: '<prefix><white>Game #<id> starts at <yellow><start></yellow>. <gray><players> online, <cap> spots.'
+  purge-start: '<prefix><white>Purge time. <gray><online> players for <cap> spots.'
+  purge-cutting: '<prefix><gray>Cutting <#FF2B2B><count></#FF2B2B> of you...'
+  purged-one: '<prefix><#FF2B2B><player></#FF2B2B> <gray>got purged. <dark_gray>(<n>/<of>)'
+  purged-kick: "<#FF2B2B><b>You got purged</b>\n\n<white>Game #<id> had more players than spots.\n<gray>Ranks lower your chance of getting cut."
+  purged-spectate: '<prefix><gray>You got purged from this one, but you can watch.'
+  selected: '<prefix><#55FF55>You''re in game #<id>.'
+  cancelled: '<prefix><gray>Game #<id> got cancelled: <white><reason>'
+  reason-not-enough: 'not enough players (needs <min>)'
+  test-started: '<prefix><white>Test game #<id> for <player> starting. <gray>No Discord, no stats. /cart stop to end it.'
   reason-stopped: 'stopped by <by>'
   reason-cancelled: 'cancelled by <by>'
-  zone-start: '<prefix><white>Everyone has dropped. The zone is live.'
-  zone-start-grace: '<prefix><white>Everyone has dropped. Grace period: <yellow><grace> min</yellow>, no PvP. Then the zone fully closes over <minutes> minutes.'
-  elim: '<gray><victim> <dark_gray>was eliminated. <gray><left> left.'
-  elim-by: '<gray><victim> <dark_gray>was eliminated by</dark_gray> <#FF0000><killer></#FF0000><dark_gray>. <gray><left> left.'
-  elim-quit: '<gray><victim> <dark_gray>left the game. <gray><left> left.'
-  end: '<prefix><#FFD700><b><winners></b></#FFD700> <white>won with <kills> kills. <gray>MVP: <white><mvp> (<mvp_kills>)'
-  end-timeout: '<prefix><white>Time is up. Co-winners: <#FFD700><winners></#FFD700>. <gray>MVP: <white><mvp> (<mvp_kills>)'
-  end-none: '<prefix><white>Nobody survived. <gray>MVP: <white><mvp> (<mvp_kills>)'
-  end-kick: "<#FF0000><b>Game #<id> is over</b>\n\n<white>Thanks for playing. The server restarts for the next game.\n<gray>See Discord for the schedule."
+  zone-start: '<prefix><white>Everyone''s down, zone is live.'
+  zone-start-grace: '<prefix><white>Everyone''s down. <#55FF55><grace> min grace</#55FF55>, no PvP till then. Zone closes <minutes> min after that.'
+  elim: '<gray><victim> died. <dark_gray><left> left'
+  elim-by: '<#FF2B2B><killer></#FF2B2B> <gray>killed</gray> <white><victim></white><gray>. <dark_gray><left> left'
+  elim-quit: '<gray><victim> left. <dark_gray><left> left'
+  end: '<prefix><#FFD24A><b><winners></b></#FFD24A> <white>won with <kills> kills. <gray>MVP <white><mvp></white> (<mvp_kills>)'
+  end-timeout: '<prefix><white>Out of time. <#FFD24A><winners></#FFD24A> <white>share the win. <gray>MVP <white><mvp></white> (<mvp_kills>)'
+  end-none: '<prefix><white>Nobody survived. <gray>MVP <white><mvp></white> (<mvp_kills>)'
+  end-kick: "<#FF2B2B><b>Game #<id> is over</b>\n\n<white>GG, thanks for playing.\n<gray>Server's resetting. Next game is on Discord."
 
 teams:
-  phase-start: '<prefix><white>Team up! <gray>Squads of <size>. Use the lead in your hotbar or <white>/team invite <player></white>. <seconds>s.'
-  phase-bar: '<white>Team up: <yellow><seconds>s</yellow> <dark_gray>|</dark_gray> <gray>teams of <size>'
-  not-now: '<prefix><gray>Teaming is only open right after the purge.'
-  self: '<prefix><gray>You cannot invite yourself.'
-  not-in-game: '<prefix><gray><player> is not in this game.'
-  full: '<prefix><gray>That team is full.'
-  already-teamed: '<prefix><gray><player> is already in a team.'
-  invited: '<prefix><white>Invited <yellow><player></yellow>.'
-  invite: '<prefix><yellow><player></yellow> <white>invited you. <accept>'
-  accept-button: '<#7DDC6A><b>[Accept]</b></#7DDC6A>'
-  no-invite: '<prefix><gray>You have no open invite.'
-  joined: '<prefix><white><player> joined the team. <gray>(<count>/<size>)'
+  phase-start: '<prefix><white>Team up, squads of <size>. <gray>Use the lead in your hotbar or /team invite <player>. <white><seconds>s'
+  phase-bar: '<white>Team up <yellow><seconds>s</yellow> <dark_gray>|</dark_gray> <gray>squads of <size>'
+  not-now: '<prefix><gray>You can only team up right after the purge.'
+  self: '<prefix><gray>You can''t invite yourself.'
+  not-in-game: '<prefix><gray><player> isn''t in this game.'
+  full: '<prefix><gray>That team''s full.'
+  already-teamed: '<prefix><gray><player> already has a team.'
+  invited: '<prefix><white>Invite sent to <yellow><player></yellow>.'
+  invite: '<prefix><yellow><player></yellow> <white>wants you on their team. <accept>'
+  accept-button: '<#55FF55><b>[Accept]</b></#55FF55>'
+  no-invite: '<prefix><gray>Nobody invited you.'
+  joined: '<prefix><white><player> joined. <gray>(<count>/<size>)'
   left: '<prefix><gray><player> left the team.'
-  disbanded: '<prefix><gray>Your team was disbanded.'
+  disbanded: '<prefix><gray>Your team broke up.'
   you-left: '<prefix><gray>You left your team.'
-  no-team: '<prefix><gray>You are not in a team.'
+  no-team: '<prefix><gray>You''re not in a team.'
   list: '<prefix><white>Team (<count>/<size>): <yellow><members>'
 
 deploy:
-  boarded: '<prefix><white>All aboard. <gray>Mode: <mode>. <white>Sneak to drop early.'
+  boarded: '<prefix><white>You''re on. <gray><mode>, sneak to jump off early.'
   riding-bar: '<white>Sneak to drop <dark_gray>|</dark_gray> <gray>auto drop in <yellow><seconds>s'
-  dropped: '<white>Gliding. <gray>Your elytra comes off when you land.'
-  landed: '<#7DDC6A>Landed. <white>Your chestplate is back.'
-  glide-timeout: '<yellow>Glide time is up. You will land safely.'
-  mount-failed: 'Could not seat <player> on a ghast. Check /cart diag.'
+  dropped: '<white>Gliding. <gray>Elytra comes off when you land.'
+  landed: '<#55FF55>Landed. <white>Chestplate''s back on.'
+  glide-timeout: '<yellow>Glide''s over, you''ll land safe.'
+  mount-failed: 'Couldn''t put <player> on a ghast. Check /cart diag.'
 
 zone:
-  outside: '<#FF0000><b>OUTSIDE THE ZONE</b></#FF0000> <gray><distance> blocks out'
-  hud-grace: '<#7DDC6A><b>GRACE</b> <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP, the zone waits'
-  hud-waiting: '<white><b>ZONE <phase>/<phases></b> <gray>shrinks in <#FFD24A><time></#FFD24A> <dark_gray>|</dark_gray> <gray>radius <white><radius>'
-  hud-shrinking: '<#FF8A1F><b>SHRINKING</b> <white><time></white> <dark_gray>|</dark_gray> <gray>radius <white><radius></white> to <white><target>'
-  hud-closed: '<#FF3333><b>ZONE CLOSED</b> <dark_gray>|</dark_gray> <gray>last one standing wins'
-  bar-grace: '<#7DDC6A>Grace period <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP, zone holds'
-  grace-over: '<prefix><#FF0000><b>Grace period over.</b> <white>PvP is on and the zone starts moving.'
-  grace-over-title: '<#FF0000><b>PVP ON'
-  grace-over-sub: '<gray>Grace period over'
-  grace-no-pvp: '<#7DDC6A>Grace period: no PvP for <white><seconds>s'
-  bar-waiting: '<white>Zone <phase>/<phases> <gray>shrinks in <yellow><seconds>s</yellow> <dark_gray>|</dark_gray> <gray>r <radius>'
-  bar-shrinking: '<#FF0000>Zone shrinking <gray><seconds>s <dark_gray>|</dark_gray> <gray>r <radius>'
-  bar-orbit: '<#FF0000>Final zone moving <dark_gray>|</dark_gray> <gray>r <radius>'
-  start-set: '<prefix><white>Zone start circle: <yellow><x>, <z></yellow> radius <yellow><r></yellow>.'
-  final-set: '<prefix><white>Final zone centre: <yellow><x>, <z></yellow>.'
-  previewing: '<prefix><white>Drawing every phase circle around you for 15 seconds.'
-  info-head: '<prefix><white><phases> phases, about <minutes> minutes in total:'
+  outside: '<#FF2B2B><b>OUTSIDE THE ZONE</b></#FF2B2B> <gray><distance> blocks out'
+  hud-grace: '<#55FF55><b>GRACE</b> <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP yet'
+  hud-waiting: '<white><b>ZONE <phase>/<phases></b> <gray>moves in <#FFD24A><time></#FFD24A> <dark_gray>|</dark_gray> <gray>radius <white><radius>'
+  hud-shrinking: '<#FF8A1F><b>SHRINKING</b> <white><time></white> <dark_gray>|</dark_gray> <gray><white><radius></white> to <white><target>'
+  hud-closed: '<#FF2B2B><b>ZONE CLOSED</b> <dark_gray>|</dark_gray> <gray>last one alive wins'
+  bar-grace: '<#55FF55>Grace <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP yet'
+  grace-over: '<prefix><#FF2B2B><b>Grace is over.</b> <white>PvP is on and the zone starts moving.'
+  grace-over-title: '<#FF2B2B><b>PVP ON'
+  grace-over-sub: '<gray>grace is over'
+  grace-no-pvp: '<#55FF55>No PvP for another <white><seconds>s'
+  bar-waiting: '<white>Zone <phase>/<phases> <gray>moves in <yellow><seconds>s</yellow> <dark_gray>|</dark_gray> <gray>r <radius>'
+  bar-shrinking: '<#FF2B2B>Zone shrinking <gray><seconds>s <dark_gray>|</dark_gray> <gray>r <radius>'
+  bar-orbit: '<#FF2B2B>Final zone moving <dark_gray>|</dark_gray> <gray>r <radius>'
+  start-set: '<prefix><white>Zone start set: <yellow><x>, <z></yellow>, radius <yellow><r></yellow>.'
+  final-set: '<prefix><white>Final zone centre set: <yellow><x>, <z></yellow>.'
+  previewing: '<prefix><white>Showing every zone circle around you for 15 seconds.'
+  info-head: '<prefix><white><phases> phases, about <minutes> min:'
   info-line: '<gray> <n>. wait <wait>s, shrink <shrink>s to r<r> at <x>,<z> <dark_gray>|</dark_gray> <gray><dmg> dmg <dark_gray>|</dark_gray> <gray>done at <at>'
-  info-closed: '<gray> Then the zone is fully closed: everyone left takes zone damage until one is left.'
-  info-orbit: '<gray> Then the circle orbits <x>,<z> at radius <r>, <speed> blocks/s.'
+  info-closed: '<gray> After that the zone is closed and everyone takes damage.'
+  info-orbit: '<gray> After that the circle moves around <x>,<z> (r <r>, <speed> blocks/s).'
 
 spectate:
-  now: '<prefix><gray>You are spectating. <white>/spectate</white> picks a player to follow.'
-  not-spectating: '<prefix><gray>You are not spectating a game.'
-  cant-leave: '<gray>Spectators stay inside the arena.'
+  now: '<prefix><gray>You''re spectating. <white>/spectate</white> to follow someone.'
+  not-spectating: '<prefix><gray>You''re not spectating.'
+  cant-leave: '<gray>Spectators have to stay in the arena.'
 
 shield:
-  broke: '<yellow>One Time Shield broke. <gray><left> left.'
+  broke: '<yellow>Shield broke. <gray><left> left.'
 
 coins:
-  kill: '<#FFD700>+<coins> coins</#FFD700> <gray>(<balance>)'
+  kill: '<#FFD24A>+<coins> coins</#FFD24A> <gray>(<balance>)'
 
 # ------------------------------------------------------------------ shop / locker
 shop:
-  bought: '<prefix><#7DDC6A>Bought <white><name></white> for <price> coins.</#7DDC6A> <gray>Balance: <balance>'
-  already-owned: '<prefix><gray>You already own <name>.'
-  too-poor: '<prefix><gray><name> costs <price> coins. You have <balance>.'
+  bought: '<prefix><#55FF55>Bought <white><name></white> for <price> coins.</#55FF55> <gray>You have <balance> left.'
+  already-owned: '<prefix><gray>You already have <name>.'
+  too-poor: '<prefix><gray><name> is <price> coins, you have <balance>.'
 
 locker:
   equipped: '<prefix><white>Equipped <yellow><name></yellow>.'
-  unequipped: '<prefix><gray>Unequipped <name>.'
+  unequipped: '<prefix><gray>Took off <name>.'
   preview-suffix: '<prefix><gray>Preview:'
 
 stats:
-  self: "<prefix><white>Your stats\n<gray>Coins: <#FFD700><coins></#FFD700>  Kills: <white><kills></white>  Wins: <white><wins></white>  Games: <white><played></white>\n<gray>Leaderboards: <#FF0000><u><site></u></#FF0000>"
+  self: "<prefix><white>Your stats\n<gray>Coins <#FFD24A><coins></#FFD24A>  Kills <white><kills></white>  Wins <white><wins></white>  Games <white><played></white>\n<gray>Leaderboards: <#FF2B2B><u><site></u></#FF2B2B>"
 
 # ------------------------------------------------------------------ hosting / tickets
 host:
-  no-ticket: '<prefix><gray>You need a Game Ticket to host. Get one: <#FF0000><u><store></u></#FF0000>'
-  too-soon: '<prefix><gray>Pick a start at least <minutes> minutes from now.'
-  slot-taken: '<prefix><gray>Another game starts within <minutes> minutes of that time. Pick another slot.'
-  kit-missing-warning: '<prefix><yellow>Note: no kit is set for <mode> yet. An admin needs to set it.'
-  queued: '<prefix><#7DDC6A>Game #<id> is queued for <start>.</#7DDC6A> <gray>Discord has been told.'
-  failed: '<prefix><#FF0000>That game could not be queued. Try again.'
+  no-ticket: '<prefix><gray>You need a Game Ticket to host. <#FF2B2B><u><store></u></#FF2B2B>'
+  too-soon: '<prefix><gray>Pick a time at least <minutes> min from now.'
+  slot-taken: '<prefix><gray>There''s already a game within <minutes> min of that. Pick another time.'
+  kit-missing-warning: '<prefix><yellow>Heads up, there''s no <mode> kit set yet. Ask an admin.'
+  queued: '<prefix><#55FF55>Game #<id> is set for <start>.</#55FF55> <gray>Posted on Discord.'
+  failed: '<prefix><#FF2B2B>Couldn''t queue that game, try again.'
 
 tickets:
-  given: '<prefix><white>Gave <n> ticket(s) to <player>. <gray>Now <count>. Host group: <lp>.'
-  duplicate: '<prefix><gray>Transaction <tx> was already applied. Tickets: <count>.'
-  revoked: '<prefix><white>Revoked <n> ticket(s) from <player>. <gray>Now <count>.'
-  revoke-cancelled-game: '<prefix><white>Cancelled game #<id>, which that ticket paid for.'
-  received: '<prefix><#7DDC6A>You got a Game Ticket!</#7DDC6A> <white>You have <count>. Set up your game now.'
-  reminder: '<prefix><white>You have <yellow><count></yellow> Game Ticket(s). <gray>Use the star in your hotbar or /cart host.'
-  refunded: '<prefix><white>Game #<id> did not run, so your ticket was given back.'
-  list-head: '<prefix><white><player> has <yellow><count></yellow> ticket(s). Recent changes:'
+  given: '<prefix><white>Gave <player> <n> ticket(s). <gray>They have <count>. Host group: <lp>.'
+  duplicate: '<prefix><gray>Transaction <tx> was already done. Tickets: <count>.'
+  revoked: '<prefix><white>Took <n> ticket(s) from <player>. <gray>They have <count>.'
+  revoke-cancelled-game: '<prefix><white>Cancelled game #<id> since that ticket paid for it.'
+  received: '<prefix><#55FF55>You got a Game Ticket.</#55FF55> <white>You have <count>, set up your game.'
+  reminder: '<prefix><white>You have <yellow><count></yellow> Game Ticket(s). <gray>Star in your hotbar or /cart host.'
+  refunded: '<prefix><white>Game #<id> didn''t happen, so you got your ticket back.'
+  list-head: '<prefix><white><player> has <yellow><count></yellow> ticket(s). Recent:'
   list-line: '<gray> <delta> <white><source></white> tx <tx> <dark_gray><when>'
 
 kits:
-  saved: '<prefix><#7DDC6A>Kit for <mode> saved from your inventory.'
-  missing: 'No kit is set for <mode>. Players boarded with an empty inventory. Use /kitready then /cart kit set <mode>.'
-  missing-admin: '<prefix><gray>No kit is set for <mode> yet.'
-  ready-confirm: '<prefix><yellow>This clears your whole inventory. Run /kitready again within 10 seconds to confirm.'
-  ready-done: '<prefix><white>Inventory cleared. Build the kit, then <yellow>/cart kit set lt</yellow> or <yellow>ht</yellow>.'
+  saved: '<prefix><#55FF55><mode> kit saved from your inventory.'
+  missing: 'No <mode> kit is set, so players boarded with nothing. Do /kitready then /cart kit set <mode>.'
+  missing-admin: '<prefix><gray>No <mode> kit set yet.'
+  ready-confirm: '<prefix><yellow>This wipes your inventory. Run /kitready again within 10s if you''re sure.'
+  ready-done: '<prefix><white>Inventory cleared. Set up the kit, then <yellow>/cart kit set lt</yellow> or <yellow>ht</yellow>.'
 
 loot:
-  added: '<prefix><white>Added <item> to tier <tier>.'
+  added: '<prefix><white>Added <item> to <tier>.'
 
 pack:
-  prompt: '<white>CartZone uses a small resource pack for the IP bar and the One Time Shield.'
-  declined-kick: "<#FF0000><b>Resource pack required</b>\n\n<white>Enable server resource packs for this server and join again."
-  failed: '<prefix><gray>The resource pack did not load. Everything still works, it just looks plainer.'
-  misconfigured: 'The resource pack is enabled but resource-pack.url or resource-pack.sha1 is missing or invalid.'
+  prompt: '<white>CartZone uses a small resource pack for the HUD, badges and items.'
+  declined-kick: "<#FF2B2B><b>You need the resource pack</b>\n\n<white>Turn on server resource packs for this server and rejoin."
+  failed: '<prefix><gray>The resource pack didn''t load. Game still works, just looks plainer.'
+  misconfigured: 'Resource pack is on but resource-pack.url or resource-pack.sha1 is missing or wrong.'
 
 # ------------------------------------------------------------------ items
 items:
   grapple:
-    name: '<#FF0000><b>Grappling Hook</b>'
-    lore: ['<gray>Cast, then reel in to pull yourself.', '<dark_gray>Lobby only.']
+    name: '<#FF2B2B><b>Grappling Hook</b>'
+    lore: ['<gray>Cast it, reel in, fly.', '<dark_gray>Lobby only']
   cosmetics:
-    name: '<#FFD700><b>Cosmetics</b>'
-    lore: ['<gray>Locker and Daily Shop.']
+    name: '<#FFD24A><b>Cosmetics</b>'
+    lore: ['<gray>Locker and daily shop']
   stats:
     name: '<white><b>Stats</b>'
-    lore: ['<gray>Your numbers and the leaderboards.']
+    lore: ['<gray>Your stats and leaderboards']
   host:
     name: '<#FF8A1F><b>Host a Game</b>'
-    lore: ['<gray>Tickets: <white><tickets>', '<gray>Pick mode, modifiers, squad size,', '<gray>player cap and start time.']
+    lore: ['<gray>Tickets: <white><tickets>', '<gray>Pick the mode, size, cap and time']
   team:
-    name: '<#7DDC6A><b>Team Up</b>'
-    lore: ['<gray>Invite players or accept invites.']
+    name: '<#55FF55><b>Team Up</b>'
+    lore: ['<gray>Invite people or accept invites']
   lobby-wind:
     name: '<white>Wind Charge'
-    lore: ['<gray>Only pushes you. Refills itself.', '<dark_gray>Lobby only.']
+    lore: ['<gray>Only pushes you, refills itself', '<dark_gray>Lobby only']
   lobby-elytra:
-    name: '<#FFD700>Lobby Elytra'
-    lore: ['<dark_gray>Lobby only.']
+    name: '<#FFD24A>Lobby Elytra'
+    lore: ['<dark_gray>Lobby only']
   temp-elytra:
-    name: '<#FF0000>Drop Elytra'
-    lore: ['<gray>Comes off when you land.']
+    name: '<#FF2B2B>Drop Elytra'
+    lore: ['<gray>Comes off when you land']
   one-time-shield:
     name: '<#FF8A1F>One Time Shield'
-    lore: ['<gray>Hold in your offhand and block.', '<gray>Stops one hit of anything, even', '<gray>a cart explosion, then breaks.', '<dark_gray>Stacks to 16.']
+    lore: ['<gray>Block with it in your offhand.', '<gray>Stops one hit of anything,', '<gray>even a cart blowing up.', '<dark_gray>Stacks to 16']
   books:
     armor:
       name: '<#C0C0C0><b>Armor Upgrade</b>'
-      lore: ['<gray>Upgrades all armor you wear', '<gray>one tier: iron > diamond > netherite.', '<dark_gray>Applies itself when you pick it up.']
+      lore: ['<gray>Your armor goes up a tier.', '<gray>iron > diamond > netherite', '<dark_gray>Used when you pick it up']
     sharpness:
       name: '<#4FE3E8><b>Sharpness Book</b>'
-      lore: ['<gray>+1 Sharpness on your sword, axe or spear.', '<dark_gray>Applies itself when you pick it up.']
+      lore: ['<gray>+1 Sharpness on your sword, axe or spear', '<dark_gray>Used when you pick it up']
     quickcharge:
       name: '<#FFB020><b>Quick Charge Book</b>'
-      lore: ['<gray>+1 Quick Charge on your crossbow.', '<dark_gray>Applies itself when you pick it up.']
+      lore: ['<gray>+1 Quick Charge on your crossbow', '<dark_gray>Used when you pick it up']
 
 books:
-  armor-applied: '<prefix><white>Armor Upgrade: your armor is now <yellow><item></yellow>.'
-  armor-waiting: '<prefix><gray>Armor Upgrade kept: wear armor below netherite and it applies.'
+  armor-applied: '<prefix><white>Armor upgraded to <yellow><item></yellow>.'
+  armor-waiting: '<prefix><gray>Holding onto the Armor Upgrade until you''re wearing something below netherite.'
   armor-tier: '<tier>'
-  kill-upgrade: '<prefix><white>Kill! Your armor upgraded to <yellow><item></yellow>.'
-  sharpness-applied: '<prefix><white>Sharpness Book: <yellow><item></yellow>.'
-  sharpness-waiting: '<prefix><gray>Sharpness Book kept: it applies when you have a sword, axe or spear below the max.'
-  quickcharge-applied: '<prefix><white>Quick Charge Book: <yellow><item></yellow>.'
-  quickcharge-waiting: '<prefix><gray>Quick Charge Book kept: it applies when you have a crossbow below the max.'
+  kill-upgrade: '<prefix><white>Kill. Armor''s now <yellow><item></yellow>.'
+  sharpness-applied: '<prefix><white><yellow><item></yellow>.'
+  sharpness-waiting: '<prefix><gray>Holding onto the Sharpness Book until you have a sword, axe or spear to put it on.'
+  quickcharge-applied: '<prefix><white><yellow><item></yellow>.'
+  quickcharge-waiting: '<prefix><gray>Holding onto the Quick Charge Book until you have a crossbow.'
   level: '<item> is now <enchant> <level>'
 
 # ------------------------------------------------------------------ chests
@@ -345,106 +370,123 @@ chests:
   name-3: 'Gold Chest'
   hologram-1: '<#CD7F32><b>★'
   hologram-2: '<#C0C0C0><b>★★'
-  hologram-3: '<#FFD700><b>★★★'
-  no-spots: 'No valid chest spots were found on map <map>. Check /cart chests info and the include/exclude zones.'
+  hologram-3: '<#FFD24A><b>★★★'
+  no-spots: 'No chest spots found on <map>. Check /cart chests info and the include/exclude zones.'
   failed: 'Chest placement failed: <error>'
-  zone-added: '<prefix><white>Chest <kind> circle added, radius <r>. The spot cache was cleared.'
+  zone-added: '<prefix><white>Chest <kind> circle added, radius <r>. Spot cache cleared.'
   zones-cleared: '<prefix><white>Chest zones cleared.'
-  scanning: '<prefix><white>Scanning the arena for chest spots. /cart chests info shows progress.'
-  scanned: '<prefix><#7DDC6A>Scan done: <n> valid spots.'
+  scanning: '<prefix><white>Scanning the arena for chest spots. /cart chests info shows how far it is.'
+  scanned: '<prefix><#55FF55>Scan done, <n> spots.'
   testing: '<prefix><white>Placing chests for <players> players...'
-  tested: '<prefix><#7DDC6A><report>'
-  cleared: '<prefix><white>All chests and holograms removed.'
+  tested: '<prefix><#55FF55><report>'
+  cleared: '<prefix><white>Removed all chests and holograms.'
   info: '<prefix><white><report> <dark_gray>|</dark_gray> <gray>scan: <scan>, cached: <cached>, include <include>, exclude <exclude>'
 
 # ------------------------------------------------------------------ arena setup
 arena:
   list: '<prefix><white>Maps: <yellow><maps></yellow> <gray>(loaded: <loaded>)'
-  busy: '<prefix><gray>A game is using the arena right now.'
-  saving: '<prefix><white>Saving the arena as template <yellow><name></yellow>...'
-  saved: '<prefix><#7DDC6A>Template <name> saved. The arena resets to exactly this after every game.'
-  save-failed: '<prefix><#FF0000>Saving failed: <error>'
-  loading: '<prefix><white>Loading map <yellow><name></yellow>...'
-  loaded: '<prefix><#7DDC6A>Map <name> loaded.'
-  load-failed: '<prefix><#FF0000>Loading failed: <error>'
-  stand-in-arena: '<prefix><gray>Stand in the arena to set this. <white>/cart arena tp</white> takes you there.'
-  set: '<prefix><white>Arena <what> set at <yellow><where></yellow>. Save the template when done.'
-  info: "<prefix><white>Map <yellow><name></yellow> <gray>(template <template>)\n<gray> centre <white><center></white>, border radius <white><border></white>\n<gray> spectator spawn <white><spawn></white>\n<gray> ghast route start <white><deploy></white>"
+  busy: '<prefix><gray>There''s a game using the arena right now.'
+  saving: '<prefix><white>Saving the arena as <yellow><name></yellow>...'
+  saved: '<prefix><#55FF55>Saved <name>. The arena resets to this after every game.'
+  save-failed: '<prefix><#FF2B2B>Save failed: <error>'
+  loading: '<prefix><white>Loading <yellow><name></yellow>...'
+  loaded: '<prefix><#55FF55><name> loaded.'
+  load-failed: '<prefix><#FF2B2B>Load failed: <error>'
+  stand-in-arena: '<prefix><gray>You need to be in the arena for that. <white>/cart arena tp</white>'
+  set: '<prefix><white>Arena <what> set at <yellow><where></yellow>. Save the template when you''re done.'
+  info: "<prefix><white>Map <yellow><name></yellow> <gray>(template <template>)\n<gray> centre <white><center></white>, border <white><border></white>\n<gray> spectator spawn <white><spawn></white>\n<gray> ghast route <white><deploy></white>"
 
 # ------------------------------------------------------------------ admin
 admin:
-  alert-prefix: '<#FF0000>[CartZone]</#FF0000> '
-  no-game: '<prefix><gray>No game is running.'
-  no-arena: '<prefix><gray>The arena is not loaded.'
-  no-such-game: '<prefix><gray>No queued game #<id>.'
-  already-running: '<prefix><gray>Game #<id> is already running (<state>).'
-  queue-live: '<prefix><white>Live: game #<id> <gray>(<state>, <players> players, <alive> alive)'
+  alert-prefix: '<#FF2B2B>[CartZone]</#FF2B2B> '
+  no-game: '<prefix><gray>No game running.'
+  no-arena: '<prefix><gray>The arena isn''t loaded.'
+  no-such-game: '<prefix><gray>There''s no queued game #<id>.'
+  already-running: '<prefix><gray>Game #<id> is already going (<state>).'
+  queue-live: '<prefix><white>Live: #<id> <gray>(<state>, <players> players, <alive> alive)'
   queue-empty: '<prefix><gray>Nothing queued.'
   queue-line: '<gray> #<id> <white><start></white> <gray><hoster>, <mode>, <team_size>, cap <cap> <dark_gray>(<source>)'
-  reloaded: '<prefix><#7DDC6A>Configs reloaded.'
+  reloaded: '<prefix><#55FF55>Reloaded.'
   lobby-set: '<prefix><white>Lobby spawn set.'
-  play-on: '<prefix><white>You will play in games (not spectate).'
-  play-off: '<prefix><white>You will spectate games again.'
+  play-on: '<prefix><white>You''ll play in games now instead of spectating.'
+  play-off: '<prefix><white>Back to spectating games.'
   build-on: '<prefix><white>Build mode on.'
   build-off: '<prefix><white>Build mode off.'
-  free-on: '<prefix><white>Free roam on: spectating is not confined to the arena.'
+  free-on: '<prefix><white>Free roam on, you can leave the arena while spectating.'
   free-off: '<prefix><white>Free roam off.'
-  coins: '<prefix><white><player> now has <#FFD700><balance></#FFD700> coins.'
-  shield-given: '<prefix><white>Gave you <n> One Time Shield(s).'
-  book-given: '<prefix><white>Gave <player> <n> <book>. Books apply themselves in the arena only.'
-  restarting: 'Game over. Restarting the server once to restore the arena.'
-  map-swap-failed: 'Could not load map <map>: <error>'
-  tick-error: 'The game loop hit an error in state <state>: <error>. See /cart diag.'
-  queue-failed: 'The game could not be queued: <error>'
+  coins: '<prefix><white><player> has <#FFD24A><balance></#FFD24A> coins now.'
+  shield-given: '<prefix><white>Here''s <n> One Time Shield(s).'
+  book-given: '<prefix><white>Gave <player> <n> <book>. They only get used in the arena.'
+  restarting: 'Game over, restarting to reset the arena.'
+  map-swap-failed: 'Couldn''t load map <map>: <error>'
+  tick-error: 'Game loop error in <state>: <error>. See /cart diag.'
+  queue-failed: 'Couldn''t queue the game: <error>'
+
+webhook:
+  test-sending: '<prefix><white>Sending a test message to Discord...'
+  test-ok: '<prefix><#55FF55>Discord got it.</#55FF55> <gray>Check the channel.'
+  test-ok-no-role: '<prefix><#55FF55>Discord got it,</#55FF55> <gray>but no role was pinged: webhooks.events-role-id in config.yml isn''t set.'
+  test-failed: '<prefix><#FF2B2B>Discord said no: <white><error></white>. <gray><hint>'
+  test-no-url: '<prefix><gray>No webhook set. Put discord-webhook-url in plugins/CartZone/secrets.yml, then /cart reload.'
+  test-disabled: '<prefix><gray>Webhooks are off (webhooks.enabled in config.yml).'
+  test-bad-url: '<prefix><gray>The webhook URL in secrets.yml has to start with https://'
+  test-title: 'Webhook test'
+  test-body: 'If you can read this, CartZone can post here. Sent by <who>.'
+  hint-url: 'The webhook URL is wrong or the webhook was deleted. Make a new one and paste it into secrets.yml.'
+  hint-400: 'Discord didn''t like the message itself, check the server console.'
+  hint-network: 'Looks like the server can''t reach Discord. Try again in a bit.'
 
 diag:
-  head: '<#FF0000><b>CartZone diagnostics</b>'
-  state: '<gray>State: <white><state></white> game <white><game></white> players <white><players></white> alive <white><alive>'
-  next: '<gray>Next: <white><next></white> <gray>(<queued> queued)'
-  eligible: '<gray>Would be selected now: <white><n></white> <gray>(min <min>), whitelist <white><whitelist>'
-  arena: '<gray>Arena: <white><world></white> map <white><map></white> template <white><template></white> chest spots <white><spots>'
+  head: '<#FF2B2B><b>CartZone diag</b>'
+  state: '<gray>State <white><state></white>, game <white><game></white>, players <white><players></white>, alive <white><alive>'
+  next: '<gray>Next <white><next></white> <gray>(<queued> queued)'
+  eligible: '<gray>Would get in right now: <white><n></white> <gray>(min <min>), whitelist <white><whitelist>'
+  arena: '<gray>Arena <white><world></white>, map <white><map></white>, template <white><template></white>, chest spots <white><spots>'
   kits: '<gray>Kits: LT <white><lt></white>, HT <white><ht>'
-  loot: '<gray>Loot entries: <white><t1>/<t2>/<t3></white> <gray>chests: <white><chests>'
+  loot: '<gray>Loot entries (LT|HT): <white><t1>/<t2>/<t3></white> <gray>chests: <white><chests>'
   deploy: '<gray>Deploy: <white><report>'
-  zone: '<gray>Zone: <white><running></white>, planned <white><minutes> min'
-  zone-wall: '<gray>Zone wall: shader for <white><walls></white> players, particles for the rest (no pack)'
-  webhook: '<gray>Discord: <white><status></white>, events role <white><role>'
-  stats: '<gray>Website stats: <white><status>'
-  pack: '<gray>Resource pack: <white><enabled></white>, <white><url>'
-  pack-you: '<gray>Your pack, as CartZone sees it: <white><state>'
-  perms: '<gray>Permissions: <white><lp></white>, database <white><db>'
-  time: '<gray>Time zone <white><zone></white>, now <white><now>'
-  shop: '<gray>Daily shop today: <white><items>'
+  zone: '<gray>Zone <white><running></white>, <white><minutes> min'
+  zone-wall: '<gray>Zone wall: shader for <white><walls></white> player(s), the rest get particles'
+  webhook: '<gray>Discord <white><status></white>, events role <white><role>'
+  stats: '<gray>Website stats <white><status>'
+  pack: '<gray>Resource pack <white><enabled></white>, <white><url>'
+  pack-you: '<gray>Your pack: <white><state>'
+  perms: '<gray>Permissions <white><lp></white>, database <white><db>'
+  time: '<gray>Time zone <white><zone></white>, it''s <white><now>'
+  shop: '<gray>Shop today: <white><items>'
 
 cmd:
-  no-permission: '<prefix><gray>You cannot do that.'
-  players-only: '<prefix><gray>Players only.'
-  unknown: '<prefix><gray>Unknown subcommand <white><sub></white>. Try /cart help.'
+  no-permission: '<prefix><gray>You can''t use that.'
+  players-only: '<prefix><gray>Only players can do that.'
+  unknown: '<prefix><gray>No idea what <white><sub></white> is. /cart help'
   usage: '<prefix><gray>Usage: <white><usage>'
-  bad-number: '<prefix><gray>Not a number: <white><value>'
-  unknown-player: '<prefix><gray>Unknown player <white><player></white>.'
+  bad-number: '<prefix><gray><white><value></white> isn''t a number.'
+  unknown-player: '<prefix><gray>Can''t find <white><player></white>.'
 
 help:
   player:
-    - '<#FF0000><b>CartZone</b>'
-    - '<white>/cart host <gray>- host a game with your ticket'
-    - '<white>/team invite|accept|leave|list <gray>- team up after the purge'
-    - '<white>/spectate <gray>- follow a player while spectating'
+    - '<#FF2B2B><b>CartZone</b>'
+    - '<white>/cart host <gray>host a game with your ticket'
+    - '<white>/team invite|accept|leave|list <gray>team up after the purge'
+    - '<white>/spectate <gray>follow someone while spectating'
   admin:
-    - '<#FF0000><b>CartZone admin</b>'
+    - '<#FF2B2B><b>CartZone admin</b>'
     - '<white>/cart host | start [now] | stop | queue | cancel <id> | schedule'
     - '<white>/cart kit set|preview <lt|ht> <gray>and</gray> /kitready'
     - '<white>/cart arena info|list|tp|load|save <name>|setspawn|setcenter|setborder <r>|setdeploy'
     - '<white>/cart zone info|start <r>|final|preview'
     - '<white>/cart chests info|include <r>|exclude <r>|clearzones|scan|test [players]|clear'
-    - '<white>/cart loot <gray>- loot tables, chest amount/spacing (Chest settings)'
-    - '<white>/cart book <armor|sharpness|quickcharge> [n] [player] <gray>- give upgrade books'
+    - '<white>/cart loot <gray>loot tables and chest settings'
+    - '<white>/cart book <armor|sharpness|quickcharge> [n] [player]'
+    - '<white>/cart npc set|remove <1-3> | refresh <gray>leaderboard statues'
+    - '<white>/cart webhook test [ping] <gray>check the Discord webhook'
     - '<white>/cart ticket give|revoke|list <uuid|name> [n] [transaction]'
     - '<white>/cart coins give|take|set <player> <n>'
     - '<white>/cart play | build | spectate | free | shield [n] | shop | reload | setlobby'
-    - '<white>/cart diag <gray>- everything that could be wrong, on one screen'
-    - '<white>/cart selftest <gray>- blows up a TNT cart in the arena and checks the block rules'
-    - '<white>/cart test [player] [minutes] <gray>- practice game now (zone closes after 3-40 min, default 20), solo is fine, no Discord/stats/restart'
+    - '<white>/offence [player] <gray>mutes and bans'
+    - '<white>/cart diag <gray>what''s wrong, on one screen'
+    - '<white>/cart selftest <gray>blows up a TNT cart and checks the block rules'
+    - '<white>/cart test [player] [minutes] <gray>practice game, solo is fine'
 
 schedule:
   today-head: "<prefix><white>Today's games (<count>):"
@@ -457,109 +499,109 @@ gui:
   prev: '<white>Previous page'
   next: '<white>Next page'
   host:
-    title: '<#FF0000><b>Host a Game</b> <dark_gray>(<tickets> ticket(s))'
-    title-admin: '<#FF0000><b>Host a Game</b> <dark_gray>(admin)'
+    title: '<#FF2B2B><b>Host a Game</b> <dark_gray>(<tickets> ticket(s))'
+    title-admin: '<#FF2B2B><b>Host a Game</b> <dark_gray>(admin)'
     mode: '<white>Mode: <yellow><value>'
-    mode-lore: ['<gray>Each mode has its own kit.', '<dark_gray>Click to switch.']
+    mode-lore: ['<gray>Each mode has its own kit and loot.', '<dark_gray>Click to switch']
     modifier: '<white><name>'
-    modifier-on: ['<gray><desc>', '<#7DDC6A>ON', '<dark_gray>Click to turn off.']
-    modifier-off: ['<gray><desc>', '<#FF0000>OFF', '<dark_gray>Click to turn on.']
+    modifier-on: ['<gray><desc>', '<#55FF55>On', '<dark_gray>Click to turn off']
+    modifier-off: ['<gray><desc>', '<#FF2B2B>Off', '<dark_gray>Click to turn on']
     squad: '<white>Team size: <yellow><value>'
-    squad-lore: ['<dark_gray>Click to change.']
-    cap: '<white>Purge cap: <yellow><value>'
-    cap-lore: ['<gray>Most players who get in.', '<gray>Limits: <min> to <max>.', '<dark_gray>Left +10, right -10, shift for 1.']
-    duration: '<white>Zone fully closed after: <yellow><value> min'
-    duration-lore: ['<gray>The zone shrinks to nothing by then.', '<gray>Limits: <min> to <max> minutes.', '<dark_gray>Left +5, right -5, shift for 1.']
+    squad-lore: ['<dark_gray>Click to change']
+    cap: '<white>Player cap: <yellow><value>'
+    cap-lore: ['<gray>Max players who get in.', '<gray>Between <min> and <max>.', '<dark_gray>Left +10, right -10, shift for 1']
+    duration: '<white>Zone closes after: <yellow><value> min'
+    duration-lore: ['<gray>Plus the 5 min grace at the start.', '<gray>Between <min> and <max> min.', '<dark_gray>Left +5, right -5, shift for 1']
     map: '<white>Map: <yellow><value>'
-    map-lore: ['<dark_gray>Left next, right previous.']
-    time: '<white>Start: <yellow><value>'
-    time-lore: ['<gray><rel>', '<dark_gray>Left +5 min, right -5 min, shift for 1 hour.']
-    time-lore-taken: ['<gray><rel>', '<#FF0000>Another game is too close to this time.', '<dark_gray>Left +5 min, right -5 min, shift for 1 hour.']
-    next-free: '<white>Next free slot'
-    next-free-lore: ['<dark_gray>Jump to the next open time.']
+    map-lore: ['<dark_gray>Left next, right previous']
+    time: '<white>Starts: <yellow><value>'
+    time-lore: ['<gray><rel>', '<dark_gray>Left +5 min, right -5 min, shift for 1 hour']
+    time-lore-taken: ['<gray><rel>', '<#FF2B2B>Too close to another game.', '<dark_gray>Left +5 min, right -5 min, shift for 1 hour']
+    next-free: '<white>Next free time'
+    next-free-lore: ['<dark_gray>Jumps to the next open slot']
     summary: '<white>Summary'
-    summary-lore: ['<gray>Mode: <white><mode>', '<gray>Team size: <white><team_size>', '<gray>Purge cap: <white><cap>', '<gray>Modifiers: <white><modifiers>', '<gray>Map: <white><map>', '<gray>Start: <white><time>', '<gray>Zone closed after: <white><duration> min']
-    cancel: '<#FF0000>Cancel'
-    cancel-lore: ['<dark_gray>Nothing is spent.']
-    finish: '<#7DDC6A><b>Finish</b>'
-    finish-lore: ['<gray>Queues the game, tells Discord', '<gray>and uses 1 of your <tickets> ticket(s).']
-    finish-lore-admin: ['<gray>Queues the game and tells Discord.']
+    summary-lore: ['<gray>Mode: <white><mode>', '<gray>Team size: <white><team_size>', '<gray>Cap: <white><cap>', '<gray>Modifiers: <white><modifiers>', '<gray>Map: <white><map>', '<gray>Starts: <white><time>', '<gray>Zone closes after: <white><duration> min']
+    cancel: '<#FF2B2B>Cancel'
+    cancel-lore: ['<dark_gray>Nothing gets spent']
+    finish: '<#55FF55><b>Done</b>'
+    finish-lore: ['<gray>Queues the game, posts it on Discord', '<gray>and uses 1 of your <tickets> ticket(s).']
+    finish-lore-admin: ['<gray>Queues the game and posts it on Discord.']
   team:
-    title: '<#7DDC6A><b>Team Up</b> <dark_gray>(teams of <size>)'
+    title: '<#55FF55><b>Team Up</b> <dark_gray>(squads of <size>)'
     head: '<white><player>'
-    lore-invite: ['<gray>Team: <count>/<size>', '<dark_gray>Click to invite.']
-    lore-accept: ['<#7DDC6A>Invited you!', '<dark_gray>Click to accept.']
-    lore-mate: ['<#7DDC6A>Your teammate.']
-    leave: '<#FF0000>Leave your team'
+    lore-invite: ['<gray>Team: <count>/<size>', '<dark_gray>Click to invite']
+    lore-accept: ['<#55FF55>Invited you', '<dark_gray>Click to accept']
+    lore-mate: ['<#55FF55>Teammate']
+    leave: '<#FF2B2B>Leave team'
   spectate:
-    title: '<white><b>Follow a player'
+    title: '<white><b>Follow someone'
     head: '<white><player>'
-    lore: ['<gray>Kills: <white><kills>', '<gray>Health: <white><health>', '<dark_gray>Click to follow.']
+    lore: ['<gray>Kills: <white><kills>', '<gray>Health: <white><health>', '<dark_gray>Click to follow']
   kit:
-    title: '<white><b>Kit preview: <mode>'
+    title: '<white><b><mode> kit'
   cosmetics:
-    title: '<#FFD700><b>Cosmetics'
+    title: '<#FFD24A><b>Cosmetics'
     locker: '<white><b>Locker'
     locker-lore: ['<gray>Equip what you own.', '<gray>Owned: <white><owned>/<total>']
-    shop: '<#7DDC6A><b>Daily Shop'
-    shop-lore: ['<gray>6 new items every day.', '<gray>Resets in <white><reset>']
-    balance: '<#FFD700><coins> coins'
-    balance-lore: ['<gray>Earn <per_kill> per kill.', '<gray>Coins can not be bought.']
+    shop: '<#55FF55><b>Daily Shop'
+    shop-lore: ['<gray>6 new things every day.', '<gray>Resets in <white><reset>']
+    balance: '<#FFD24A><coins> coins'
+    balance-lore: ['<gray><per_kill> per kill.', '<gray>Coins can''t be bought.']
   shop:
-    title: '<#7DDC6A><b>Daily Shop'
+    title: '<#55FF55><b>Daily Shop'
     resets: '<gray>Resets in <white><time>'
-    lore-buy: ['', '<gray>Price: <#FFD700><price> coins', '<#7DDC6A>Click to buy.']
-    lore-poor: ['', '<gray>Price: <#FFD700><price> coins', '<#FF0000>You have <coins>.']
-    lore-owned: ['', '<#7DDC6A>Owned.']
+    lore-buy: ['', '<gray>Price: <#FFD24A><price> coins', '<#55FF55>Click to buy']
+    lore-poor: ['', '<gray>Price: <#FFD24A><price> coins', '<#FF2B2B>You have <coins>']
+    lore-owned: ['', '<#55FF55>Owned']
   cosmetic:
     rarity: '<gray>Rarity: <rarity>'
     category: '<gray><category>'
     description: '<gray><text>'
-    suffix-preview: '<gray>Shows as: <suffix>'
+    suffix-preview: '<gray>Looks like: <suffix>'
   locker:
     title: '<white><b>Locker</b> <dark_gray><category> (<page>/<pages>)'
     tab: '<gray><category>'
     tab-on: '<white><b><category>'
-    lore-equip: ['', '<dark_gray>Click to equip, right-click to preview.']
-    lore-equipped: ['', '<#7DDC6A>Equipped.', '<dark_gray>Click to unequip, right-click to preview.']
+    lore-equip: ['', '<dark_gray>Click to equip, right-click to preview']
+    lore-equipped: ['', '<#55FF55>Equipped', '<dark_gray>Click to take off, right-click to preview']
     empty: '<gray>Nothing here yet'
-    empty-lore: ['<gray>Buy cosmetics in the Daily Shop.']
+    empty-lore: ['<gray>Get cosmetics in the Daily Shop.']
   loot:
-    title: '<white><b>Loot tables'
+    title: '<white><b>Loot'
     pool: '<white><b><pool> loot'
-    pool-lore: ['<gray>Chests in <pool> games roll from', '<gray>the three tiers on this row.']
+    pool-lore: ['<gray>Chests in <pool> games use', '<gray>the three tiers on this row.']
     tier-1: '<#CD7F32><b>★ Bronze'
     tier-2: '<#C0C0C0><b>★★ Silver'
-    tier-3: '<#FFD700><b>★★★ Gold'
+    tier-3: '<#FFD24A><b>★★★ Gold'
     tier-name-1: 'Bronze'
     tier-name-2: 'Silver'
     tier-name-3: 'Gold'
-    tier-lore: ['<gray>Entries: <white><entries>', '<dark_gray>Click to edit.']
-    tier-title: '<white><b>Loot: <tier></b> <dark_gray>(<page>/<pages>)'
-    help: '<white>How to edit'
+    tier-lore: ['<gray>Items: <white><entries>', '<dark_gray>Click to edit']
+    tier-title: '<white><b><tier></b> <dark_gray>(<page>/<pages>)'
+    help: '<white>How this works'
     help-lore: ['<gray>Click an item in your inventory to add it.', '<gray>Left / right: min / max +1', '<gray>Shift: -1 instead', '<gray>Q: rarity, F: pearl flag', '<gray>Ctrl+Q: remove']
     specials: '<#FF8A1F>Add a CartZone item'
-    specials-lore: ['<gray>One Time Shield and the upgrade books.']
+    specials-lore: ['<gray>One Time Shield and the books']
     specials-title: '<white><b>Add to <tier></b> <dark_gray>(click one)'
     settings: '<#FF8A1F><b>Chest settings'
-    settings-lore: ['<gray>How many chests, how close together,', '<gray>items per chest and the tier mix.']
+    settings-lore: ['<gray>How many chests, how close,', '<gray>items per chest and tier mix']
     settings-title: '<white><b>Chest settings'
     set-base: '<white>Base chests: <yellow><value>'
-    set-base-lore: ['<gray>Chests every game has.', '<dark_gray><controls>']
+    set-base-lore: ['<gray>Every game gets at least this many.', '<dark_gray><controls>']
     set-per-player: '<white>Extra per player: <yellow><value>'
-    set-per-player-lore: ['<gray>Added for each player in the game.', '<dark_gray><controls>']
+    set-per-player-lore: ['<gray>Added for each player.', '<dark_gray><controls>']
     set-max: '<white>Max chests: <yellow><value>'
     set-max-lore: ['<gray>Never more than this.', '<dark_gray><controls>']
     set-spacing: '<white>Spacing: <yellow><value> blocks'
-    set-spacing-lore: ['<gray>Closest two chests can be.', '<gray>Lower = denser.', '<dark_gray><controls>']
+    set-spacing-lore: ['<gray>How close two chests can be.', '<gray>Lower means more packed.', '<dark_gray><controls>']
     set-slots-min: '<white>Items per chest, min: <yellow><value>'
     set-slots-min-lore: ['<dark_gray><controls>']
     set-slots-max: '<white>Items per chest, max: <yellow><value>'
     set-slots-max-lore: ['<dark_gray><controls>']
     share: '<white><tier> chests: <yellow><value>%'
-    share-lore: ['<gray>Share of chests that are this tier.', '<dark_gray>Left +5, right -5']
+    share-lore: ['<gray>How many chests are this tier.', '<dark_gray>Left +5, right -5']
     preview: '<white>Chests per game'
-    preview-lore: ['<gray>Solo: <white><solo>', '<gray>25 players: <white><p25>', '<gray>50 players: <white><p50>', '<gray>100 players: <white><p100>', '<dark_gray>Applies from the next game.']
+    preview-lore: ['<gray>Solo: <white><solo>', '<gray>25 players: <white><p25>', '<gray>50 players: <white><p50>', '<gray>100 players: <white><p100>', '<dark_gray>Counts from the next game']
     entry-rarity: '<gray>Rarity: <rarity>'
     entry-amount: '<gray>Amount: <white><min>-<max></white> <dark_gray>(max <cap>)'
     entry-pearl: '<light_purple>Counts as a pearl'
@@ -567,64 +609,58 @@ gui:
   schedule:
     title: '<white><b>Schedule</b> <dark_gray>(<zone>)'
     entry: '<white><line>'
-    entry-line: '<time> <days> - <team_size>, <mode>'
-    entry-lore: ['<gray>Cap: <white><cap>', '<gray>Map: <white><map>', '<gray>Modifiers: <white><modifiers>', '<gray>Enabled: <white><enabled>', '<dark_gray>Click to edit.']
-    add: '<#7DDC6A>Add a game'
-    add-lore: ['<dark_gray>Creates a daily 16:00 game to edit.']
+    entry-line: '<time> <days>, <team_size>, <mode>'
+    entry-lore: ['<gray>Cap: <white><cap>', '<gray>Map: <white><map>', '<gray>Modifiers: <white><modifiers>', '<gray>On: <white><enabled>', '<dark_gray>Click to edit']
+    add: '<#55FF55>Add a game'
+    add-lore: ['<dark_gray>Makes a daily 16:00 game you can edit']
     today: "<white>Today's games"
-    today-lore: ['<dark_gray>Lists them in chat.']
+    today-lore: ['<dark_gray>Lists them in chat']
     edit-title: '<white><b>Edit <id>'
     time: '<white>Time: <yellow><value></yellow> <gray><zone>'
-    time-lore: ['<dark_gray>Left +15 min, right -15 min, shift for 1 hour.']
+    time-lore: ['<dark_gray>Left +15 min, right -15 min, shift for 1 hour']
     days: '<white>Days: <yellow><value>'
-    days-lore: ['<dark_gray>Left next preset, right previous.']
-    enabled: '<white>Enabled: <yellow><value>'
-    enabled-lore: ['<dark_gray>Click to toggle.']
-    delete: '<#FF0000>Delete'
-    delete-lore: ['<dark_gray>Shift-click to delete.']
+    days-lore: ['<dark_gray>Left next, right previous']
+    enabled: '<white>On: <yellow><value>'
+    enabled-lore: ['<dark_gray>Click to toggle']
+    delete: '<#FF2B2B>Delete'
+    delete-lore: ['<dark_gray>Shift-click to delete']
 
 selftest:
-  start: '<prefix><white>Self-test: a TNT cart explodes at <yellow><where></yellow> in the arena...'
-  pass: '<#7DDC6A>PASS</#7DDC6A> <white><check></white> <gray>(<detail>)'
-  fail: '<#FF0000>FAIL</#FF0000> <white><check></white> <gray>(<detail>)'
-  drops: '<gray>Items that appeared: <white><drops>'
+  start: '<prefix><white>Self-test: blowing up a TNT cart at <yellow><where></yellow> in the arena...'
+  pass: '<#55FF55>PASS</#55FF55> <white><check></white> <gray>(<detail>)'
+  fail: '<#FF2B2B>FAIL</#FF2B2B> <white><check></white> <gray>(<detail>)'
+  drops: '<gray>Dropped items: <white><drops>'
 
 offence:
-  muted: "<prefix><#FF3333><b>You are muted</b> <gray>for <white><length></white> (<type>). <dark_gray>Ends: <until>"
-  still-muted: '<prefix><gray>You are muted. Time left: <white><left>'
-  ban-reason: '<type> (<length>, offence #<id>)'
-  ban-screen: "<#FF0000><b>CartZone</b>
-
-<white>You are banned: <#FF3333><type></#FF3333>
-<gray>Length: <white><length></white>
-<gray>Ends: <white><until>
-
-<dark_gray>Offence #<id>. Appeal on our Discord."
-  blocked: '<prefix><#FF3333>That message was blocked.'
-  staff-applied: "<#FF3333>[Offence #<id>]</#FF3333> <white><player></white> <gray>got a <white><length> <action></white> for <white><type></white> <gray>by <by> <dark_gray>(<reason>)</dark_gray> <click:run_command:'/offence undo <id>'><hover:show_text:'Undo offence #<id>'><#FFD24A>[Undo]</#FFD24A></hover></click>"
-  staff-undone: '<#7DDC6A>[Offence #<id>]</#7DDC6A> <gray>undone by <white><by></white>: <white><player></white> <gray>(<type>) no longer counts, punishment lifted.'
-  filter-alert: "<#FF8A1F>[Chat filter]</#FF8A1F> <white><player></white> <gray>(<type>): <white><message></white> <click:run_command:'/offence <player>'><#FFD24A>[Punish]</#FFD24A></click>"
-  duplicate: '<prefix><gray><player> already got <type> in the last minute; skipped.'
-  failed: '<prefix><#FF3333>Could not save the offence: <error>'
-  undo-missing: '<prefix><gray>No active offence #<id>.'
-  unknown-type: '<prefix><gray>Unknown type. Types: <white><types>'
-  reloaded: '<prefix><white>offences.yml and chatfilter.yml reloaded.'
-  gui-pick-title: '<white><b>Offence</b> <dark_gray>pick a player'
+  muted: '<prefix><#FF2B2B>You''re muted for <length></#FF2B2B> <gray>(<type>). Ends <until>.'
+  still-muted: '<prefix><gray>You''re muted for another <white><left></white>.'
+  ban-reason: '<type> (<length>, #<id>)'
+  ban-screen: "<#FF2B2B><b>You're banned from CartZone</b>\n\n<white><type>, <length>\n<gray>Ends: <white><until>\n\n<dark_gray>Ban #<id>, you can appeal on our Discord."
+  blocked: '<prefix><#FF2B2B>That message didn''t go through.'
+  staff-applied: "<#FF2B2B>[#<id>]</#FF2B2B> <white><player></white> <gray>got a <white><length> <action></white> for <white><type></white> <gray>from <by> <dark_gray>(<reason>)</dark_gray> <click:run_command:'/offence undo <id>'><hover:show_text:'Undo #<id>'><#FFD24A>[Undo]</#FFD24A></hover></click>"
+  staff-undone: '<#55FF55>[#<id>]</#55FF55> <gray><by> undid <white><player></white><gray>''s <type>. It doesn''t count anymore.'
+  filter-alert: "<#FF8A1F>[Filter]</#FF8A1F> <white><player></white> <gray>(<type>): <white><message></white> <click:run_command:'/offence <player>'><#FFD24A>[Punish]</#FFD24A></click>"
+  duplicate: '<prefix><gray><player> already got <type> in the last minute, skipped.'
+  failed: '<prefix><#FF2B2B>Couldn''t save that: <error>'
+  undo-missing: '<prefix><gray>There''s nothing to undo for #<id>.'
+  unknown-type: '<prefix><gray>Not a type. Types: <white><types>'
+  reloaded: '<prefix><white>Reloaded offences.yml and chatfilter.yml.'
+  gui-pick-title: '<white><b>Offence</b> <dark_gray>pick someone'
   gui-pick-name: '<white><player>'
-  gui-pick-lore: ['<dark_gray>Click to open.']
+  gui-pick-lore: ['<dark_gray>Click to open']
   gui-title: '<white><b>Offence:</b> <player>'
   gui-head: '<white><b><player>'
-  gui-head-total: '<gray>Offences: <white><total></white> <dark_gray>(<active> running)'
-  gui-head-active: '<#FF3333><action></#FF3333> <gray>until <white><until>'
-  gui-type: '<#FF3333><b><type>'
-  gui-type-lore: ['<gray>Earlier: <white><count>', '<gray>This would be the <white><nth></white> offence:', '<white><next>', '', '<dark_gray>Click, then confirm.']
-  gui-confirm-title: '<white><b>Confirm</b> <dark_gray><player>'
-  gui-confirm: '<#7DDC6A><b>Give <what></b> <gray>(<type>)'
-  gui-confirm-lore: ['<gray><player>, <nth> offence of this type.']
-  gui-cancel: '<#FF3333><b>Cancel'
+  gui-head-total: '<gray>Offences: <white><total></white> <dark_gray>(<active> active)'
+  gui-head-active: '<#FF2B2B><action></#FF2B2B> <gray>until <white><until>'
+  gui-type: '<#FF2B2B><b><type>'
+  gui-type-lore: ['<gray>Before: <white><count>', '<gray>This would be their <white><nth></white>:', '<white><next>', '', '<dark_gray>Click, then confirm']
+  gui-confirm-title: '<white><b>Sure?</b> <dark_gray><player>'
+  gui-confirm: '<#55FF55><b>Give <what></b> <gray>(<type>)'
+  gui-confirm-lore: ['<gray><player>, <nth> time for this.']
+  gui-cancel: '<#FF2B2B><b>Cancel'
   gui-history: '<white><b>History</b> <gray>(<count>)'
-  gui-history-lore: ['<gray>Every offence, newest first.', '<dark_gray>Shift-click one there to undo it.']
+  gui-history-lore: ['<gray>Newest first.', '<dark_gray>Shift-click one in there to undo it']
   gui-history-title: '<white><b>History:</b> <player>'
   gui-record: '<white><type> <dark_gray>#<id>'
   gui-record-lore: ['<gray><date>', '<gray><length> <action>, <status>', '<gray>By: <white><by>', '<gray>Reason: <white><reason>']
-  gui-record-undo: ['', '<#FFD24A>Shift-click to undo.']
+  gui-record-undo: ['', '<#FFD24A>Shift-click to undo']

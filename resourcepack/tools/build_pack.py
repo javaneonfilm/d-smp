@@ -253,8 +253,9 @@ def main():
 
     # Kill sound (kill1.ogg from the Mace.VIP pack), played to the killer as cartzone:kill.
     os.makedirs(os.path.join(OUT, "assets", "cartzone", "sounds"), exist_ok=True)
-    shutil.copyfile(os.path.join(ROOT, "sounds", "kill.ogg"), os.path.join(OUT, "assets", "cartzone", "sounds", "kill.ogg"))
-    write_json("assets/cartzone/sounds.json", {"kill": {"category": "master", "sounds": ["cartzone:kill"]}})
+    for snd in ("kill", "purge"):
+        shutil.copyfile(os.path.join(ROOT, "sounds", snd + ".ogg"), os.path.join(OUT, "assets", "cartzone", "sounds", snd + ".ogg"))
+    write_json("assets/cartzone/sounds.json", {snd: {"category": "master", "sounds": ["cartzone:" + snd]} for snd in ("kill", "purge")})
 
     for base, _, names in os.walk(ZONE_WALL):
         for n in names:

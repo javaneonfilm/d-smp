@@ -4,5 +4,11 @@
     "sounds": [
       "cartzone:kill"
     ]
+  },
+  "purge": {
+    "category": "master",
+    "sounds": [
+      "cartzone:purge"
+    ]
   }
 }

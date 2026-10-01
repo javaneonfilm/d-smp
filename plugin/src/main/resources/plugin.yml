@@ -109,10 +109,4 @@ permissions:
       cartzone.perk.purge-immune: true
       cartzone.perk.lobby-wind: true
       cartzone.perk.lobby-elytra: true
-      cartzone.tag.creator:
-    description: CREATOR badge and purple name.
-    default: false
-  cartzone.tag.media:
-    description: MEDIA badge and orange name.
-    default: false
-  cartzone.tag.vipplus: true
+      cartzone.tag.vipplus: true

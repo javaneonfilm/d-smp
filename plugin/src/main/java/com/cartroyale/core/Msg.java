@@ -46,6 +46,18 @@ public final class Msg {
         var in = plugin.getResource("messages.yml");
         if (in != null) {
             defaults = YamlConfiguration.loadConfiguration(new InputStreamReader(in, StandardCharsets.UTF_8));
+            // An existing file keeps its own text for every key it has, so a rewrite of the
+            // messages would never arrive. When the jar's messages-version is newer, the old file
+            // is kept as messages-old-<n>.yml and the new one goes in its place.
+            int have = yml.getInt("messages-version", 1), want = defaults.getInt("messages-version", 1);
+            if (want > have) {
+                File old = new File(plugin.getDataFolder(), "messages-old-" + have + ".yml");
+                if (f.renameTo(old)) {
+                    plugin.saveResource("messages.yml", true);
+                    yml = YamlConfiguration.loadConfiguration(f);
+                    log.info("messages.yml updated to version " + want + "; your old one is " + old.getName() + ".");
+                }
+            }
             yml.setDefaults(defaults);
         }
         warned.clear();

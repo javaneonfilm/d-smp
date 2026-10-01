@@ -94,26 +94,51 @@ public final class Nametags {
             remove(p);
             return;
         }
-        Scoreboard b = board();
-        String name = teamName(p.getUniqueId());
-        Team t = b.getTeam(name);
-        if (t == null) t = b.registerNewTeam(name);
-        if (!t.hasEntry(p.getName())) t.addEntry(p.getName());
         Component prefix = tag(p);
-        t.prefix(prefix.equals(Component.empty()) ? Component.empty() : prefix.append(Component.space()));
+        Component pre = prefix.equals(Component.empty()) ? Component.empty() : prefix.append(Component.space());
         Component suffix = plugin.cosmetics().suffixComponent(p.getUniqueId());
-        t.suffix(suffix == null ? Component.empty() : Component.space().append(suffix));
+        Component suf = suffix == null ? Component.empty() : Component.space().append(suffix);
         TextColor c = color(p);
-        // Names above the head can only take the 16 team colours; the tab list and chat get the exact one.
-        t.color(NamedTextColor.nearestTo(c));
-        t.setAllowFriendlyFire(true);
-        Component list = Component.empty().append(t.prefix()).append(Component.text(p.getName(), c)).append(t.suffix());
+        // Every player has their own scoreboard (Sidebar), so the team goes on all of them.
+        for (Scoreboard b : boards()) apply(b, p.getName(), teamName(p.getUniqueId()), pre, suf, c);
+        Component list = Component.empty().append(pre).append(Component.text(p.getName(), c)).append(suf);
         p.playerListName(list);
     }
 
+    private static void apply(Scoreboard b, String player, String name, Component pre, Component suf, TextColor c) {
+        Team t = b.getTeam(name);
+        if (t == null) t = b.registerNewTeam(name);
+        if (!t.hasEntry(player)) t.addEntry(player);
+        t.prefix(pre);
+        t.suffix(suf);
+        // Names above the head can only take the 16 team colours; the tab list and chat get the exact one.
+        t.color(NamedTextColor.nearestTo(c));
+        t.setAllowFriendlyFire(true);
+    }
+
+    private java.util.List<Scoreboard> boards() {
+        java.util.List<Scoreboard> all = new java.util.ArrayList<>(plugin.sidebar().all());
+        all.add(board());
+        return all;
+    }
+
+    /** A new player board gets everyone's current nametag team. */
+    public void copyTo(Scoreboard target) {
+        if (tabPlugin(plugin)) return;
+        for (Team t : board().getTeams()) {
+            if (!t.getName().startsWith("cr")) continue;
+            for (String entry : t.getEntries()) {
+                Player p = Bukkit.getPlayerExact(entry);
+                apply(target, entry, t.getName(), t.prefix(), t.suffix(), p == null ? NamedTextColor.WHITE : color(p));
+            }
+        }
+    }
+
     public void remove(Player p) {
-        Team t = board().getTeam(teamName(p.getUniqueId()));
-        if (t != null) t.unregister();
+        for (Scoreboard b : boards()) {
+            Team t = b.getTeam(teamName(p.getUniqueId()));
+            if (t != null) t.unregister();
+        }
     }
 
     public void applyMatch(Match m) {

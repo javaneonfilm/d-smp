@@ -35,7 +35,7 @@ import java.util.UUID;
 public final class CartCommand implements TabExecutor {
 
     private static final List<String> SUBS = List.of("help", "host", "start", "stop", "queue", "cancel", "schedule", "kit", "arena", "zone",
-        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "test", "shield", "shop", "book");
+        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "test", "shield", "shop", "book", "webhook", "npc");
 
     private final CartRoyale plugin;
 
@@ -125,6 +125,34 @@ public final class CartCommand implements TabExecutor {
                     m(s, plugin.rank().toggleFree(p) ? "admin.free-on" : "admin.free-off");
                 }
                 case "diag" -> diag(s);
+                case "npc" -> {
+                    // /cart npc set <1-3> | remove <1-3> | refresh: the lobby leaderboard statues.
+                    if (a.length < 2) return usage(s, "/cart npc <set|remove|refresh> [1-3]");
+                    if (a[1].equalsIgnoreCase("refresh")) {
+                        plugin.leaderboard().refresh();
+                        m(s, "leaderboard.refreshed");
+                        return true;
+                    }
+                    int n = a.length > 2 ? Integer.parseInt(a[2]) : 0;
+                    if (n < 1 || n > 3) return usage(s, "/cart npc <set|remove> <1-3>");
+                    if (a[1].equalsIgnoreCase("set")) {
+                        if (!(s instanceof Player p)) return notPlayer(s);
+                        Location l = p.getLocation();
+                        l.setPitch(0);
+                        plugin.leaderboard().setSpot(n, l);
+                        m(s, "leaderboard.set", "place", n);
+                    } else if (a[1].equalsIgnoreCase("remove")) {
+                        plugin.leaderboard().removeSpot(n);
+                        m(s, "leaderboard.removed", "place", n);
+                    } else {
+                        return usage(s, "/cart npc <set|remove|refresh> [1-3]");
+                    }
+                }
+                case "webhook" -> {
+                    // /cart webhook test [ping]: one embed to Discord, then what Discord said.
+                    if (a.length < 2 || !a[1].equalsIgnoreCase("test")) return usage(s, "/cart webhook test [ping]");
+                    plugin.hooks().test(s, a.length > 2 && a[2].equalsIgnoreCase("ping"));
+                }
                 case "test" -> {
                     // /cart test [player] [minutes]: a practice game on the live server, solo is fine.
                     // Minutes default to the normal match length; 3-40 so a quick check stays possible.
@@ -570,6 +598,8 @@ public final class CartCommand implements TabExecutor {
                 : a.length == 3 && a[1].equalsIgnoreCase("load") ? plugin.arenas().maps() : List.of();
             case "zone" -> a.length == 2 ? List.of("info", "start", "final", "preview") : List.of();
             case "book" -> a.length == 2 ? List.of("armor", "sharpness", "quickcharge") : List.of();
+            case "npc" -> a.length == 2 ? List.of("set", "remove", "refresh") : a.length == 3 ? List.of("1", "2", "3") : List.of();
+            case "webhook" -> a.length == 2 ? List.of("test") : a.length == 3 ? List.of("ping") : List.of();
             case "chests" -> a.length == 2 ? List.of("info", "include", "exclude", "clearzones", "scan", "test", "clear") : List.of();
             case "ticket" -> a.length == 2 ? List.of("give", "revoke", "list") : a.length == 3 ? names() : List.of();
             case "coins" -> a.length == 2 ? List.of("give", "take", "set") : a.length == 3 ? names() : List.of();
