@@ -125,12 +125,14 @@ ranks:
 # Rank badges and name colours, shown in chat, the tab list and above the head (and in the TAB
 # plugin through %cartzone_tag% / %cartzone_namecolor%). The FIRST entry whose permission a player
 # has wins, so the highest rank goes on top. The badges are pictures from the resource pack:
-#  VIP,  VIP+,  HOST,  MOD,  ADMIN. A tag can also be plain text,
+#  VIP,  VIP+,  HOST,  MOD,  ADMIN,  MEDIA,  CREATOR. A tag can also be plain text,
 # e.g. tag: '<gold>[MVP]'. To use one, give a LuckPerms group the permission.
 rank-tags:
   - {id: admin, permission: cartzone.tag.admin, tag: "", name-color: '#FF3333'}
   - {id: mod, permission: cartzone.tag.mod, tag: "", name-color: '#2E9BFF'}
   - {id: host, permission: cartzone.tag.host, tag: "", name-color: '#33CC33'}
+  - {id: creator, permission: cartzone.tag.creator, tag: "", name-color: '#A23CF9'}
+  - {id: media, permission: cartzone.tag.media, tag: "", name-color: '#FFAA33'}
   - {id: vipplus, permission: cartzone.tag.vipplus, tag: "", name-color: '#E01B1B'}
   - {id: vip, permission: cartzone.tag.vip, tag: "", name-color: '#FF6B6B'}
 

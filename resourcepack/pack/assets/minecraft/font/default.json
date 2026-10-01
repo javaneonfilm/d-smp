@@ -44,6 +44,24 @@
       "chars": [
         "\ue104"
       ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_media.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue105"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/rank_creator.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue106"
+      ]
     }
   ]
 }

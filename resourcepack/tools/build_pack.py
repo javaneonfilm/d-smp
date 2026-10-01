@@ -234,11 +234,11 @@ def main():
 
     # Rank badges in the DEFAULT font, so they work as plain characters anywhere: chat,
     # nametags, the tab list and the TAB plugin. Keep the chars in sync with config.yml rank-tags.
-    for name, ch in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", "")]:
+    for name, ch in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", ""), ("media", ""), ("creator", "")]:
         shutil.copyfile(os.path.join(ROOT, "ranks", name + ".png"), os.path.join(OUT, "assets", "cartzone", "textures", "font", "rank_" + name + ".png"))
     write_json("assets/minecraft/font/default.json", {"providers": [
         {"type": "bitmap", "file": "cartzone:font/rank_" + n + ".png", "ascent": 8, "height": 9, "chars": [c]}
-        for n, c in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", "")]]})
+        for n, c in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", ""), ("media", ""), ("creator", "")]]})
     save_png("assets/cartzone/textures/font/cart.png", cart_icon())
     write_json("assets/cartzone/font/hud.json", hud_font())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())

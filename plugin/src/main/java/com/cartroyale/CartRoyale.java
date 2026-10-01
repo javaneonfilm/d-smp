@@ -109,6 +109,7 @@ public final class CartRoyale extends JavaPlugin {
         }
         saveDefaultConfig();
         migrateServerIp();
+        addNewRankTags();
         getConfig().options().copyDefaults(true);
         saveConfig();
         writeSecretsExample();
@@ -277,6 +278,38 @@ public final class CartRoyale extends JavaPlugin {
         } catch (java.io.IOException e) {
             getLogger().warning("Could not update server-ip in config.yml: " + e.getMessage());
         }
+    }
+
+    /**
+     * Startup saves defaults into config.yml, so a live file has its own frozen rank-tags list.
+     * Ranks added to the jar later are slotted in at their default position, once: rank-tags-known
+     * remembers which ids were already offered, so a rank the owner deleted stays deleted.
+     */
+    private void addNewRankTags() {
+        var defaults = getConfig().getDefaults();
+        if (defaults == null || !getConfig().isSet("rank-tags")) return;
+        java.util.List<java.util.Map<?, ?>> def = defaults.getMapList("rank-tags");
+        java.util.List<java.util.Map<?, ?>> live = new java.util.ArrayList<>(getConfig().getMapList("rank-tags"));
+        java.util.Set<String> known = new java.util.HashSet<>(getConfig().getStringList("rank-tags-known"));
+        if (known.isEmpty()) for (var m : live) known.add(String.valueOf(m.get("id")));
+        boolean changed = false;
+        for (int i = 0; i < def.size(); i++) {
+            String id = String.valueOf(def.get(i).get("id"));
+            if (known.contains(id)) continue;
+            // Insert before the first live entry that comes after it in the default order.
+            int at = live.size();
+            for (int j = i + 1; j < def.size() && at == live.size(); j++) {
+                String after = String.valueOf(def.get(j).get("id"));
+                for (int k = 0; k < live.size(); k++) if (after.equals(String.valueOf(live.get(k).get("id")))) { at = k; break; }
+            }
+            live.add(at, def.get(i));
+            known.add(id);
+            changed = true;
+            getLogger().info("config.yml: added rank tag '" + id + "'.");
+        }
+        for (var m : def) known.add(String.valueOf(m.get("id")));
+        if (changed) getConfig().set("rank-tags", live);
+        getConfig().set("rank-tags-known", new java.util.ArrayList<>(known));
     }
 
     /** Match length limits for hosted games (host.limits.min-minutes / max-minutes). */

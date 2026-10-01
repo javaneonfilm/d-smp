@@ -66,6 +66,12 @@ permissions:
   cartzone.tag.host:
     description: HOST badge and green name (give it to the LuckPerms group tickets grant).
     default: false
+  cartzone.tag.creator:
+    description: CREATOR badge and purple name.
+    default: false
+  cartzone.tag.media:
+    description: MEDIA badge and orange name.
+    default: false
   cartzone.tag.vipplus:
     description: VIP+ badge and dark red name.
     default: false
@@ -80,6 +86,22 @@ permissions:
       cartzone.perk.purge-low: true
       cartzone.perk.lobby-wind: true
       cartzone.tag.vip: true
+  # MEDIA gets the VIP perks, CREATOR the VIP+ perks, each with its own badge.
+  cartzone.rank.media:
+    description: 'Bundle: VIP perks (purge-low, lobby-wind) + MEDIA badge.'
+    default: false
+    children:
+      cartzone.perk.purge-low: true
+      cartzone.perk.lobby-wind: true
+      cartzone.tag.media: true
+  cartzone.rank.creator:
+    description: 'Bundle: VIP+ perks (purge-immune, lobby-wind, lobby-elytra) + CREATOR badge.'
+    default: false
+    children:
+      cartzone.perk.purge-immune: true
+      cartzone.perk.lobby-wind: true
+      cartzone.perk.lobby-elytra: true
+      cartzone.tag.creator: true
   cartzone.rank.vipplus:
     description: 'Bundle: purge-immune, lobby-wind, lobby-elytra, VIP+ tag.'
     default: false
@@ -87,4 +109,10 @@ permissions:
       cartzone.perk.purge-immune: true
       cartzone.perk.lobby-wind: true
       cartzone.perk.lobby-elytra: true
-      cartzone.tag.vipplus: true
+      cartzone.tag.creator:
+    description: CREATOR badge and purple name.
+    default: false
+  cartzone.tag.media:
+    description: MEDIA badge and orange name.
+    default: false
+  cartzone.tag.vipplus: true
