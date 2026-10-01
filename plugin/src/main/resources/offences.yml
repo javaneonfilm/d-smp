@@ -1,0 +1,36 @@
+# /offence: punishments that step up with every offence of the same type.
+# ladder = length for the 1st, 2nd, 3rd... offence; past the end the LAST step repeats.
+# Lengths: 30m, 12h, 3d, 2w, perm.  action: MUTE (no chat / private messages) or BAN.
+types:
+  hate-speech:
+    name: Hate speech
+    action: MUTE
+    ladder: [3d, 7d, 14d]
+    icon: WRITABLE_BOOK
+  death-threats:
+    name: Death threats
+    action: MUTE
+    ladder: [7d, 14d, 30d]
+    icon: SKELETON_SKULL
+  racism:
+    name: Racism
+    action: MUTE
+    ladder: [14d, 30d, perm]
+    icon: BARRIER
+  cheating:
+    name: Cheating
+    action: BAN
+    ladder: [14d, 30d, perm]
+    icon: DIAMOND_SWORD
+  bug-abuse:
+    name: Bug abusing
+    action: BAN
+    ladder: [3d, 7d, 14d]
+    icon: SPIDER_EYE
+
+# The same type again within this many seconds is ignored, so an anticheat that fires the
+# punish command several times in a row only counts once.
+duplicate-seconds: 60
+
+# Commands a muted player can't use.
+muted-blocked-commands: [msg, tell, w, whisper, r, reply, me, say, mail, team msg]

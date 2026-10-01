@@ -206,6 +206,10 @@ deploy:
 
 zone:
   outside: '<#FF0000><b>OUTSIDE THE ZONE</b></#FF0000> <gray><distance> blocks out'
+  hud-grace: '<#7DDC6A><b>GRACE</b> <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP, the zone waits'
+  hud-waiting: '<white><b>ZONE <phase>/<phases></b> <gray>shrinks in <#FFD24A><time></#FFD24A> <dark_gray>|</dark_gray> <gray>radius <white><radius>'
+  hud-shrinking: '<#FF8A1F><b>SHRINKING</b> <white><time></white> <dark_gray>|</dark_gray> <gray>radius <white><radius></white> to <white><target>'
+  hud-closed: '<#FF3333><b>ZONE CLOSED</b> <dark_gray>|</dark_gray> <gray>last one standing wins'
   bar-grace: '<#7DDC6A>Grace period <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP, zone holds'
   grace-over: '<prefix><#FF0000><b>Grace period over.</b> <white>PvP is on and the zone starts moving.'
   grace-over-title: '<#FF0000><b>PVP ON'
@@ -584,3 +588,43 @@ selftest:
   pass: '<#7DDC6A>PASS</#7DDC6A> <white><check></white> <gray>(<detail>)'
   fail: '<#FF0000>FAIL</#FF0000> <white><check></white> <gray>(<detail>)'
   drops: '<gray>Items that appeared: <white><drops>'
+
+offence:
+  muted: "<prefix><#FF3333><b>You are muted</b> <gray>for <white><length></white> (<type>). <dark_gray>Ends: <until>"
+  still-muted: '<prefix><gray>You are muted. Time left: <white><left>'
+  ban-reason: '<type> (<length>, offence #<id>)'
+  ban-screen: "<#FF0000><b>CartZone</b>
+
+<white>You are banned: <#FF3333><type></#FF3333>
+<gray>Length: <white><length></white>
+<gray>Ends: <white><until>
+
+<dark_gray>Offence #<id>. Appeal on our Discord."
+  blocked: '<prefix><#FF3333>That message was blocked.'
+  staff-applied: "<#FF3333>[Offence #<id>]</#FF3333> <white><player></white> <gray>got a <white><length> <action></white> for <white><type></white> <gray>by <by> <dark_gray>(<reason>)</dark_gray> <click:run_command:'/offence undo <id>'><hover:show_text:'Undo offence #<id>'><#FFD24A>[Undo]</#FFD24A></hover></click>"
+  staff-undone: '<#7DDC6A>[Offence #<id>]</#7DDC6A> <gray>undone by <white><by></white>: <white><player></white> <gray>(<type>) no longer counts, punishment lifted.'
+  filter-alert: "<#FF8A1F>[Chat filter]</#FF8A1F> <white><player></white> <gray>(<type>): <white><message></white> <click:run_command:'/offence <player>'><#FFD24A>[Punish]</#FFD24A></click>"
+  duplicate: '<prefix><gray><player> already got <type> in the last minute; skipped.'
+  failed: '<prefix><#FF3333>Could not save the offence: <error>'
+  undo-missing: '<prefix><gray>No active offence #<id>.'
+  unknown-type: '<prefix><gray>Unknown type. Types: <white><types>'
+  reloaded: '<prefix><white>offences.yml and chatfilter.yml reloaded.'
+  gui-pick-title: '<white><b>Offence</b> <dark_gray>pick a player'
+  gui-pick-name: '<white><player>'
+  gui-pick-lore: ['<dark_gray>Click to open.']
+  gui-title: '<white><b>Offence:</b> <player>'
+  gui-head: '<white><b><player>'
+  gui-head-total: '<gray>Offences: <white><total></white> <dark_gray>(<active> running)'
+  gui-head-active: '<#FF3333><action></#FF3333> <gray>until <white><until>'
+  gui-type: '<#FF3333><b><type>'
+  gui-type-lore: ['<gray>Earlier: <white><count>', '<gray>This would be the <white><nth></white> offence:', '<white><next>', '', '<dark_gray>Click, then confirm.']
+  gui-confirm-title: '<white><b>Confirm</b> <dark_gray><player>'
+  gui-confirm: '<#7DDC6A><b>Give <what></b> <gray>(<type>)'
+  gui-confirm-lore: ['<gray><player>, <nth> offence of this type.']
+  gui-cancel: '<#FF3333><b>Cancel'
+  gui-history: '<white><b>History</b> <gray>(<count>)'
+  gui-history-lore: ['<gray>Every offence, newest first.', '<dark_gray>Shift-click one there to undo it.']
+  gui-history-title: '<white><b>History:</b> <player>'
+  gui-record: '<white><type> <dark_gray>#<id>'
+  gui-record-lore: ['<gray><date>', '<gray><length> <action>, <status>', '<gray>By: <white><by>', '<gray>Reason: <white><reason>']
+  gui-record-undo: ['', '<#FFD24A>Shift-click to undo.']

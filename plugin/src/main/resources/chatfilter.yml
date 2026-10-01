@@ -1,0 +1,27 @@
+# Chat filter. A message that matches is never shown to anyone. With auto-punish the matching
+# /offence type is applied straight away (staff get an alert with an [Undo] button); with
+# auto-punish: false the message is only blocked and staff are alerted with a [Punish] button.
+#
+# words:   whole words. Letters may be stretched (niiice), leetspeak is undone (n1c3 = nice),
+#          and spaced-out letters are joined (n i c e = nice). Write them in lower case.
+# phrases: several words in a row, matched the same way.
+# Each list belongs to an /offence type from offences.yml.
+enabled: true
+auto-punish: true
+# Staff and admins are not filtered.
+bypass-permission: cartzone.offence
+
+types:
+  racism:
+    words: [nigger, niggers, nigga, niggas, nigguh, niglet, negroid, coon, coons, chink, chinks, gook, gooks,
+            spic, spics, wetback, wetbacks, beaner, beaners, kike, kikes, raghead, ragheads, towelhead,
+            sandnigger, jigaboo, zipperhead, porchmonkey, junglebunny, golliwog]
+    phrases: [porch monkey, jungle bunny, go back to africa, white power, heil hitler, sieg heil, gas the jews]
+  hate-speech:
+    words: [faggot, faggots, fag, fags, dyke, dykes, tranny, trannies, kys]
+    phrases: [kill yourself, go kill yourself, hang yourself, neck yourself, you should die, end your life]
+  death-threats:
+    words: []
+    phrases: [i will kill you irl, im going to kill you irl, ill kill you irl, kill you in real life, i know where you live,
+              i will find you, ill find where you live, i will dox you, ill dox you, gonna dox you, ill swat you,
+              i will swat you, kill your family, your family will die, shoot you irl, stab you irl, shoot up your school]

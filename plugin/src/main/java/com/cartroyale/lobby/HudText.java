@@ -58,4 +58,45 @@ public final class HudText {
         }
         return w;
     }
+
+    // ---------------- zone boss bar ----------------
+
+    public static final int HEX_CELLS = 16, HEX_ADVANCE = 10;
+    private static final char HEX_FULL = '', HEX_EMPTY = '', HEX_GRACE = '', HEX_EDGE = '';
+
+    /**
+     * The zone bar for players with the pack: a row of hexagon cells where the (invisible) vanilla
+     * bar sits, and the title centred above it. {@code full} cells are lit; {@code edge} marks the
+     * cell draining right now (-1 for none); grace lights them green.
+     */
+    public static Component zoneBar(Component title, int full, int edge, boolean grace) {
+        StringBuilder row = new StringBuilder();
+        for (int i = 0; i < HEX_CELLS; i++) {
+            row.append(i == edge ? HEX_EDGE : i < full ? (grace ? HEX_GRACE : HEX_FULL) : HEX_EMPTY);
+        }
+        int w = HEX_CELLS * HEX_ADVANCE, t = width(title);
+        // Row first, then step back so the title is centred over it, then forward to the row's end.
+        return Component.text()
+            .append(Component.text(row + shift(-(w + t) / 2)).font(FONT).color(NamedTextColor.WHITE))
+            .append(title)
+            .append(Component.text(shift((w - t) / 2)).font(FONT))
+            .build();
+    }
+
+    /** Pixel width of a component in the default font, bold counted (+1 per character). */
+    static int width(Component c) {
+        return width(c, false);
+    }
+
+    private static int width(Component c, boolean boldParent) {
+        var st = c.style().decoration(net.kyori.adventure.text.format.TextDecoration.BOLD);
+        boolean bold = st == net.kyori.adventure.text.format.TextDecoration.State.TRUE
+            || (st == net.kyori.adventure.text.format.TextDecoration.State.NOT_SET && boldParent);
+        int w = 0;
+        if (c instanceof net.kyori.adventure.text.TextComponent tc) {
+            w += width(tc.content()) + (bold ? tc.content().length() : 0);
+        }
+        for (Component child : c.children()) w += width(child, bold);
+        return w;
+    }
 }

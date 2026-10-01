@@ -159,6 +159,34 @@ def cart_icon():
     return Image.open(os.path.join(ROOT, "ranks", "cart_icon.png")).convert("RGBA")
 
 
+# Zone boss bar: a row of hexagon cells drawn where the (invisible PINK) bar would be.
+HEX_ROWS = [1, 5, 9, 9, 9, 9, 9, 9, 5, 1]   # pointy-top hexagon, 9 x 10
+
+
+def hex_cell(fill, top, rim):
+    """One 9x10 hexagon: rim colour on the outline, fill inside, a lighter band near the top."""
+    w, h = 9, len(HEX_ROWS)
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    for y, rw in enumerate(HEX_ROWS):
+        x0 = (w - rw) // 2
+        prev = HEX_ROWS[y - 1] if y > 0 else 0
+        nxt = HEX_ROWS[y + 1] if y < h - 1 else 0
+        for x in range(x0, x0 + rw):
+            d = abs(x - w // 2)
+            edge = y in (0, h - 1) or x in (x0, x0 + rw - 1) or d > prev // 2 or d > nxt // 2
+            img.putpixel((x, y), rim if edge else (top if y == 2 else fill))
+    return img
+
+
+def hex_cells():
+    return {
+        "hex_full.png": hex_cell((214, 32, 20, 235), (255, 92, 70, 235), (90, 8, 4, 235)),     # zone time left
+        "hex_empty.png": hex_cell((0, 0, 0, 110), (0, 0, 0, 110), (0, 0, 0, 170)),             # time used up
+        "hex_grace.png": hex_cell((52, 190, 70, 235), (130, 240, 140, 235), (12, 70, 20, 235)),  # grace period
+        "hex_edge.png": hex_cell((255, 150, 40, 240), (255, 210, 120, 240), (110, 50, 6, 240)),  # the cell draining now
+    }
+
+
 def invisible_bar():
     return Image.new("RGBA", (182, 5), (0, 0, 0, 0))
 
@@ -173,6 +201,11 @@ def hud_font():
         "providers": [
             {"type": "bitmap", "file": "cartzone:font/cart.png", "ascent": 8, "height": 10, "chars": [""]},
             {"type": "bitmap", "file": "cartzone:font/bar.png", "ascent": BAR_ASCENT, "height": BAR_H, "chars": [""]},
+            # Hex cells sit 9 px below the title's top, exactly where the vanilla bar would be.
+            {"type": "bitmap", "file": "cartzone:font/hex_full.png", "ascent": -2, "height": 10, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/hex_empty.png", "ascent": -2, "height": 10, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/hex_grace.png", "ascent": -2, "height": 10, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/hex_edge.png", "ascent": -2, "height": 10, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
     }
@@ -196,6 +229,8 @@ def main():
     # The One Time Shield uses the vanilla shield look again (his call), so no shield model here.
 
     save_png("assets/cartzone/textures/font/bar.png", bar_background())
+    for name, img in hex_cells().items():
+        save_png("assets/cartzone/textures/font/" + name, img)
 
     # Rank badges in the DEFAULT font, so they work as plain characters anywhere: chat,
     # nametags, the tab list and the TAB plugin. Keep the chars in sync with config.yml rank-tags.

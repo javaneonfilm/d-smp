@@ -19,6 +19,42 @@
       ]
     },
     {
+      "type": "bitmap",
+      "file": "cartzone:font/hex_full.png",
+      "ascent": -2,
+      "height": 10,
+      "chars": [
+        "\ue010"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/hex_empty.png",
+      "ascent": -2,
+      "height": 10,
+      "chars": [
+        "\ue011"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/hex_grace.png",
+      "ascent": -2,
+      "height": 10,
+      "chars": [
+        "\ue012"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/hex_edge.png",
+      "ascent": -2,
+      "height": 10,
+      "chars": [
+        "\ue013"
+      ]
+    },
+    {
       "type": "space",
       "advances": {
         "\uf801": -1,

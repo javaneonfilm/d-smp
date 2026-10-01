@@ -18,6 +18,11 @@ commands:
   spectate:
     description: Pick a player to follow while spectating.
     usage: /spectate
+  offence:
+    description: Punish a player (mute/ban ladders from offences.yml).
+    usage: /offence [player] [type] [reason]
+    aliases: [offense]
+    permission: cartzone.offence
   kitready:
     description: Clear your inventory to build a kit.
     usage: /kitready
@@ -33,6 +38,10 @@ permissions:
     children:
       cartzone.host: true
       cartzone.tag.admin: true
+      cartzone.offence: true
+  cartzone.offence:
+    description: /offence menu, chat filter alerts, not filtered. Give it to your mod group.
+    default: op
   cartzone.host:
     description: Can open the Host GUI when holding a ticket.
     default: true

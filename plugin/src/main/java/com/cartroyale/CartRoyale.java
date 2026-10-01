@@ -66,6 +66,8 @@ public final class CartRoyale extends JavaPlugin {
     private Deployment deploy;
     private Zone zone;
     private Presence presence;
+    private com.cartroyale.mod.Offences offences;
+    private com.cartroyale.mod.ChatFilter chatFilter;
     private com.cartroyale.loot.UpgradeBooks books;
     private TeamManager teams;
     private Spectators spectators;
@@ -160,7 +162,9 @@ public final class CartRoyale extends JavaPlugin {
             if (swept > 0) getLogger().info("Removed " + swept + " leftover plugin entities from the arena.");
         }
 
-        register(new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
+        offences = new com.cartroyale.mod.Offences(this);
+        chatFilter = new com.cartroyale.mod.ChatFilter(this);
+        register(offences, chatFilter, new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
             presence = new Presence(this), new MatchListener(this), new ArenaRules(this),
             books = new com.cartroyale.loot.UpgradeBooks(this), chests);
         CartCommand cart = new CartCommand(this);
@@ -169,6 +173,7 @@ public final class CartRoyale extends JavaPlugin {
         bind("team", small);
         bind("kitready", small);
         bind("spectate", small);
+        bind("offence", new com.cartroyale.mod.OffenceGui(this));
 
         stats = new Stats(this);
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
@@ -317,6 +322,8 @@ public final class CartRoyale extends JavaPlugin {
     public Deployment deploy() { return deploy; }
     public Zone zone() { return zone; }
     public Presence presence() { return presence; }
+    public com.cartroyale.mod.Offences offences() { return offences; }
+    public com.cartroyale.mod.ChatFilter chatFilter() { return chatFilter; }
     public com.cartroyale.loot.UpgradeBooks books() { return books; }
     public TeamManager teams() { return teams; }
     public Spectators spectators() { return spectators; }

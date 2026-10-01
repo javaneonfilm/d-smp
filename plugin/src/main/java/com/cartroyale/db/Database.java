@@ -185,6 +185,19 @@ public final class Database {
             }
             setVersion(3);
         }
+        if (current < 4) {
+            // v4: /offence history (mutes and bans that step up per type).
+            try (Statement s = conn.createStatement()) {
+                s.execute("""
+                    CREATE TABLE IF NOT EXISTS offences (
+                      id INTEGER PRIMARY KEY AUTOINCREMENT, uuid TEXT NOT NULL, name TEXT NOT NULL,
+                      type TEXT NOT NULL, action TEXT NOT NULL, length_ms INTEGER NOT NULL,
+                      at INTEGER NOT NULL, until INTEGER NOT NULL, by_name TEXT NOT NULL,
+                      reason TEXT, revoked INTEGER NOT NULL DEFAULT 0)""");
+                s.execute("CREATE INDEX IF NOT EXISTS offences_uuid ON offences(uuid)");
+            }
+            setVersion(4);
+        }
     }
 
     private void setVersion(int v) throws SQLException {

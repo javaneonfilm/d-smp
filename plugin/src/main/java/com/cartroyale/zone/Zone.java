@@ -40,7 +40,9 @@ public final class Zone {
     private long tick;
     private boolean wasGrace;
     private final ZoneWall wall;
+    /** Without the pack: a plain red bar. With it: the PINK bar (invisible in the pack) carries the hexagon row. */
     private final BossBar bar = BossBar.bossBar(net.kyori.adventure.text.Component.empty(), 1f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10);
+    private final BossBar hexBar = BossBar.bossBar(net.kyori.adventure.text.Component.empty(), 1f, BossBar.Color.PINK, BossBar.Overlay.PROGRESS);
 
     public Zone(CartRoyale plugin) {
         this.plugin = plugin;
@@ -167,7 +169,11 @@ public final class Zone {
         if (task != null) task.cancel();
         task = null;
         wall.clear();
-        for (Player p : Bukkit.getOnlinePlayers()) p.hideBossBar(bar);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.hideBossBar(bar);
+        p.hideBossBar(hexBar);
+            p.hideBossBar(hexBar);
+        }
         match = null;
     }
 
@@ -217,15 +223,39 @@ public final class Zone {
         return wall.count();
     }
 
+    private long barBuiltAt = -1;
+
+    /** Builds both bars at most once per tick, then shows each player the one that fits their pack. */
     private void updateBar(Player p, ZoneMath.State s) {
-        String key = inGrace() ? "zone.bar-grace" : s.orbiting() ? "zone.bar-orbit" : s.shrinking() ? "zone.bar-shrinking" : "zone.bar-waiting";
-        int secs = inGrace() ? graceSecondsLeft() : (int) Math.ceil(s.secondsLeftInStep());
-        bar.name(plugin.msg().get(key, "seconds", secs, "time", String.format("%d:%02d", secs / 60, secs % 60), "phase", s.phase() + 1,
-            "phases", plan.phases().size(), "radius", (int) Math.round(s.circle().r())));
-        double total = ZoneMath.totalSeconds(plan) + graceMs() / 1000.0;
-        float prog = total <= 0 ? 0 : (float) Math.max(0, Math.min(1, 1 - ((System.currentTimeMillis() - startedAt) / 1000.0) / total));
-        bar.progress(prog);
-        p.showBossBar(bar);
+        if (barBuiltAt != tick) {
+            barBuiltAt = tick;
+            buildBars(s);
+        }
+        boolean hex = plugin.presence().hasPack(p.getUniqueId());
+        p.showBossBar(hex ? hexBar : bar);
+        p.hideBossBar(hex ? bar : hexBar);
+    }
+
+    private void buildBars(ZoneMath.State s) {
+        boolean grace = inGrace();
+        boolean closed = !grace && !s.shrinking() && s.phase() >= plan.phases().size();
+        int secs = grace ? graceSecondsLeft() : (int) Math.ceil(s.secondsLeftInStep());
+        String key = grace ? "zone.hud-grace" : closed ? "zone.hud-closed" : s.shrinking() ? "zone.hud-shrinking" : "zone.hud-waiting";
+        net.kyori.adventure.text.Component title = plugin.msg().get(key, "time", String.format("%d:%02d", secs / 60, secs % 60),
+            "phase", s.phase() + 1, "phases", plan.phases().size(),
+            "radius", (int) Math.round(s.circle().r()), "target", (int) Math.round(s.target().r()));
+        // Grace: the cells count the grace down in green. After that they count the zone down in red.
+        double zoneTotal = ZoneMath.totalSeconds(plan);
+        double elapsed = (System.currentTimeMillis() - startedAt) / 1000.0 - graceMs() / 1000.0;
+        double left = grace ? graceSecondsLeft() / Math.max(1.0, graceMs() / 1000.0)
+            : zoneTotal <= 0 ? 0 : Math.max(0, Math.min(1, 1 - elapsed / zoneTotal));
+        int cells = com.cartroyale.lobby.HudText.HEX_CELLS;
+        int full = (int) Math.ceil(left * cells - 1e-9);
+        int edge = !grace && s.shrinking() && full > 0 ? full - 1 : -1;
+        hexBar.name(com.cartroyale.lobby.HudText.zoneBar(title, full, edge, grace));
+        bar.name(title);
+        bar.color(grace ? BossBar.Color.GREEN : BossBar.Color.RED);
+        bar.progress((float) left);
     }
 
     /** ZONE-6: a band of particles on the circle, only within view distance of this player. */
