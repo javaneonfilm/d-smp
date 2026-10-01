@@ -143,8 +143,8 @@ public final class GameManager {
         GameRow row = new GameRow(id, s, source);
         queue.add(row);
         sortQueue();
-        plugin.announcer().hosted(row);
-        plugin.msg().send(Bukkit.getServer(), "game.hosted", "id", id, "hoster", s.hosterName,
+        if (!row.test()) plugin.announcer().hosted(row);
+        if (!row.test()) plugin.msg().send(Bukkit.getServer(), "game.hosted", "id", id, "hoster", s.hosterName,
             "mode", plugin.announcer().modeName(s), "team_size", plugin.announcer().teamSize(s.squad), "start", plugin.announcer().startLine(row));
         plugin.getLogger().info("Game #" + id + " queued for " + plugin.announcer().startLine(row) + " by " + s.hosterName + " (" + source + ")");
         return row;
@@ -186,6 +186,35 @@ public final class GameManager {
     }
 
     /** /cart start [now]: opens the next game (or a default one) right away. */
+    private final Set<UUID> testPlayers = new HashSet<>();
+
+    /** /cart test: a solo-capable practice game that starts in a few seconds and includes {@code p}. */
+    public void startTest(org.bukkit.command.CommandSender by, Player p) {
+        if (match != null) {
+            plugin.msg().send(by, "admin.already-running", "id", match.id(), "state", match.state.name());
+            return;
+        }
+        adminsPlaying.add(p.getUniqueId());
+        testPlayers.add(p.getUniqueId());
+        GameSettings s = plugin.defaults().copy();
+        s.startAt = System.currentTimeMillis() + plugin.getConfig().getInt("join.countdown-seconds", 10) * 1000L + 5000;
+        s.hosterUuid = p.getUniqueId();
+        s.hosterName = p.getName();
+        create(s, "test").whenComplete((row, t) -> Bukkit.getScheduler().runTask(plugin, () -> {
+            if (row == null) {
+                plugin.adminAlert("admin.queue-failed", "error", t == null ? "unknown" : String.valueOf(t.getMessage()));
+                return;
+            }
+            if (match == null) openMatch(row);
+            plugin.msg().send(Bukkit.getServer(), "game.test-started", "id", row.id, "player", p.getName());
+        }));
+    }
+
+    private void endTest() {
+        for (UUID u : testPlayers) adminsPlaying.remove(u);
+        testPlayers.clear();
+    }
+
     public void startSoon(boolean now, Player by) {
         long lead = now ? plugin.getConfig().getInt("join.countdown-seconds", 10) * 1000L + 3000
             : plugin.getConfig().getInt("join.start-command-seconds", 60) * 1000L;
@@ -226,7 +255,7 @@ public final class GameManager {
             GameRow next = next();
             if (next == null) return;
             long warnMs = plugin.getConfig().getInt("webhooks.warning-minutes", 5) * 60_000L;
-            if (!next.warned && now >= next.s.startAt - warnMs) {
+            if (!next.warned && !next.test() && now >= next.s.startAt - warnMs) {
                 if (now < next.s.startAt + 60_000) plugin.announcer().warning(next);
                 next.warned = true;
                 plugin.store().setWarned(next.id);
@@ -290,7 +319,7 @@ public final class GameManager {
                 if (left <= 0) finishTeaming();
             }
             case PLAYING -> {
-                long hard = (plugin.announcer().durationMinutes() + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
+                long hard = (plugin.zone().plannedMinutes(match.row.test()) + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
                 if (now - match.playingAt >= hard) end(true);
             }
             case ENDING -> {
@@ -350,14 +379,14 @@ public final class GameManager {
             p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.6f, 1.4f);
         }
         plugin.msg().send(Bukkit.getServer(), "game.purge-start", "online", el.size(), "cap", match.s().purgeCap);
-        plugin.announcer().purge(match.row, el.size());
+        if (!match.row.test()) plugin.announcer().purge(match.row, el.size());
         plugin.getLogger().info("Game #" + match.id() + " purge starting with " + el.size() + " eligible players (cap " + match.s().purgeCap + ")");
     }
 
     private void doPurge() {
         GameSettings s = match.s();
         List<Player> el = eligible();
-        int min = plugin.getConfig().getInt("join.min-players", 2);
+        int min = match.row.test() ? 1 : plugin.getConfig().getInt("join.min-players", 2);
         if (el.size() < min) {
             abort(plugin.msg().plain("game.reason-not-enough", "min", min));
             return;
@@ -456,7 +485,7 @@ public final class GameManager {
         plugin.zone().start(match, plugin.arenas().world(), plugin.arenas().map());
         for (UUID u : match.players.keySet()) {
             Player p = Bukkit.getPlayer(u);
-            if (p != null) plugin.msg().send(p, "game.zone-start", "minutes", plugin.announcer().durationMinutes());
+            if (p != null) plugin.msg().send(p, "game.zone-start", "minutes", plugin.zone().plannedMinutes(match.row.test()));
         }
         checkWin();
     }
@@ -474,7 +503,7 @@ public final class GameManager {
             Match.MP k = match.get(killer);
             if (k != null && !match.sameTeam(killer, victim)) {
                 k.kills++;
-                plugin.econ().rewardKill(killer, k.name);
+                if (!match.row.test()) plugin.econ().rewardKill(killer, k.name);
             }
         }
         String killerName = killer == null || match.get(killer) == null ? null : match.get(killer).name;
@@ -526,10 +555,11 @@ public final class GameManager {
             results.add(new Store.PlayerResult(mp.uuid, mp.name, mp.team, mp.kills, mp.placement == 0 ? 1 : mp.placement, winners.contains(mp.uuid)));
         }
         long endedAt = System.currentTimeMillis();
-        plugin.store().finish(match.id(), endedAt, String.join(", ", winnerNames), mvp == null ? null : mvp.uuid,
+        if (match.row.test()) plugin.store().setStatus(match.id(), GameRow.Status.CANCELLED);
+        else plugin.store().finish(match.id(), endedAt, String.join(", ", winnerNames), mvp == null ? null : mvp.uuid,
                 mvp == null ? null : mvp.name, mvp == null ? 0 : mvp.kills, results)
             .thenRun(() -> plugin.stats().pushSoon());
-        plugin.announcer().results(match.row, winnerNames, winnerKills, mvp == null ? null : mvp.name, mvp == null ? 0 : mvp.kills);
+        if (!match.row.test()) plugin.announcer().results(match.row, winnerNames, winnerKills, mvp == null ? null : mvp.name, mvp == null ? 0 : mvp.kills);
         Component winLine = plugin.msg().get(winnerNames.isEmpty() ? "game.end-none" : timeout ? "game.end-timeout" : "game.end",
             "winners", String.join(", ", winnerNames), "kills", winnerKills, "mvp", mvp == null ? "-" : mvp.name, "mvp_kills", mvp == null ? 0 : mvp.kills);
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -547,6 +577,20 @@ public final class GameManager {
     private void kickAndReset() {
         match.enter(GameState.RESETTING);
         World w = plugin.arenas().world();
+        if (match.row.test()) {
+            // Practice game: everyone back to the lobby, arena restored in place, no kick, no restart.
+            for (Player p : List.copyOf(Bukkit.getOnlinePlayers())) {
+                if (plugin.arenas().isArena(p.getWorld()) || match.get(p.getUniqueId()) != null) plugin.lobby().send(p);
+            }
+            plugin.chests().clear(w);
+            plugin.deploy().stop(true);
+            plugin.nametags().clearMatch();
+            String map = match.map;
+            match = null;
+            endTest();
+            resetArena(map);
+            return;
+        }
         for (Player p : List.copyOf(Bukkit.getOnlinePlayers())) {
             if (Ranks.isAdmin(p)) {
                 p.setGameMode(GameMode.ADVENTURE);
@@ -577,6 +621,7 @@ public final class GameManager {
         plugin.zone().stop();
         plugin.deploy().stop(true);
         plugin.teams().reset();
+        endTest();
         plugin.nametags().clearMatch();
         World w = plugin.arenas().world();
         plugin.chests().clear(w);

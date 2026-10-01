@@ -61,10 +61,25 @@ public final class Zone {
         return t;
     }
 
+    /** /cart test: about 3 minutes, so a practice game is quick. */
+    private static final List<ZoneMath.Phase> TEST_PHASES = List.of(
+        new ZoneMath.Phase(30, 30, 300, 2, 20), new ZoneMath.Phase(20, 25, 120, 2, 20),
+        new ZoneMath.Phase(20, 20, 40, 3, 20), new ZoneMath.Phase(15, 15, 5, 4, 20));
+
+    public int plannedMinutes(boolean test) {
+        double t = 0;
+        for (ZoneMath.Phase p : test ? TEST_PHASES : phases()) t += p.waitSeconds() + p.shrinkSeconds();
+        return (int) Math.ceil((t + plugin.getConfig().getInt("deploy.planned-seconds", 60)) / 60.0);
+    }
+
     public ZoneMath.Plan planFor(MapConfig mc) {
+        return planFor(mc, false);
+    }
+
+    public ZoneMath.Plan planFor(MapConfig mc, boolean test) {
         double orbitR = yml.get().getDouble("orbit.radius", 100), speed = yml.get().getDouble("orbit.speed", 4.3);
         double[] oc = ZoneMath.orbitCenter(mc.finalX, mc.finalZ, mc.centerX, mc.centerZ, orbitR);
-        return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, phases(), orbitR, speed, oc[0], oc[1]);
+        return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, test ? TEST_PHASES : phases(), orbitR, speed, oc[0], oc[1]);
     }
 
     public boolean running() {
@@ -80,7 +95,7 @@ public final class Zone {
         stop();
         match = m;
         world = w;
-        plan = planFor(mc);
+        plan = planFor(mc, m.row.test());
         startedAt = System.currentTimeMillis();
         tick = 0;
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);

@@ -18,6 +18,11 @@ public final class GameRow {
         this.source = source;
     }
 
+    /** /cart test: a practice game. No Discord, no stats, no coins, no kick, no restart. */
+    public boolean test() {
+        return "test".equals(source);
+    }
+
     public boolean bought() {
         return "ticket".equals(source);
     }

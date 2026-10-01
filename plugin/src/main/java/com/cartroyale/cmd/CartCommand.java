@@ -35,7 +35,7 @@ import java.util.UUID;
 public final class CartCommand implements TabExecutor {
 
     private static final List<String> SUBS = List.of("help", "host", "start", "stop", "queue", "cancel", "schedule", "kit", "arena", "zone",
-        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "shield", "shop");
+        "chests", "loot", "ticket", "coins", "reload", "setlobby", "play", "build", "spectate", "free", "diag", "selftest", "test", "shield", "shop");
 
     private final CartRoyale plugin;
 
@@ -125,6 +125,12 @@ public final class CartCommand implements TabExecutor {
                     m(s, plugin.rank().toggleFree(p) ? "admin.free-on" : "admin.free-off");
                 }
                 case "diag" -> diag(s);
+                case "test" -> {
+                    // /cart test [player]: a practice game on the live server, solo is fine.
+                    Player p = a.length > 1 ? Bukkit.getPlayerExact(a[1]) : s instanceof Player self ? self : null;
+                    if (p == null) return usage(s, "/cart test [player]");
+                    plugin.games().startTest(s, p);
+                }
                 case "selftest" -> new SelfTest(plugin).run(s);
                 case "shield" -> {
                     // /cart shield [n] [player] - the player is put on the offhand, ready to block.

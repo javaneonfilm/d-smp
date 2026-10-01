@@ -168,6 +168,7 @@ game:
   selected: '<prefix><#7DDC6A>You were selected for game #<id>. Good luck.'
   cancelled: '<prefix><gray>Game #<id> was cancelled: <white><reason>'
   reason-not-enough: 'not enough players (need <min>)'
+  test-started: '<prefix><yellow>Test game #<id></yellow> <white>for <player> starts in a few seconds. <gray>Solo is fine. No Discord, no stats, no restart. /cart stop ends it.'
   reason-stopped: 'stopped by <by>'
   reason-cancelled: 'cancelled by <by>'
   zone-start: '<prefix><white>Everyone has dropped. The zone is live, about <minutes> minutes to the final circle.'
@@ -411,6 +412,7 @@ help:
     - '<white>/cart play | build | spectate | free | shield [n] | shop | reload | setlobby'
     - '<white>/cart diag <gray>- everything that could be wrong, on one screen'
     - '<white>/cart selftest <gray>- blows up a TNT cart in the arena and checks the block rules'
+    - '<white>/cart test [player] <gray>- practice game now, solo is fine, no Discord/stats/restart'
 
 schedule:
   today-head: "<prefix><white>Today's games (<count>):"

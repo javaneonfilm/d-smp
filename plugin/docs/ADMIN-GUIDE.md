@@ -71,6 +71,7 @@ in `loot.yml`.
 - **Schedule**: `/cart schedule`. Your three daily games (16:00 Duos, 18:00 Squads, 20:00 Solos, in
   `timezone`, default UTC) are already set. Click one to change time, days, mode, team size, cap,
   map or modifiers. Games are created and announced 60 minutes ahead.
+- **Practice alone**: `/cart test` starts a solo-capable game for you in about 15 s (3-minute zone, no Discord, no stats, no restart; `/cart stop` ends it).
 - **Host now**: `/cart host` (admins can start from 1 minute ahead) or `/cart start` (opens the next
   game in 60 s; `/cart start now` in about 13 s).
 - `/cart queue`, `/cart cancel <id>`, `/cart stop` (ends the running game, no result, restores the arena).
