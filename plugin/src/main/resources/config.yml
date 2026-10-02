@@ -165,8 +165,8 @@ webhooks:
   events-role-id: ''        # right-click the @Events role with Developer Mode on, Copy Role ID
   flag: ''                  # optional text before the title; plain text, no emoji
   warning-minutes: 5
-  daily-post:
-    enabled: true
+  daily-post:                # the "Today's games" list in Discord once a day
+    send: false             # off: CartZone doesn't post the schedule
     time: '12:00'           # in the time zone above
     ping: false
     # Optional custom server emoji per team size, e.g. '<:head:123456789012345678>'

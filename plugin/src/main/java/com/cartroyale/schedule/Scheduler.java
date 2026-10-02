@@ -184,7 +184,8 @@ public final class Scheduler {
     /** The owner's "Game 1: 4:00 PM Duos" list, once a day at the configured time. */
     private void dailyPost(long now, ZoneId zone) {
         var cfg = plugin.getConfig();
-        if (!cfg.getBoolean("webhooks.daily-post.enabled", true)) return;
+        // Off unless switched on: the owner posts the schedule himself. (daily-post.enabled is the old, ignored key.)
+        if (!cfg.getBoolean("webhooks.daily-post.send", false)) return;
         LocalTime at = ScheduleEntry.parseTime(cfg.getString("webhooks.daily-post.time", "12:00"));
         if (at == null) return;
         ZonedDateTime zNow = ZonedDateTime.ofInstant(Instant.ofEpochMilli(now), zone);
