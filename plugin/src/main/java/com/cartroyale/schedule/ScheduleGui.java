@@ -57,6 +57,21 @@ public final class ScheduleGui {
                     "enabled", e.enabled ? "on" : "off"));
             gui.set(slot++, it, c -> edit(p, e));
         }
+        boolean paused = sch().paused();
+        String until = sch().pausedUntil() == Long.MAX_VALUE ? plugin.msg().plain("gui.schedule.until-resumed")
+            : com.cartroyale.util.Times.dayClock(sch().pausedUntil(), plugin.zoneId());
+        gui.set(45, Items.make(paused ? Material.RED_CONCRETE : Material.LIME_CONCRETE,
+            plugin.msg().item(paused ? "gui.schedule.paused" : "gui.schedule.running"),
+            plugin.msg().lore(paused ? "gui.schedule.paused-lore" : "gui.schedule.running-lore", "until", until)), c -> {
+            if (sch().paused()) {
+                sch().resume();
+                plugin.msg().send(p, "schedule.resumed");
+            } else {
+                int n = sch().pause(Long.MAX_VALUE, p.getName());
+                plugin.msg().send(p, "schedule.paused", "until", plugin.msg().plain("gui.schedule.until-resumed"), "cancelled", n);
+            }
+            open(p);
+        });
         gui.set(49, Items.make(Material.EMERALD, plugin.msg().item("gui.schedule.add"), plugin.msg().lore("gui.schedule.add-lore")), c -> {
             ScheduleEntry e = sch().add();
             sch().save();

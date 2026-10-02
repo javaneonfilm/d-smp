@@ -50,7 +50,7 @@ class ResourcesTest {
             String top = k.substring(0, k.indexOf('.'));
             if (!SECTIONS.contains(top)) continue;
             // Prefixes completed at runtime, file names, database kv keys and map-yml paths are not messages.
-            if (k.endsWith("-") || k.matches(".*\\.(yml|json|tmp)$") || k.equals("arena.map") || k.equals("tickets.whitelisted")
+            if (k.endsWith("-") || k.matches(".*\\.(yml|json|tmp)$") || k.equals("arena.map") || k.equals("tickets.whitelisted") || k.equals("schedule.paused-until")
                 || k.matches("(deploy|zone)\\.(x|y|z|yaw|start\\..*|final\\..*)")) continue;
             if (!y.contains(k) && !isConfigKey(k)) missing.add(k);
         }

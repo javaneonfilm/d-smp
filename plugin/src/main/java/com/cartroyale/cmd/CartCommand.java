@@ -79,6 +79,20 @@ public final class CartCommand implements TabExecutor {
                     if (!plugin.games().cancelQueued(id, plugin.msg().plain("game.reason-cancelled", "by", s.getName()))) m(s, "admin.no-such-game", "id", id);
                 }
                 case "schedule" -> {
+                    // /cart schedule [pause [12h|3d]|resume]: no argument opens the GUI.
+                    if (a.length >= 2 && a[1].equalsIgnoreCase("pause")) {
+                        long len = a.length > 2 ? com.cartroyale.mod.Offences.parseLength(a[2]) : -1;
+                        long until = len < 0 ? Long.MAX_VALUE : System.currentTimeMillis() + len;
+                        int n = plugin.scheduler().pause(until, s.getName());
+                        m(s, "schedule.paused", "until", until == Long.MAX_VALUE ? plugin.msg().plain("gui.schedule.until-resumed")
+                            : Times.dayClock(until, plugin.zoneId()), "cancelled", n);
+                        return true;
+                    }
+                    if (a.length >= 2 && a[1].equalsIgnoreCase("resume")) {
+                        plugin.scheduler().resume();
+                        m(s, "schedule.resumed");
+                        return true;
+                    }
                     if (!(s instanceof Player p)) return notPlayer(s);
                     plugin.scheduleGui().open(p);
                 }
@@ -598,6 +612,7 @@ public final class CartCommand implements TabExecutor {
                 : a.length == 3 && a[1].equalsIgnoreCase("load") ? plugin.arenas().maps() : List.of();
             case "zone" -> a.length == 2 ? List.of("info", "start", "final", "preview") : List.of();
             case "book" -> a.length == 2 ? List.of("armor", "sharpness", "quickcharge") : List.of();
+            case "schedule" -> a.length == 2 ? List.of("pause", "resume") : a.length == 3 && a[1].equalsIgnoreCase("pause") ? List.of("12h", "1d", "3d", "7d") : List.of();
             case "npc" -> a.length == 2 ? List.of("set", "remove", "refresh") : a.length == 3 ? List.of("1", "2", "3") : List.of();
             case "webhook" -> a.length == 2 ? List.of("test") : a.length == 3 ? List.of("ping") : List.of();
             case "chests" -> a.length == 2 ? List.of("info", "include", "exclude", "clearzones", "scan", "test", "clear") : List.of();

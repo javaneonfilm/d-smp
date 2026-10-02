@@ -33,12 +33,50 @@ public final class Scheduler {
     private final java.util.Set<String> tried = new java.util.HashSet<>();
     private long lastCheck;
     private String lastDailyPost;
+    /** Auto queue paused until this time (Long.MAX_VALUE = until someone resumes it, 0 = running). */
+    private volatile long pausedUntil;
 
     public Scheduler(CartRoyale plugin) {
         this.plugin = plugin;
         this.yml = new Yml(plugin, "schedule.yml", true);
         load();
         plugin.db().kvGet("daily-post.last").thenAccept(v -> lastDailyPost = v);
+        plugin.db().kvGet("schedule.paused-until").thenAccept(v -> {
+            try {
+                pausedUntil = v == null ? 0 : Long.parseLong(v);
+            } catch (NumberFormatException e) {
+                pausedUntil = 0;
+            }
+        });
+    }
+
+    public boolean paused() {
+        return pausedUntil > System.currentTimeMillis();
+    }
+
+    public long pausedUntil() {
+        return pausedUntil;
+    }
+
+    /**
+     * Stops the auto queue until {@code until} (Long.MAX_VALUE = until resumed). Scheduled games that
+     * were already created and start before then are cancelled too. Returns how many were cancelled.
+     */
+    public int pause(long until, String by) {
+        pausedUntil = until;
+        plugin.db().kvSet("schedule.paused-until", String.valueOf(until));
+        int n = 0;
+        for (GameRow g : new ArrayList<>(plugin.games().queue())) {
+            if (g.source != null && g.source.startsWith("schedule:") && g.s.startAt < until) {
+                if (plugin.games().cancelQueued(g.id, plugin.msg().plain("schedule.paused-reason", "by", by))) n++;
+            }
+        }
+        return n;
+    }
+
+    public void resume() {
+        pausedUntil = 0;
+        plugin.db().kvSet("schedule.paused-until", "0");
     }
 
     public void reload() {
@@ -113,6 +151,8 @@ public final class Scheduler {
     public void tick(long now) {
         if (now - lastCheck < 15_000) return;
         lastCheck = now;
+        if (pausedUntil != 0 && pausedUntil <= now) resume(); // a timed pause ran out
+        if (paused()) return;
         ZoneId zone = plugin.zoneId();
         long ahead = plugin.getConfig().getInt("schedule.create-ahead-minutes", 60) * 60_000L;
         ZonedDateTime base = ZonedDateTime.ofInstant(Instant.ofEpochMilli(now), zone);
@@ -163,7 +203,7 @@ public final class Scheduler {
         for (ScheduleEntry e : entries.values()) {
             if (!e.enabled || !e.days.contains(day.getDayOfWeek())) continue;
             long at = ZonedDateTime.of(day, e.time, zone).toInstant().toEpochMilli();
-            if (at < System.currentTimeMillis()) continue;
+            if (at < System.currentTimeMillis() || at < pausedUntil) continue;
             boolean exists = out.stream().anyMatch(g -> Math.abs(g.s.startAt - at) < 60_000);
             if (exists) continue;
             GameSettings s = new GameSettings();

@@ -472,6 +472,7 @@ help:
   admin:
     - '<#FF2B2B><b>CartZone admin</b>'
     - '<white>/cart host | start [now] | stop | queue | cancel <id> | schedule'
+    - '<white>/cart schedule pause [12h|3d] | resume <gray>stop or restart the scheduled games'
     - '<white>/cart kit set|preview <lt|ht> <gray>and</gray> /kitready'
     - '<white>/cart arena info|list|tp|load|save <name>|setspawn|setcenter|setborder <r>|setdeploy'
     - '<white>/cart zone info|start <r>|final|preview'
@@ -489,6 +490,9 @@ help:
     - '<white>/cart test [player] [minutes] <gray>practice game, solo is fine'
 
 schedule:
+  paused: '<prefix><white>Scheduled games are paused until <yellow><until></yellow>. <gray><cancelled> upcoming one(s) cancelled.'
+  resumed: '<prefix><white>Scheduled games are back on.'
+  paused-reason: 'schedule paused by <by>'
   today-head: "<prefix><white>Today's games (<count>):"
   today-line: '<gray> Game <n>: <white><time></white> <yellow><team_size></yellow> <gray><mode> <dark_gray><id>'
 
@@ -624,6 +628,11 @@ gui:
     enabled-lore: ['<dark_gray>Click to toggle']
     delete: '<#FF2B2B>Delete'
     delete-lore: ['<dark_gray>Shift-click to delete']
+    running: '<#55FF55><b>Auto queue: on'
+    running-lore: ['<gray>Scheduled games get created by themselves.', '<dark_gray>Click to pause (also cancels the', '<dark_gray>scheduled ones already queued)']
+    paused: '<#FF2B2B><b>Auto queue: paused'
+    paused-lore: ['<gray>Paused until <until>.', '<dark_gray>Click to turn it back on']
+    until-resumed: 'you turn it back on'
 
 selftest:
   start: '<prefix><white>Self-test: blowing up a TNT cart at <yellow><where></yellow> in the arena...'

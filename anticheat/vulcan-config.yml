@@ -1,0 +1,3967 @@
+##############################################
+#   AntiGamingChair (Vulcan) for CartZone    #
+##############################################
+# Vulcan, renamed in every message players see. Cheating bans go through CartZone's
+# /offence ladder ("offence %player% cheating ..."), so they count as Cheating offences
+# (14d, 30d, perm), show up in /offence history and can be undone there.
+#
+# Thresholds (max-violations) are about a third of Vulcan's defaults: combat, packet and
+# player checks ban fast. Movement checks that CartZone itself sets off (minecarts on powered
+# rails, ghast drops and forced elytra gliding, TNT cart and wind charge launches, the lobby
+# grapple) only alert staff: speed, flight, motion, elytra, entityspeed, entityflight, velocity,
+# jump, strafe. Flip punishable: true on any of them once you've watched them stay quiet.
+# Timer checks keep the fake timeout kick: lag sets them off, so they never ban.
+
+# The prefix that will be used for all of the %prefix% messages throughout the plugin
+prefix: '&4&lAntiGamingChair &8|'
+
+alerts:
+  format: '%prefix% &f%player% &7failed &f%check% %dev%&7(&fType %type%&7)%dev% &7[&4%vl%&7/&4%max-vl%&7]'
+  hover-message:
+    - '&7Ping: &c%ping% &8| &7TPS: &c%tps% &8| &7Version: &c%version% &8| &7Client: &c%client-brand%'
+    - ''
+    - '&7Description:'
+    - '&7%description%'
+    - ''
+    - '&7Information:'
+    - '&7%info%'
+    - ''
+    - '&7Click to teleport to &b%player%&7.'
+  click-commands:
+    - '/vulcan clickalert %player%'
+  click-alert-command-commands:
+    - 'tp %player%'
+  toggled-on-message: '%prefix% &7Alerts &aon&7.'
+  toggled-off-message: '%prefix% &7Alerts &coff&7.'
+  print-to-console: true
+  console-format: '[AntiGamingChair] %player% failed %check% %dev%(Type %type%)%dev% (%vl%/%max-vl%)'
+  custom-commands: []
+  severity:
+    violations:
+      2: 2
+      3: 3
+      4: 4
+      5: 6
+      6: 6
+      7: 6
+      8: 6
+      9: 6
+      10: 6
+    colors:
+      1: '&a'
+      2: '&e'
+      3: '&6'
+      4: '&c'
+      5: '&4'
+      6: '&4'
+      7: '&4'
+      8: '&4'
+      9: '&4'
+      10: '&4'
+  experimental-symbol: "*"
+
+log-file:
+  enabled: true
+  alert-message: "%player% failed %check% %dev%(Type %type%)%dev% [VL: %vl%] [Ping: %ping%] [TPS: %tps%] [Version: %version%] [Client: %client-brand%]"
+  punishment-message: "%player% was punished for %check% %dev%(Type %type%)%dev% [VL: %vl%] [Ping: %ping%] [TPS: %tps%] [Client: %client-brand%]"
+
+unloaded-chunks:
+  setback-enabled: false
+  message: '%prefix% &c%player% &7was set back for being in an unloaded chunk.'
+  max-ticks: 40
+
+punishment-file:
+  enabled: true
+
+violation-reset:
+  enabled: true
+  interval-in-minutes: 8
+  message-enabled: false
+  message: '%prefix% &7Violations for everyone online were reset.'
+
+client-brand-alerts:
+  resolve: true
+  enabled: true
+  ignore-alerts-list:
+    - 'vanilla'
+  message: '%prefix% &c%player% &7joined on &f%client-brand%&7.'
+  blocked-client-brands: []
+  unallowed-client-brand-kick-message: '&cYou can''t join with %client-brand%.'
+  console: false
+  console-message: '[AntiGamingChair] %player% joined using %client-brand%'
+  whitelist-enabled: false
+  whitelisted-client-brands: []
+
+connection:
+  debug-messages: false
+  ignore-ids-over-0: false
+  other-anticheat-support: false
+  invalid:
+    kick-message: 'Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+    staff-alert-message: '%prefix% &c%player% &7was kicked for an invalid confirmation packet (ID: &c%id%&7)'
+    console-alert-message: '[AntiGamingChair] &c%player% &7was kicked for an invalid confirmation packet (ID: &c%id%&7)'
+  out-of-order:
+    kick-message: 'Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+    staff-alert-message: '%prefix% &c%player% &7was kicked for an out of order confirmation packet (&7got &c%id% &7, expected &c%last-id%&7)'
+    console-alert-message: '[AntiGamingChair] %player% was kicked for an out of order confirmation packet (got %id%, expected %last-id%)'
+  no-response:
+    delay-in-seconds: 30
+    kick-message: 'Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+    staff-alert-message: '%prefix% &c%player% &7was kicked for not answering confirmation packets (&c%delay%&7ms)'
+    console-alert-message: '[AntiGamingChair] %player% was kicked for not answering confirmation packets (%delay%ms)'
+  max-size:
+    amount: 2000
+    kick-message: 'Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+    staff-alert-message: '%prefix% &c%player% &7was kicked for too many pending confirmations (&c%size%&7)'
+    console-alert-message: '[AntiGamingChair] %player% was kicked for too many pending confirmations (%size%)'
+  keepalive:
+    kick-enabled: true
+    max-delay: 45000
+    kick-message: 'Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+    staff-alert-message: '%prefix% &c%player% &7was kicked for not answering KeepAlives (&c%delay%ms&7)'
+    console-message: '[AntiGamingChair] %player% was kicked for not answering KeepAlives (%delay%ms)'
+  max-ping:
+    kick-enabled: true
+    max-ping: 20000
+    max-ticks: 20
+    kick-message: 'Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+    staff-alert-message: '%prefix% &c%player% &7was kicked for very high ping (&c%ping%ms&7)'
+    console-message: '[AntiGamingChair] %player% was kicked for very high ping (%ping%ms)'
+
+punishments:
+  message: '%prefix% &c%player% &7got banned for &f%check% &7(&fType %type%&7) &7[&4x%vl%&7]'
+  broadcast:
+    - "&8&m----------------------------------------"
+    - "&4&lAntiGamingChair &7caught &c%player% &7cheating. They're gone."
+    - "&8&m----------------------------------------"
+
+judgement-days:
+  started-broadcast:
+    - "&8&m----------------------------------------"
+    - "&4&lAntiGamingChair &7Judgement Day has started..."
+    - "&8&m----------------------------------------"
+  ended-broadcast:
+    - "&8&m----------------------------------------"
+    - "&7Judgement Day is over. &c%amount% &7players got banned."
+    - "&8&m----------------------------------------"
+  commands:
+    - "offence %player% cheating AntiGamingChair Judgement Day"
+  broadcast:
+    - '&8&m----------------------------------------'
+    - '&c%player% &7got banned by &4&lAntiGamingChair&7.'
+    - '&8&m----------------------------------------'
+  cooldown: 1000
+  run-at-interval: false
+  interval: 36000
+
+freeze:
+  logged-out-while-frozen-commands: []
+
+ghost-blocks-fix:
+  enabled: true
+  ghost-water-fix: true
+  minimum-tps: 18.5
+  ignore-legacy-via: true
+  buffer:
+    max: 3
+    decay: .1
+  setback: true
+  update-blocks: false
+  ticks: 3
+  message-enabled: false
+  message: '&cYou were standing on a ghost block, it got fixed.'
+  staff-message-enabled: false
+  staff-message: '%prefix% &c%player%''s &7position was fixed for a ghost block (%world%, %x%, %y%, %z%) &7[%ticks%]'
+  print-to-console: true
+  console-message: '%player% position was fixed for a ghost block (%world%, %x%, %y%, %z%) [%ticks%]'
+
+messages:
+  no-permission: '&cYou can''t use that.'
+  cant-execute-from-console: '&cThat doesn''t work from console.'
+  ban-command-syntax: '%prefix% &7Usage: &c/vulcan ban (player)&7.'
+  kb-command-syntax: '%prefix% &7Usage: &c/vulcan knockback (player) &8| &c/vulcan kb (player)&7.'
+  profile-command-syntax: '%prefix% &7Usage: &c/vulcan profile (player)&7.'
+  jday-command-syntax: '%prefix% &7Usage: &c/jday add (player) &8| &c/jday execute &8| &c/jday list &8| &c/jday remove (player)&7.'
+  reload-success: '%prefix% &aReloaded.'
+  invalid-target: '%prefix% &cCan''t find that player.'
+  kb-test-success: '%prefix% &aKnockback test done on %player%.'
+  jday-no-pending-bans: '%prefix% &cNobody is on the Judgement Day list.'
+  jday-added-to-list: '%prefix% &c%player% &7is on the list.'
+  reset-command: '%prefix% &7Violations for everyone online were reset.'
+  disable-check-command-syntax: '%prefix% &cUsage: /vulcan disablecheck (check name), case sensitive.'
+  invalid-check: '%prefix% &cNot a check. Examples: AimA, BadPacketsF, AutoClickerJ.'
+  removed-check: '%prefix% &cDisabled %check%.'
+  disabled-check: '%prefix% &cDisabled %check%.'
+  violations-command-syntax: '%prefix% &cUsage: /vulcan violations (player)'
+  no-logs: '%prefix% &cNo logs for this player.'
+  cps-command-syntax: '%prefix% &cUsage: /vulcan cps (player)'
+  connection-command-syntax: '%prefix% &cUsage: /vulcan connection (player)'
+  logs-command-syntax: '%prefix% &cUsage: /logs (player) (page)'
+  no-logs-file: '%prefix% &cThere''s no logs file.'
+  logs-command-no-logs: '%prefix% &cNo logs found for %player%.'
+  no-page: '%prefix% &cThere''s no page %page% for %player%.'
+  update-available: '%prefix% &7There''s an update (&cv%new-version%&7).'
+  latest-version: '%prefix% &aUp to date.'
+  injection-failure: 'You joined too fast, try again.'
+  frozen: '&cYou''re frozen. Wait for staff.'
+  logged-out-while-frozen: '%prefix% &c%player% left while frozen.'
+  froze: '%prefix% &7Froze &a%player%&7.'
+  unfroze: '%prefix% &7Unfroze &c%player%&7.'
+  freeze-command-syntax: '%prefix% &cUsage: /vulcan freeze (player)'
+  shuffle-command-syntax: '%prefix% &cUsage: /vulcan shuffle (player)'
+  shuffled-hotbar: '%prefix% &aShuffled %player%''s hotbar.'
+  rotate-command-syntax: '%prefix% &cUsage: /vulcan rotate (player)'
+  randomly-rotated: '%prefix% &aRotated %player%.'
+  reset-command-syntax: '%prefix% &cUsage: /vulcan reset (player)'
+  violations-reset: '%prefix% &aReset violations for %player%.'
+  unknown-command: '%prefix% &cUnknown command.'
+  unfroze-staff-broadcast: '%prefix% &c%player% &7was unfrozen by &c%staff%&7.'
+  froze-staff-broadcast: '%prefix% &c%player% &7was frozen by &c%staff%&7.'
+  removed-from-jday: '%prefix% &aTook %player% off Judgement Day.'
+  jday-remove-syntax: '%prefix% &cUsage: /jday remove (player)'
+  punishlogs-syntax: '%prefix% &cUsage: /punishlogs (player)'
+  sent-test-alert: '%prefix% &aSent a test alert.'
+  description-command-syntax: '%prefix% &cUsage: /vulcan description (checkname)'
+
+commands:
+  help:
+    - "&8&m----------------------------------------"
+    - "&4&lAntiGamingChair &7(Vulcan v%version%)"
+    - "&r"
+    - "&c/vulcan help &8- &7This menu"
+    - "&c/vulcan profile &8- &7Someone's profile"
+    - "&c/vulcan ban (player) &8- &7Ban for cheating (goes through /offence)"
+    - "&c/vulcan reload &8- &7Reload the files"
+    - "&c/vulcan disablecheck (check) &8- &7Turn a check off (case sensitive)"
+    - "&c/vulcan violations (player) &8- &7Someone's violations"
+    - "&c/vulcan cps (player) &8- &7Someone's CPS"
+    - "&c/vulcan kb (player) &8- &7Knockback test"
+    - "&c/vulcan checks &8- &7Enabled checks"
+    - "&c/vulcan connection (player) &8- &7Connection info"
+    - "&c/vulcan freeze (player) &8- &7Freeze / unfreeze"
+    - "&c/vulcan rotate (player) &8- &7Random head rotation"
+    - "&c/vulcan shuffle (player) &8- &7Shuffle their hotbar slot"
+    - "&c/vulcan top &8- &7Most violations per category"
+    - "&c/vulcan testalert &8- &7Test the Discord webhook"
+    - "&r"
+    - "&c/jday add (player) &8- &7Add to Judgement Day"
+    - "&c/jday execute &8- &7Run Judgement Day"
+    - ""
+    - "&c/alerts &8- &7Alerts on / off"
+    - "&c/logs (player) (page) &8- &7Someone's violations"
+    - "&c/punishlogs (player) &8- &7Someone's punishments"
+    - "&8&m----------------------------------------"
+  ban:
+    commands:
+      - 'offence %player% cheating AntiGamingChair manual ban'
+    broadcast:
+      - "&8&m----------------------------------------"
+      - "&4&lAntiGamingChair &7caught &c%player% &7cheating. They're gone."
+      - "&8&m----------------------------------------"
+  profile:
+    - "&8&m----------------------------------------"
+    - "&4&lAntiGamingChair &7profile for &c%player%"
+    - " &8- &7%uuid%"
+    - ""
+    - "&7Version: &c%client-version%"
+    - "&7Client: &c%client-brand%"
+    - "&7Sensitivity: &c%sensitivity%%"
+    - "&7Last CPS: &c%cps% CPS"
+    - "&7Move speed: &c%move-speed%"
+    - ""
+    - "&7Total violations (&c%total-violations%&7):"
+    - " &8- &7Combat: &c%combat-violations%"
+    - " &8- &7Movement: &c%movement-violations%"
+    - " &8- &7Player: &c%player-violations%"
+    - ""
+    - "&7Collisions:"
+    - " &8- &7Nearby blocks: %nearby-blocks%"
+    - " &8- &7Nearby entities: %nearby-entities%"
+    - ""
+    - "&7Potion effects: %potion-effects%"
+    - "&8&m----------------------------------------"
+  cps: "%prefix% &7Last CPS for &c%player%&7: &c%cps%"
+  connection:
+    - "&8&m----------------------------------------"
+    - "&7Connection info for &c%player%"
+    - ""
+    - "&7Transaction ping: &c%transaction-ping%ms"
+    - "&7KeepAlive ping: &c%keepalive-ping%ms"
+    - ""
+    - "&7Last transaction reply: &c%last-replied-transaction%ms ago"
+    - "&7Queued transactions: &c%queued-transactions%"
+    - ""
+    - "&7Flying delay: &c%flying-delay%ms"
+    - "&8&m----------------------------------------"
+  logs:
+    color: '&7'
+    header-footer: '&8&m--------&r &7Logs for &c%player% &7(&c%page%&8/&c%max-pages%&7) &8&m--------'
+  top:
+    - "&8&m----------------------------------------"
+    - "&cMost violations:"
+    - " &8- &7%total-1-name% &7(&c%total-1-violations% VL&7)"
+    - " &8- &7%total-2-name% &7(&c%total-2-violations% VL&7)"
+    - " &8- &7%total-3-name% &7(&c%total-3-violations% VL&7)"
+    - " &8- &7%total-4-name% &7(&c%total-4-violations% VL&7)"
+    - " &8- &7%total-5-name% &7(&c%total-5-violations% VL&7)"
+    - ""
+    - "&cCombat:"
+    - " &8- &7%combat-1-name% &7(&c%combat-1-violations% VL&7)"
+    - " &8- &7%combat-2-name% &7(&c%combat-2-violations% VL&7)"
+    - " &8- &7%combat-3-name% &7(&c%combat-3-violations% VL&7)"
+    - " &8- &7%combat-4-name% &7(&c%combat-4-violations% VL&7)"
+    - " &8- &7%combat-5-name% &7(&c%combat-5-violations% VL&7)"
+    - ""
+    - "&cMovement:"
+    - " &8- &7%movement-1-name% &7(&c%movement-1-violations% VL&7)"
+    - " &8- &7%movement-2-name% &7(&c%movement-2-violations% VL&7)"
+    - " &8- &7%movement-3-name% &7(&c%movement-3-violations% VL&7)"
+    - " &8- &7%movement-4-name% &7(&c%movement-4-violations% VL&7)"
+    - " &8- &7%movement-5-name% &7(&c%movement-5-violations% VL&7)"
+    - ""
+    - "&cPlayer:"
+    - " &8- &7%player-1-name% &7(&c%player-1-violations% VL&7)"
+    - " &8- &7%player-2-name% &7(&c%player-2-violations% VL&7)"
+    - " &8- &7%player-3-name% &7(&c%player-3-violations% VL&7)"
+    - " &8- &7%player-4-name% &7(&c%player-4-violations% VL&7)"
+    - " &8- &7%player-5-name% &7(&c%player-5-violations% VL&7)"
+    - "&8&m----------------------------------------"
+  jday:
+    list-header-footer: "&8&m----------------------------------------"
+    list-format: " &8- &7%name%"
+  punishlogs:
+    header-footer: '&8&m--------&r &7Punishments for &c%player% &8&m--------'
+  description: "%prefix% &7%check%: %description%"
+
+punishment-statistics-broadcast:
+  enabled: false
+  interval: 18000
+  broadcast:
+    - '&8&m----------------------------------------'
+    - '&4&lAntiGamingChair &7banned &c%amount% &7cheaters in the last 7 days.'
+    - '&8&m----------------------------------------'
+
+settings:
+  toggle-alerts-on-join: true
+  per-check-severities: true
+  cinematic: false
+  debug: false
+  check-for-updates: true
+  inject-early: true
+  # CartZone pushes players a lot (grapple, TNT carts, wind charges, ghast drops), so the
+  # exemption after plugin velocity is a little longer than Vulcan's default.
+  max-velocity-ticks: 80
+  max-logs-file-size: 7500
+  server-name: 'CartZone'
+  async-alerts: true
+  enable-api: true
+  update-checker: true
+  # Wait 10 s between the last flag and the ban, so the alert is in chat before they vanish.
+  punishment-delay: 10000
+  ignore-floodgate: true
+  ignore-flags-geyser-client-brand: false
+  join-check-wait-time: 2500
+  ignore-geyser-uuids: true
+  ignore-geyser-prefixes: true
+  ignore-geyser-prefix: "*"
+  max-alert-violation: 250
+  flight-cooldown: 40
+  top-command-unresolved: "Nobody"
+  ignore-if-in-judgement-day: false
+  ignore-vivecraft: false
+  lenient-scaffolding: true
+  bstats: true
+  entity-collision: true
+  hook-mcmmo: true
+  hook-mythicmobs: true
+  hook-gsit: true
+  hook-brewery: true
+  ignore-alerts-over-max-violations: false
+  ignore-alerts-over-max-violations-amount: 3
+  incompatability-manager: true
+  plugin-messaging: true
+  dont-setback-lower-positions: false
+  min-ticks-existed: 3
+  velocity-world-border: false
+  entity-cram-fix-enabled: false
+  entity-cram-entities-amount: 10
+  entity-cram-exempt-ticks: 30
+  handle-attributes: true
+  dont-register-geyser: false
+
+discord-webhook:
+  cooldown: false
+  cooldown-reset-ticks: 12000
+  cooldown-max-webhooks: 100
+  alerts:
+    enabled: false
+    url: 'insert-webhook-url-here'
+    avatar: 'https://i.imgur.com/JPG1Kwk.png'
+    thumbnail: 'http://cravatar.eu/avatar/%name%/64.png'
+    color-r: 252
+    color-g: 140
+    color-b: 3
+    username: 'AntiGamingChair'
+    title: 'AntiGamingChair alert'
+    description: '**`%player%`** failed %check% %dev%(Type %type%)%dev% [%vl%/%max-vl%]'
+    content: ''
+    information-field: false
+    client-version-field: true
+    client-brand-field: true
+    server-name-field: false
+    description-field: false
+    location-field: true
+    ping-tps-field: true
+  punishments:
+    enabled: false
+    url: 'insert-webhook-url-here'
+    avatar: 'https://i.imgur.com/JPG1Kwk.png'
+    thumbnail: 'http://cravatar.eu/avatar/%name%/64.png'
+    color-r: 255
+    color-g: 0
+    color-b: 0
+    username: 'AntiGamingChair'
+    title: 'AntiGamingChair ban'
+    description: '**`%player%`** got banned for %check% (Type %type%) [VL: %vl%]'
+    content: ''
+    description-field: false
+    server-name-field: false
+    client-brand-field: false
+    client-version-field: false
+    ping-tps-field: false
+    location-field: false
+
+########################################################################################################################
+# Checks. max-violations is the VL that triggers punishment-commands (when punishable: true).
+# BAN = 'offence %player% cheating AntiGamingChair %check% %type%' (CartZone's cheating ladder).
+########################################################################################################################
+checks:
+  combat:
+    aim:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .75
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .65
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: .75
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .5
+          decay: .75
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      e:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .75
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      f:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 12
+          multiple: .5
+          decay: .45
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      g:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .75
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      h:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 7
+          multiple: .5
+          decay: .75
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      i:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 7
+          multiple: .5
+          decay: .75
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      k:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      l:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 10
+          multiple: .45
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      m:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .4
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      n:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      o:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      p:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .4
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      q:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      r:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 20
+          multiple: .3
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      s:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 20
+          multiple: .25
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      u:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      w:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 20
+          multiple: .25
+          decay: .125
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      x:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 12
+          multiple: .25
+          decay: .125
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      y:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: -1
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+    autoblock:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .5
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+    # Only A (raw CPS over 25) bans. The rest are statistics and only ever alert.
+    autoclicker:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-cps: 25
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .5
+      c:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: 1
+      d:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .5
+      e:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .75
+      f:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: 1.25
+      g:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .25
+          decay: 1.25
+      h:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: 1
+      i:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: 1.25
+      j:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: 1.25
+      k:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .75
+      l:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: 1
+      m:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .75
+      n:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 25
+          multiple: .15
+          decay: .75
+      o:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .25
+          decay: 1.25
+      p:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+      q:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 35
+          multiple: .3
+          decay: 2.0
+      r:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 50
+          multiple: .15
+          decay: 10
+      s:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 30
+          multiple: .15
+          decay: .825
+      t:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 25
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 25
+          multiple: .15
+          decay: .75
+        min-kurtosis: 13
+    reach:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .035
+        max-reach: 3.03
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .25
+          decay: .225
+        max-reach: 3.15
+    fastbow:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .125
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+    criticals:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .05
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .05
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+    killaura:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .6
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .5
+          decay: .25
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      f:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 10
+          multiple: .25
+          decay: 2
+      h:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      j:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .5
+      k:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .75
+      l:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .6
+          decay: .5
+        hotbar-shuffle:
+          enabled: false
+          minimum-vl-to-shuffle: 2
+          shuffle-every: 2
+        random-rotation:
+          enabled: false
+          minimum-vl-to-randomly-rotate: 2
+          rotate-every: 2
+    hitbox:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .125
+        max-angle: .36
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .25
+          decay: .125
+        max-angle: 45
+    # Anti-knockback. TNT carts, wind charges and the grapple all push players around, so these alert only.
+    velocity:
+      a:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .075
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .35
+          decay: .125
+      c:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .25
+          decay: .175
+      d:
+        enabled: false
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 15
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .05
+  movement:
+    noslow:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .15
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 7
+          multiple: .25
+          decay: .075
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 7
+          multiple: .25
+          decay: .15
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 7
+          multiple: .25
+          decay: .15
+      e:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 7
+          multiple: .25
+          decay: .15
+    # Launches (TNT carts, wind charges, grapple, ghast drops) move players in ways these read as
+    # cheating, so motion only alerts.
+    motion:
+      a:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .25
+      b:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .25
+      c:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .05
+      d:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .05
+      e:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .05
+      g:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .15
+      h:
+        enabled: false
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 20
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .15
+    # Wind charges and explosions make people jump funny, so jump only alerts.
+    jump:
+      a:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 8
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .15
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 8
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .15
+      c:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .15
+    step:
+      a:
+        enabled: true
+        punishable: true
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      b:
+        enabled: true
+        punishable: true
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .25
+          decay: .35
+      c:
+        enabled: true
+        punishable: true
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .1
+    boatfly:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .33
+          decay: .125
+        kick-out: false
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .25
+          decay: .25
+        kick-out: false
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .25
+          decay: .125
+        kick-out: false
+    # Riding happy ghasts and minecarts: alert only.
+    entityflight:
+      a:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: .25
+        kick-out: false
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: .25
+    antilevitation:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .25
+          decay: .075
+    nosaddle:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .125
+    # Minecarts on powered rails are fast on purpose: alert only.
+    entityspeed:
+      a:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .5
+          decay: .25
+        kick-out: false
+        min-difference: .01
+    # Everyone glides in from the ghasts on a forced elytra: alert only.
+    elytra:
+      a:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .25
+        max-speed: 4.25
+      b:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .25
+          decay: .125
+      c:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .125
+      f:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .25
+          decay: .125
+      g:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 8
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .1
+      i:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .1
+      k:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .1
+      l:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .1
+      m:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .1
+      n:
+        enabled: false
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 20
+        alert-interval: 1
+        dont-alert-until: 2
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .045
+    # TNT carts, wind charges and the grapple make players fast: alert only.
+    speed:
+      a:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 4
+        alert-interval: 1
+        dont-alert-until: 2
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .35
+          decay: .125
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 2
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .045
+        min-difference: .0025
+      c:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 2
+        dont-alert-until: 2
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .045
+        min-difference: .001
+      d:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 2
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .045
+        min-difference: .0025
+      e:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 2
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .025
+    fastclimb:
+      a:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .125
+    wallclimb:
+      a:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .35
+          decay: .225
+    jesus:
+      a:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .025
+      b:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .175
+      c:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 10
+          multiple: .45
+          decay: .75
+      d:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .45
+          decay: .175
+      e:
+        enabled: true
+        punishable: true
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 10
+          multiple: .25
+          decay: .175
+    # Ghast drops, gliding and launches: alert only.
+    flight:
+      a:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 5
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 10
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .65
+          decay: .275
+        ignore-ghost-blocks: true
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 5
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 10
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .275
+      c:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 5
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 10
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .75
+          decay: .225
+        ignore-ghost-blocks: true
+      d:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 5
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 10
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .35
+          decay: .275
+        ignore-ghost-blocks: true
+      e:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 5
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 10
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .4
+          decay: .5
+        ignore-ghost-blocks: true
+      f:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 5
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: false
+        max-violations: 10
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .4
+          decay: .04
+    vclip:
+      a:
+        enabled: true
+        punishable: false
+        setback: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 20
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+    sprint:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .25
+          decay: .4
+    # Knockback from launches changes direction mid-air: alert only.
+    strafe:
+      a:
+        enabled: true
+        punishable: false
+        setback: false
+        min-vl-to-setback: 1
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 2
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .5
+          decay: .05
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .15
+          decay: .075
+  player:
+    fastuse:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+    fastplace:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-blocks: 15
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .25
+          decay: .5
+        max-blocks: 4
+    fastbreak:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .5
+        min-difference: -125
+    tower:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .75
+    scaffold:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .25
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .5
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .5
+      e:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .5
+      f:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .1
+      g:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .25
+      h:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .25
+          decay: .35
+      i:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      j:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      k:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .35
+        max-blocks: 6
+      m:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 4
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .25
+      n:
+        enabled: false
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 12
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .25
+      o:
+        enabled: false
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 12
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+    # Lag spikes set timer off too, so it keeps the fake timeout kick instead of a ban.
+    timer:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 8
+        alert-interval: 2
+        dont-alert-until: 3
+        maximum-ping: 100000
+        minimum-tps: 19.8
+        punishment-commands:
+          - 'minecraft:kick %player% Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+        buffer:
+          max: 35
+          multiple: .425
+          decay: 1.85
+        max-speed: 1.05
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 20
+        alert-interval: 2
+        dont-alert-until: 8
+        maximum-ping: 100000
+        minimum-tps: 19.8
+        punishment-commands:
+          - 'minecraft:kick %player% Internal Exception: io.netty.handler.timeout.ReadTimeoutException'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .25
+        max-balance: 75
+    baritone:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 20
+          multiple: .5
+          decay: .25
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .5
+          decay: .05
+    ghosthand:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        cancel: true
+    airplace:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+    badpackets:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .5
+          decay: .25
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .01
+      e:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      f:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      g:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      h:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      i:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      j:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      k:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .4
+      m:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .33
+          decay: .25
+      n:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 20
+          multiple: .25
+          decay: 2.5
+      o:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .15
+      p:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .15
+      q:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .15
+      r:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .25
+      s:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      t:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      u:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      v:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .5
+          decay: .075
+        kick-out: false
+      w:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .5
+          decay: .75
+      x:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 6
+          multiple: .5
+          decay: .35
+      y:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      z:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      1:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 12
+          multiple: .25
+          decay: .25
+      2:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 12
+          multiple: .25
+          decay: .25
+      4:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .25
+          decay: .025
+      5:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      6:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .05
+      7:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 10
+          multiple: .25
+          decay: .05
+      8:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 5
+          multiple: .25
+          decay: .05
+      9:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+    inventory:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .25
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .25
+          decay: .25
+    invalid:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .25
+          decay: .045
+      d:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 8
+          multiple: .25
+          decay: .5
+      e:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 3
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .01
+      f:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .01
+      g:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 2
+          multiple: .5
+          decay: .025
+      h:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .05
+      i:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 3
+          multiple: .5
+          decay: .05
+      j:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        setback: false
+        min-vl-to-setback: 1
+        broadcast-punishment: true
+        max-violations: 7
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 1
+          multiple: .5
+          decay: .05
+    groundspoof:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .125
+      b:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 2
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .125
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 5
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        buffer:
+          max: 4
+          multiple: .5
+          decay: .125
+    # "Too many violations in a category" checks. Movement and autoclicker (and the total, which
+    # includes them) only alert, since those categories pick up CartZone's own mechanics.
+    improbable:
+      a:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-combat-violations: 12
+      b:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-movement-violations: 30
+      c:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-player-violations: 15
+      d:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-autoclicker-violations: 30
+      e:
+        enabled: true
+        punishable: false
+        discord-alert-interval: 1
+        broadcast-punishment: false
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-total-violations: 50
+      f:
+        enabled: true
+        punishable: true
+        discord-alert-interval: 1
+        broadcast-punishment: true
+        max-violations: 1
+        alert-interval: 1
+        dont-alert-until: 1
+        maximum-ping: 100000
+        minimum-tps: 19.0
+        punishment-commands:
+          - 'offence %player% cheating AntiGamingChair %check% %type%'
+        max-scaffold-violations: 12
