@@ -39,6 +39,7 @@ public final class Zone {
     private Match match;
     private long tick;
     private boolean wasGrace;
+    private int lastTickSound = -1;
     private final ZoneWall wall;
     /** Without the pack: a plain red bar. With it: the PINK bar (invisible in the pack) carries the hexagon row. */
     private final BossBar bar = BossBar.bossBar(net.kyori.adventure.text.Component.empty(), 1f, BossBar.Color.RED, BossBar.Overlay.NOTCHED_10);
@@ -134,9 +135,9 @@ public final class Zone {
         return task != null;
     }
 
-    /** Grace period at the start (match.grace-minutes): no PvP and the zone holds still. Added on top of the zone time. */
+    /** Grace period at the start (match.grace-seconds): no PvP and the zone holds still. Added on top of the zone time. */
     public long graceMs() {
-        return Math.max(0, plugin.getConfig().getInt("match.grace-minutes", 5)) * 60_000L;
+        return Math.max(0, plugin.getConfig().getInt("match.grace-seconds", 120)) * 1000L;
     }
 
     public boolean inGrace() {
@@ -162,6 +163,7 @@ public final class Zone {
         tick = 0;
         wall.model(yml.get().getString("wall.item-model", "lodestone:border"));
         wasGrace = graceMs() > 0;
+        lastTickSound = -1;
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);
     }
 
@@ -171,7 +173,6 @@ public final class Zone {
         wall.clear();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.hideBossBar(bar);
-        p.hideBossBar(hexBar);
             p.hideBossBar(hexBar);
         }
         match = null;
@@ -210,12 +211,41 @@ public final class Zone {
             if (!playing) continue;
             if (outside) {
                 if (tick % 20 == 0) plugin.msg().actionbar(p, "zone.outside", "distance", (int) Math.ceil(c.distanceOutside(l.getX(), l.getZ())));
-                if (tick % interval == 0) {
-                    p.damage(s.damageHp(), DamageSource.builder(DamageType.OUTSIDE_BORDER).build());
-                }
+                if (tick % interval == 0) zoneDamage(p, s.damageHp(), c.distanceOutside(l.getX(), l.getZ()));
             }
         }
         wall.retain(walled);
+    }
+
+    /**
+     * Zone damage grows with distance outside (zone.yml damage-per-block, capped at max-damage)
+     * and goes straight through armor, Protection and Resistance: absorption hearts first, then
+     * health. A hit that would kill goes through the normal damage path, so the death is still
+     * credited to the zone (and any last attacker) like before.
+     */
+    private void zoneDamage(Player p, double base, double outside) {
+        double perBlock = yml.get().getDouble("damage-per-block", 0.15), max = yml.get().getDouble("max-damage", 16);
+        double dmg = Math.min(max, base + Math.max(0, outside) * perBlock);
+        double abs = p.getAbsorptionAmount();
+        if (abs > 0) {
+            double used = Math.min(abs, dmg);
+            p.setAbsorptionAmount(abs - used);
+            dmg -= used;
+        }
+        if (dmg <= 0) {
+            p.playHurtAnimation(0);
+            return;
+        }
+        if (p.getHealth() - dmg <= 0) {
+            p.damage(1_000_000, DamageSource.builder(DamageType.OUTSIDE_BORDER).build());
+            return;
+        }
+        p.setHealth(p.getHealth() - dmg);
+        p.playHurtAnimation(0);
+        p.getWorld().playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_HURT, 1f, 1f);
+        // Keeps the last-damage cause on the zone, which is how deaths get attributed.
+        p.setLastDamageCause(new org.bukkit.event.entity.EntityDamageEvent(p, org.bukkit.event.entity.EntityDamageEvent.DamageCause.WORLD_BORDER,
+            DamageSource.builder(DamageType.OUTSIDE_BORDER).build(), dmg));
     }
 
     /** For /cart diag: how many players are seeing the shader wall right now. */
@@ -240,7 +270,9 @@ public final class Zone {
         boolean grace = inGrace();
         boolean closed = !grace && !s.shrinking() && s.phase() >= plan.phases().size();
         int secs = grace ? graceSecondsLeft() : (int) Math.ceil(s.secondsLeftInStep());
-        String key = grace ? "zone.hud-grace" : closed ? "zone.hud-closed" : s.shrinking() ? "zone.hud-shrinking" : "zone.hud-waiting";
+        // Grace counts down to PvP: green, yellow for the last 30 s, blinking red for the last 10.
+        String key = grace ? (secs <= 10 ? "zone.hud-pvp-in-now" : secs <= 30 ? "zone.hud-pvp-in-soon" : "zone.hud-pvp-in")
+            : closed ? "zone.hud-closed" : s.shrinking() ? "zone.hud-shrinking" : "zone.hud-waiting";
         net.kyori.adventure.text.Component title = plugin.msg().get(key, "time", String.format("%d:%02d", secs / 60, secs % 60),
             "phase", s.phase() + 1, "phases", plan.phases().size(),
             "radius", (int) Math.round(s.circle().r()), "target", (int) Math.round(s.target().r()));
@@ -252,9 +284,18 @@ public final class Zone {
         int cells = com.cartroyale.lobby.HudText.HEX_CELLS;
         int full = (int) Math.ceil(left * cells - 1e-9);
         int edge = !grace && s.shrinking() && full > 0 ? full - 1 : -1;
-        hexBar.name(com.cartroyale.lobby.HudText.zoneBar(title, full, edge, grace));
+        char lit = com.cartroyale.lobby.HudText.HEX_FULL;
+        if (grace) {
+            lit = secs <= 10 ? ((tick / 10) % 2 == 0 ? com.cartroyale.lobby.HudText.HEX_FULL : com.cartroyale.lobby.HudText.HEX_EMPTY)
+                : secs <= 30 ? com.cartroyale.lobby.HudText.HEX_WARN : com.cartroyale.lobby.HudText.HEX_GRACE;
+            if (secs <= 5 && secs != lastTickSound) {
+                lastTickSound = secs;
+                for (Player p : world.getPlayers()) p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 1.4f);
+            }
+        }
+        hexBar.name(com.cartroyale.lobby.HudText.zoneBar(title, full, edge, lit));
         bar.name(title);
-        bar.color(grace ? BossBar.Color.GREEN : BossBar.Color.RED);
+        bar.color(grace ? (secs <= 30 ? BossBar.Color.YELLOW : BossBar.Color.GREEN) : BossBar.Color.RED);
         bar.progress((float) left);
     }
 

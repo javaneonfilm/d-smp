@@ -184,6 +184,7 @@ def hex_cells():
         "hex_empty.png": hex_cell((0, 0, 0, 110), (0, 0, 0, 110), (0, 0, 0, 170)),             # time used up
         "hex_grace.png": hex_cell((52, 190, 70, 235), (130, 240, 140, 235), (12, 70, 20, 235)),  # grace period
         "hex_edge.png": hex_cell((255, 150, 40, 240), (255, 210, 120, 240), (110, 50, 6, 240)),  # the cell draining now
+        "hex_warn.png": hex_cell((240, 200, 40, 240), (255, 240, 140, 240), (100, 80, 6, 240)),  # grace almost over
     }
 
 
@@ -206,6 +207,7 @@ def hud_font():
             {"type": "bitmap", "file": "cartzone:font/hex_empty.png", "ascent": -2, "height": 10, "chars": [""]},
             {"type": "bitmap", "file": "cartzone:font/hex_grace.png", "ascent": -2, "height": 10, "chars": [""]},
             {"type": "bitmap", "file": "cartzone:font/hex_edge.png", "ascent": -2, "height": 10, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/hex_warn.png", "ascent": -2, "height": 10, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
     }

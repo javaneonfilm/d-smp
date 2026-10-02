@@ -164,6 +164,12 @@ public final class Lobby implements Listener {
             inv.setChestplate(ely);
         }
         inv.setHeldItemSlot(cfg.getInt("lobby-items.cosmetics.slot", 4));
+        // Clearing and refilling a slot in the same tick can leave the client showing it empty
+        // (the sync thinks the client still has the old, identical item), which is how the lobby
+        // elytra "vanished" after the void teleport. A full resync next tick fixes what they see.
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (p.isOnline()) p.updateInventory();
+        });
     }
 
     private ItemStack grapple() {

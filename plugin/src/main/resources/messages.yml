@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 2
+messages-version: 3
 
 prefix: '<#FF2B2B><b>CartZone</b> <dark_gray>|</dark_gray> '
 
@@ -125,7 +125,7 @@ board:
   squad-title: ' <gray>Squad'
   no-game: 'nothing planned'
   zone-off: '-'
-  zone-grace: 'grace <time>'
+  zone-grace: 'PvP in <time>'
   zone-waiting: 'moves in <time>'
   zone-shrinking: 'shrinking <time>'
   zone-closed: 'closed'
@@ -193,7 +193,7 @@ game:
   reason-stopped: 'stopped by <by>'
   reason-cancelled: 'cancelled by <by>'
   zone-start: '<prefix><white>Everyone''s down, zone is live.'
-  zone-start-grace: '<prefix><white>Everyone''s down. <#55FF55><grace> min grace</#55FF55>, no PvP till then. Zone closes <minutes> min after that.'
+  zone-start-grace: '<prefix><white>Everyone''s down. <gray>PvP turns on in <#55FF55><grace></#55FF55>, then the zone closes over <minutes> min.'
   elim: '<gray><victim> died. <dark_gray><left> left'
   elim-by: '<#FF2B2B><killer></#FF2B2B> <gray>killed</gray> <white><victim></white><gray>. <dark_gray><left> left'
   elim-quit: '<gray><victim> left. <dark_gray><left> left'
@@ -231,15 +231,19 @@ deploy:
 
 zone:
   outside: '<#FF2B2B><b>OUTSIDE THE ZONE</b></#FF2B2B> <gray><distance> blocks out'
-  hud-grace: '<#55FF55><b>GRACE</b> <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP yet'
+  hud-grace: '<#55FF55><b>PVP ON IN</b> <white><b><time></b>'
+  hud-pvp-in: '<white><b>PVP ON IN</b> <#55FF55><b><time></b></#55FF55> <dark_gray>|</dark_gray> <gray>loot up'
+  hud-pvp-in-soon: '<white><b>PVP ON IN</b> <#FFD24A><b><time></b></#FFD24A> <dark_gray>|</dark_gray> <gray>get ready'
+  hud-pvp-in-now: '<#FF2B2B><b>PVP ON IN <time></b>'
   hud-waiting: '<white><b>ZONE <phase>/<phases></b> <gray>moves in <#FFD24A><time></#FFD24A> <dark_gray>|</dark_gray> <gray>radius <white><radius>'
   hud-shrinking: '<#FF8A1F><b>SHRINKING</b> <white><time></white> <dark_gray>|</dark_gray> <gray><white><radius></white> to <white><target>'
   hud-closed: '<#FF2B2B><b>ZONE CLOSED</b> <dark_gray>|</dark_gray> <gray>last one alive wins'
   bar-grace: '<#55FF55>Grace <white><time></white> <dark_gray>|</dark_gray> <gray>no PvP yet'
-  grace-over: '<prefix><#FF2B2B><b>Grace is over.</b> <white>PvP is on and the zone starts moving.'
+  grace-over: '<prefix><#FF2B2B><b>PvP is on.</b> <white>The zone starts moving now.'
   grace-over-title: '<#FF2B2B><b>PVP ON'
-  grace-over-sub: '<gray>grace is over'
-  grace-no-pvp: '<#55FF55>No PvP for another <white><seconds>s'
+  grace-over-sub: '<gray>the zone starts moving'
+  grace-no-pvp: '<#55FF55>PvP turns on in <white><seconds>s'
+  grace-no-carts: '<#55FF55>TNT carts don''t go off until PvP is on (<white><seconds>s</white>)'
   bar-waiting: '<white>Zone <phase>/<phases> <gray>moves in <yellow><seconds>s</yellow> <dark_gray>|</dark_gray> <gray>r <radius>'
   bar-shrinking: '<#FF2B2B>Zone shrinking <gray><seconds>s <dark_gray>|</dark_gray> <gray>r <radius>'
   bar-orbit: '<#FF2B2B>Final zone moving <dark_gray>|</dark_gray> <gray>r <radius>'
@@ -468,6 +472,7 @@ help:
     - '<#FF2B2B><b>CartZone</b>'
     - '<white>/cart host <gray>host a game with your ticket'
     - '<white>/team invite|accept|leave|list <gray>team up after the purge'
+    - '<white>/tc [message] <gray>team chat, or /tc on its own to toggle it'
     - '<white>/spectate <gray>follow someone while spectating'
   admin:
     - '<#FF2B2B><b>CartZone admin</b>'
@@ -515,7 +520,7 @@ gui:
     cap: '<white>Player cap: <yellow><value>'
     cap-lore: ['<gray>Max players who get in.', '<gray>Between <min> and <max>.', '<dark_gray>Left +10, right -10, shift for 1']
     duration: '<white>Zone closes after: <yellow><value> min'
-    duration-lore: ['<gray>Plus the 5 min grace at the start.', '<gray>Between <min> and <max> min.', '<dark_gray>Left +5, right -5, shift for 1']
+    duration-lore: ['<gray>Plus 2 min at the start before PvP.', '<gray>Between <min> and <max> min.', '<dark_gray>Left +5, right -5, shift for 1']
     map: '<white>Map: <yellow><value>'
     map-lore: ['<dark_gray>Left next, right previous']
     time: '<white>Starts: <yellow><value>'
@@ -639,6 +644,12 @@ selftest:
   pass: '<#55FF55>PASS</#55FF55> <white><check></white> <gray>(<detail>)'
   fail: '<#FF2B2B>FAIL</#FF2B2B> <white><check></white> <gray>(<detail>)'
   drops: '<gray>Dropped items: <white><drops>'
+
+teamchat:
+  format: '<#55FF55>[Team]</#55FF55> <name><dark_gray>:</dark_gray> <white><message>'
+  on: '<prefix><white>Team chat on. <gray>Everything you type goes to your team. /tc again to turn it off.'
+  off: '<prefix><white>Team chat off.'
+  no-team: '<prefix><gray>You''re not on a team right now.'
 
 offence:
   muted: '<prefix><#FF2B2B>You''re muted for <length></#FF2B2B> <gray>(<type>). Ends <until>.'

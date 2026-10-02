@@ -162,6 +162,15 @@ public final class CartCommand implements TabExecutor {
                         return usage(s, "/cart npc <set|remove|refresh> [1-3]");
                     }
                 }
+                case "testperm" -> {
+                    // Hidden, for testing perks without LuckPerms: /cart testperm <node> [player]. Lasts until they log out.
+                    if (a.length < 2) return usage(s, "/cart testperm <node> [player]");
+                    Player p = a.length > 2 ? Bukkit.getPlayerExact(a[2]) : s instanceof Player self ? self : null;
+                    if (p == null) return usage(s, "/cart testperm <node> [player]");
+                    p.addAttachment(plugin, a[1], true);
+                    plugin.lobby().reset(p);
+                    s.sendMessage("Gave " + p.getName() + " " + a[1] + " until they log out.");
+                }
                 case "webhook" -> {
                     // /cart webhook test [ping]: one embed to Discord, then what Discord said.
                     if (a.length < 2 || !a[1].equalsIgnoreCase("test")) return usage(s, "/cart webhook test [ping]");

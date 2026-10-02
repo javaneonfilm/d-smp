@@ -13,6 +13,10 @@ phases:
 # close-fully: the last circle shrinks to nothing (radius 0), so the zone is fully closed at the end.
 # max-speed: no shrink is faster than this many blocks per second; the time comes out of the wait.
 close-fully: true
+# Zone damage = the phase's damage + damage-per-block for every block you are outside the circle,
+# never more than max-damage per hit (half-hearts). It ignores armor, Protection and Resistance.
+damage-per-block: 0.15
+max-damage: 16
 max-speed: 1.5
 
 # Only without close-fully: after the last phase the final circle orbits on a ring of this radius at walking speed.

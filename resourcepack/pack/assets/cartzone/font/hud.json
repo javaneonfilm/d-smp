@@ -55,6 +55,15 @@
       ]
     },
     {
+      "type": "bitmap",
+      "file": "cartzone:font/hex_warn.png",
+      "ascent": -2,
+      "height": 10,
+      "chars": [
+        "\ue014"
+      ]
+    },
+    {
       "type": "space",
       "advances": {
         "\uf801": -1,

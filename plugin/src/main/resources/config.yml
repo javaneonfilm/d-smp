@@ -78,7 +78,7 @@ elytra:
   allow-fireworks: false
 
 match:
-  grace-minutes: 5          # after everyone lands: no PvP and the zone holds still for this long
+  grace-seconds: 120        # after everyone lands: no PvP (carts included) and the zone holds still
   zone-close-minutes: 20    # then the zone is fully closed this long later (unless the host picks 20-40)
   hard-timeout-extra-minutes: 5
   end-kick-seconds: 10

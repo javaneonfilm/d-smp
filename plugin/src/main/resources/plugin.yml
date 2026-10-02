@@ -15,6 +15,10 @@ commands:
   team:
     description: Team up before a team game.
     usage: /team <invite|accept|leave|list>
+  teamchat:
+    description: Chat with your team only. Without a message it toggles team chat on/off.
+    usage: /teamchat [message]
+    aliases: [tc]
   spectate:
     description: Pick a player to follow while spectating.
     usage: /spectate

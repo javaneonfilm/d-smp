@@ -178,6 +178,9 @@ public final class CartRoyale extends JavaPlugin {
         bind("kitready", small);
         bind("spectate", small);
         bind("offence", new com.cartroyale.mod.OffenceGui(this));
+        com.cartroyale.match.TeamChat teamChat = new com.cartroyale.match.TeamChat(this);
+        bind("teamchat", teamChat);
+        register(teamChat);
 
         stats = new Stats(this);
         leaderboard = new com.cartroyale.lobby.Leaderboard(this);

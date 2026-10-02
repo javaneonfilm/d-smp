@@ -34,6 +34,6 @@ public final class Times {
     /** "07:42" style duration for mm:ss. */
     public static String mmss(long seconds) {
         if (seconds < 0) seconds = 0;
-        return String.format(Locale.ROOT, "%02d:%02d", seconds / 60, seconds % 60);
+        return String.format(Locale.ROOT, "%d:%02d", seconds / 60, seconds % 60);
     }
 }

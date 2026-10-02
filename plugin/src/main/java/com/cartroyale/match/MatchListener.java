@@ -74,6 +74,21 @@ public final class MatchListener implements Listener {
         }
     }
 
+    /**
+     * Grace: TNT carts don't go off at all. Blocking only the damage wasn't enough, because the
+     * crater still dropped people to their death.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onCartPrime(org.bukkit.event.entity.ExplosionPrimeEvent e) {
+        if (!(e.getEntity() instanceof ExplosiveMinecart cart) || !plugin.arenas().isArena(cart.getWorld())) return;
+        Match m = live();
+        if (m == null || m.state != GameState.PLAYING || !plugin.zone().inGrace()) return;
+        e.setCancelled(true);
+        String owner = cart.getPersistentDataContainer().get(Keys.CART_OWNER, PersistentDataType.STRING);
+        Player p = owner == null ? null : org.bukkit.Bukkit.getPlayer(UUID.fromString(owner));
+        if (p != null) plugin.msg().actionbar(p, "zone.grace-no-carts", "seconds", plugin.zone().graceSecondsLeft());
+    }
+
     /** Whoever hits a TNT cart (and so ignites it) becomes its owner. */
     @EventHandler(ignoreCancelled = true)
     public void onHitCart(VehicleDamageEvent e) {
@@ -89,6 +104,15 @@ public final class MatchListener implements Listener {
         if (!(e.getEntity() instanceof Player victim)) return;
         Match m = live();
         if (m == null || !m.isAlive(victim.getUniqueId())) return;
+        // Grace: TNT carts can't hurt anyone but whoever set them off (unowned ones hurt nobody).
+        if (m.state == GameState.PLAYING && plugin.zone().inGrace()
+            && (e.getDamager() instanceof ExplosiveMinecart || e.getDamager() instanceof TNTPrimed || e.getDamager() instanceof org.bukkit.entity.Minecart)) {
+            UUID owner = responsible(e.getDamager());
+            if (owner == null || !owner.equals(victim.getUniqueId())) {
+                e.setCancelled(true);
+                return;
+            }
+        }
         UUID attacker = responsible(e.getDamager());
         if (attacker == null || attacker.equals(victim.getUniqueId())) return;
         if (m.state != GameState.PLAYING) {

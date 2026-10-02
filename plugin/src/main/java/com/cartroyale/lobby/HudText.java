@@ -62,17 +62,17 @@ public final class HudText {
     // ---------------- zone boss bar ----------------
 
     public static final int HEX_CELLS = 16, HEX_ADVANCE = 10;
-    private static final char HEX_FULL = '', HEX_EMPTY = '', HEX_GRACE = '', HEX_EDGE = '';
+    public static final char HEX_FULL = '', HEX_EMPTY = '', HEX_GRACE = '', HEX_EDGE = '', HEX_WARN = '';
 
     /**
      * The zone bar for players with the pack: a row of hexagon cells where the (invisible) vanilla
      * bar sits, and the title centred above it. {@code full} cells are lit; {@code edge} marks the
-     * cell draining right now (-1 for none); grace lights them green.
+     * cell draining right now (-1 for none); {@code lit} is the glyph for lit cells (colour).
      */
-    public static Component zoneBar(Component title, int full, int edge, boolean grace) {
+    public static Component zoneBar(Component title, int full, int edge, char lit) {
         StringBuilder row = new StringBuilder();
         for (int i = 0; i < HEX_CELLS; i++) {
-            row.append(i == edge ? HEX_EDGE : i < full ? (grace ? HEX_GRACE : HEX_FULL) : HEX_EMPTY);
+            row.append(i == edge ? HEX_EDGE : i < full ? lit : HEX_EMPTY);
         }
         int w = HEX_CELLS * HEX_ADVANCE, t = width(title);
         // Row first, then step back so the title is centred over it, then forward to the row's end.

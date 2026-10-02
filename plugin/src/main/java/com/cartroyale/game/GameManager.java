@@ -320,7 +320,7 @@ public final class GameManager {
                 if (left <= 0) finishTeaming();
             }
             case PLAYING -> {
-                long hard = (match.row.s.minutes + plugin.getConfig().getInt("match.grace-minutes", 5) + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
+                long hard = (match.row.s.minutes + (plugin.getConfig().getInt("match.grace-seconds", 120) + 59) / 60 + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
                 if (now - match.playingAt >= hard) end(true);
             }
             case ENDING -> {
@@ -531,7 +531,7 @@ public final class GameManager {
         plugin.zone().start(match, plugin.arenas().world(), plugin.arenas().map());
         for (UUID u : match.players.keySet()) {
             Player p = Bukkit.getPlayer(u);
-            if (p != null) plugin.msg().send(p, "game.zone-start-grace", "minutes", match.row.s.minutes, "grace", plugin.getConfig().getInt("match.grace-minutes", 5));
+            if (p != null) plugin.msg().send(p, "game.zone-start-grace", "minutes", match.row.s.minutes, "grace", com.cartroyale.util.Times.mmss(plugin.getConfig().getInt("match.grace-seconds", 120)));
         }
         checkWin();
     }
