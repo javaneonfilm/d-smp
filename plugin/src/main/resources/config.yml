@@ -5,7 +5,7 @@ server-ip: cartzone.vip
 # Shown in the webhook title, e.g. "Game #12 (EU)". It is the server's region, not the domain.
 region: EU
 # Wall-clock times: schedule, Host GUI times, daily shop reset. Any Java zone id (UTC, Europe/Berlin...).
-timezone: UTC
+timezone: Europe/Berlin
 
 worlds:
   lobby: lobby        # the server's main world (level-name in server.properties)

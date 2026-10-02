@@ -111,6 +111,7 @@ public final class CartRoyale extends JavaPlugin {
         }
         saveDefaultConfig();
         migrateServerIp();
+        migrateTimezone();
         addNewRankTags();
         getConfig().options().copyDefaults(true);
         saveConfig();
@@ -267,6 +268,37 @@ public final class CartRoyale extends JavaPlugin {
      * The address became plain cartzone.vip (2026-10-01). Existing config.yml files have the old one
      * written in, so swap that single line in place (saveConfig would freeze every default into the file).
      */
+    /**
+     * 2026-10-02: schedule times were meant as German time, but the config said UTC, so every game
+     * started two hours late for him. Switches a config that still says UTC to Europe/Berlin, once
+     * (a marker file stops it from undoing a deliberate change back to UTC later).
+     */
+    private void migrateTimezone() {
+        java.io.File marker = new java.io.File(getDataFolder(), ".timezone-migrated");
+        java.io.File f = new java.io.File(getDataFolder(), "config.yml");
+        if (marker.exists() || !f.exists()) return;
+        try {
+            String txt = java.nio.file.Files.readString(f.toPath());
+            StringBuilder out = new StringBuilder();
+            boolean changed = false;
+            for (String line : txt.split("\n", -1)) {
+                if (line.startsWith("timezone:") && line.replace("'", "").replace("\"", "").trim().equals("timezone: UTC")) {
+                    line = "timezone: Europe/Berlin";
+                    changed = true;
+                }
+                out.append(line).append('\n');
+            }
+            if (changed) {
+                java.nio.file.Files.writeString(f.toPath(), out.substring(0, out.length() - 1));
+                reloadConfig();
+                getLogger().info("config.yml: timezone changed from UTC to Europe/Berlin (schedule times are German time now).");
+            }
+            java.nio.file.Files.writeString(marker.toPath(), "done\n");
+        } catch (java.io.IOException e) {
+            getLogger().warning("Could not update timezone in config.yml: " + e.getMessage());
+        }
+    }
+
     private void migrateServerIp() {
         java.io.File f = new java.io.File(getDataFolder(), "config.yml");
         try {

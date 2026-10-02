@@ -173,6 +173,7 @@ public final class Scheduler {
             s.squad = e.squad;
             s.purgeCap = e.purgeCap;
             s.map = e.map;
+            s.minutes = plugin.defaults().minutes; // the configured length, not GameSettings' built-in 30
             s.startAt = at;
             s.hosterName = plugin.getConfig().getString("schedule.hoster-name", "CartZone");
             tried.add(source);
