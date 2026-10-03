@@ -83,6 +83,7 @@ public final class CartRoyale extends JavaPlugin {
     private ScheduleGui scheduleGui;
     private LootEditorGui lootEditor;
     private Lobby lobby;
+    private com.cartroyale.hooks.VulcanHook vulcan;
     private Stats stats;
     private RankService rank;
     private GameManager games;
@@ -188,6 +189,12 @@ public final class CartRoyale extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             getLogger().info(com.cartroyale.hooks.papi.PapiHook.register(this) ? "PlaceholderAPI: %cartzone_*% placeholders registered." : "PlaceholderAPI: could not register %cartzone_*%.");
         }
+        vulcan = new com.cartroyale.hooks.VulcanHook(this);
+        int vh = vulcan.register();
+        if (vh > 0) getLogger().info("Vulcan: lobby, grapple and deploy glide are exempt (" + vh + " events hooked).");
+        else if (getServer().getPluginManager().isPluginEnabled("Vulcan")) getLogger().warning("Vulcan is on but its API events weren't found; check enable-api: true in Vulcan's config.");
+        // The locator bar gives away where everyone is; it stays off in every world.
+        for (org.bukkit.World w : Bukkit.getWorlds()) w.setGameRule(org.bukkit.GameRule.LOCATOR_BAR, false);
         games.startTicking();
         started = true;
         for (Player p : Bukkit.getOnlinePlayers()) lobby.send(p);
@@ -411,6 +418,7 @@ public final class CartRoyale extends JavaPlugin {
     public ScheduleGui scheduleGui() { return scheduleGui; }
     public LootEditorGui lootEditor() { return lootEditor; }
     public Lobby lobby() { return lobby; }
+    public com.cartroyale.hooks.VulcanHook vulcan() { return vulcan; }
     public Stats stats() { return stats; }
     public RankService rank() { return rank; }
     public GameManager games() { return games; }

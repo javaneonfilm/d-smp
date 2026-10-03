@@ -181,6 +181,7 @@ public final class ArenaManager {
         w.setGameRule(GameRule.DO_TILE_DROPS, false);
         w.setGameRule(GameRule.DO_ENTITY_DROPS, true);
         w.setGameRule(GameRule.FALL_DAMAGE, true);
+        w.setGameRule(GameRule.LOCATOR_BAR, false);
         w.setTime(6000);
         w.setStorm(false);
         w.getWorldBorder().setCenter(mc.centerX, mc.centerZ);

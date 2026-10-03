@@ -159,6 +159,13 @@ lobby-items:
     enabled: true
     slot: 8
 
+# Vulcan / AntiGamingChair: don't flag what CartZone does to players on purpose.
+anticheat:
+  # Ignore all flags in the lobby (elytra perk, grapple, wind charges, void rescue).
+  exempt-lobby: true
+  # Ignore flags this long after the plugin launches someone (grapple pull).
+  launch-exempt-ms: 4000
+
 webhooks:
   enabled: true
   username: CartZone

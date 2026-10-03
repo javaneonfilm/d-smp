@@ -82,6 +82,7 @@ public final class Lobby implements Listener {
         w.setGameRule(org.bukkit.GameRule.ANNOUNCE_ADVANCEMENTS, false);
         w.setGameRule(org.bukkit.GameRule.DO_IMMEDIATE_RESPAWN, true);
         w.setGameRule(org.bukkit.GameRule.SPAWN_RADIUS, 0);
+        w.setGameRule(org.bukkit.GameRule.LOCATOR_BAR, false);
         w.setStorm(false);
         w.setThundering(false);
     }
@@ -271,6 +272,7 @@ public final class Lobby implements Listener {
         Vector v = to.toVector().subtract(from.toVector()).normalize().multiply(speed);
         v.setY(v.getY() + plugin.getConfig().getDouble("lobby-items.grapple.pull-lift", 0.7));
         if (v.length() > max) v.normalize().multiply(max);
+        if (plugin.vulcan() != null) plugin.vulcan().launched(p);
         p.setVelocity(v);
         p.setFallDistance(0);
         p.getWorld().playSound(from, org.bukkit.Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1f, 0.7f);

@@ -133,6 +133,7 @@ public final class Presence implements Listener {
         if (bar != null) p.hideBossBar(bar);
         packLoaded.remove(p.getUniqueId());
         packFailed.remove(p.getUniqueId());
+        if (plugin.vulcan() != null) plugin.vulcan().quit(p);
         plugin.nametags().remove(p);
         plugin.sidebar().quit(p);
     }
