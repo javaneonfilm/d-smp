@@ -181,20 +181,21 @@ def cart_icon():
 
 
 # Squad cards (top-left HUD). Keep in sync with HudText.squadCard and cz_hud.glsl.
-CARD_W, CARD_H = 126, 18
+CARD_W, CARD_H = 136, 23
 WALL_MARKER = (204, 18, 52, 251)   # cz_wall.glsl CZ_WALL_MARKER
 
 
 def squad_card():
-    """126x18 glass card; the last row stays empty so stacked cards have a gap."""
+    """136x23 glass card (22 tall); the last row stays empty."""
     img = Image.new("RGBA", (CARD_W, CARD_H), (0, 0, 0, 0))
     img.paste(glass(CARD_W, CARD_H - 1), (0, 0))
     return img
 
 
-def bar_piece(w, track):
-    """w x 3 bar piece. Solid white (tinted by the text colour) or the faint track."""
-    return Image.new("RGBA", (w, 3), (255, 255, 255, 70) if track else (255, 255, 255, 255))
+def bar_piece(w, track, h=3):
+    """w x h bar piece. Solid white (tinted by the text colour) or the faint track. The font draws
+    it at its own height, so a 2 px bar needs 2 px images or its width gets scaled too."""
+    return Image.new("RGBA", (w, h), (255, 255, 255, 70) if track else (255, 255, 255, 255))
 
 
 def kills_icon():
@@ -242,7 +243,10 @@ def hud_font():
             # Bar pieces 1-128 px (E040-E047 solid, E048-E04F track), 11 px below the title's top.
         ] + [{"type": "bitmap", "file": f"cartzone:font/bar_{'track' if t else 'fill'}_{1 << i}.png", "ascent": -4, "height": 3,
               "chars": [chr(0xE040 + (8 if t else 0) + i)]} for t in (0, 1) for i in range(8)] + [
-            {"type": "bitmap", "file": "cartzone:font/kills.png", "ascent": 7, "height": 7, "chars": [""]},
+            # The same pieces, 2 px tall and 15 px below the title's top, for the squad cards.
+            {"type": "bitmap", "file": f"cartzone:font/card_bar_{'track' if t else 'fill'}_{1 << i}.png", "ascent": -8, "height": 2,
+             "chars": [chr(0xE050 + (8 if t else 0) + i)]} for t in (0, 1) for i in range(8)] + [
+            {"type": "bitmap", "file": "cartzone:font/kills.png", "ascent": 4, "height": 7, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
     }
@@ -270,6 +274,8 @@ def main():
     for i in range(8):
         save_png(f"assets/cartzone/textures/font/bar_fill_{1 << i}.png", bar_piece(1 << i, False))
         save_png(f"assets/cartzone/textures/font/bar_track_{1 << i}.png", bar_piece(1 << i, True))
+        save_png(f"assets/cartzone/textures/font/card_bar_fill_{1 << i}.png", bar_piece(1 << i, False, 2))
+        save_png(f"assets/cartzone/textures/font/card_bar_track_{1 << i}.png", bar_piece(1 << i, True, 2))
 
     # Rank badges in the DEFAULT font, so they work as plain characters anywhere: chat,
     # nametags, the tab list and the TAB plugin. Keep the chars in sync with config.yml rank-tags.
@@ -282,6 +288,10 @@ def main():
     save_png("assets/cartzone/textures/font/card.png", squad_card())
     save_png("assets/cartzone/textures/font/kills.png", kills_icon())
     write_json("assets/cartzone/font/hud.json", hud_font())
+    # Card text: the vanilla ASCII sheet, 3 px lower than normal text so names sit inside the card.
+    ascii_p = json.load(open(os.path.join(HERE, "ascii_provider.json"), encoding="utf-8"))
+    ascii_p["ascent"] = 4
+    write_json("assets/cartzone/font/card.json", {"providers": [{"type": "space", "advances": {" ": 4}}, ascii_p]})
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_progress.png", invisible_bar())
 

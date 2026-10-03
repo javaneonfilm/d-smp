@@ -134,10 +134,12 @@ public final class Stats {
         return sb.append('"').toString();
     }
 
-    /** The slot-9 stats book: the player's own numbers plus the website link. */
+    /** The slot-9 stats book: the player's own numbers, plus the website link if stats.site-url is set. */
     public void show(Player p) {
-        plugin.store().profile(p.getUniqueId()).thenAccept(pr -> Bukkit.getScheduler().runTask(plugin, () ->
-            plugin.msg().send(p, "stats.self", "coins", pr.coins(), "kills", pr.kills(), "wins", pr.wins(), "played", pr.played(),
-                "site", com.cartroyale.core.Msg.link(plugin.getConfig().getString("stats.site-url", "https://cartzone.vip/#boards")))));
+        plugin.store().profile(p.getUniqueId()).thenAccept(pr -> Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.msg().send(p, "stats.self", "coins", pr.coins(), "kills", pr.kills(), "wins", pr.wins(), "played", pr.played());
+            String site = plugin.getConfig().getString("stats.site-url", "");
+            if (site != null && !site.isBlank()) plugin.msg().send(p, "stats.self-site", "site", com.cartroyale.core.Msg.link(site));
+        }));
     }
 }

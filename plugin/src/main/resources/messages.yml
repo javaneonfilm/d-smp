@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 5
+messages-version: 6
 
 prefix: '<accent>●</accent> '
 
@@ -294,11 +294,13 @@ locker:
   preview-suffix: '<prefix><sub>Preview:'
 
 stats:
-  self: "<prefix><fg>Your stats\n<sub>Coins <coin><coins></coin>  Kills <fg><kills></fg>  Wins <fg><wins></fg>  Games <fg><played></fg>\n<sub>Leaderboards: <accent><u><site></u></accent>"
+  self: "<prefix><fg>Your stats\n<sub>Coins <coin><coins></coin>  Kills <fg><kills></fg>  Wins <fg><wins></fg>  Games <fg><played></fg>"
+  self-site: '<sub>Leaderboards: <accent><u><site></u></accent>'
 
 # ------------------------------------------------------------------ hosting / tickets
 host:
-  no-ticket: '<prefix><sub>You need a Game Ticket to host. <accent><u><store></u></accent>'
+  no-ticket: '<prefix><sub>You need a Game Ticket to host.'
+  no-ticket-store: '<sub>Get one here: <accent><u><store></u></accent>'
   too-soon: '<prefix><sub>Pick a time at least <minutes> min from now.'
   slot-taken: '<prefix><sub>There''s already a game within <minutes> min of that. Pick another time.'
   kit-missing-warning: '<prefix><hl>Heads up, there''s no <mode> kit set yet. Ask an admin.'
@@ -376,6 +378,7 @@ books:
   armor-applied: '<prefix><fg>Your armor has <hl><item></hl> now.'
   armor-waiting: '<prefix><sub>Holding onto the Protection Book until you wear armor below Protection V.'
   armor-tier: '<tier>'
+  repaired: '<prefix><fg>Repaired your armor <hl>+<percent>%</hl> <sub>with <victim>''s.'
   kill-upgrade: '<prefix><fg>Kill. Armor''s now <hl><item></hl>.'
   sharpness-applied: '<prefix><fg><hl><item></hl>.'
   sharpness-waiting: '<prefix><sub>Holding onto the Sharpness Book until you have a sword, axe or spear to put it on.'

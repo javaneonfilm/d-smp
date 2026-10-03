@@ -196,6 +196,37 @@ public final class UpgradeBooks implements Listener {
         killer.playSound(killer.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1f, 1.1f);
     }
 
+    /**
+     * upgrades.repair-on-kill: the killer's armor soaks up what was left of the victim's, slot by
+     * slot. A victim piece at 60% repairs the killer's piece in the same slot by 60% of its max.
+     */
+    public void repairFrom(Player killer, String victim, ItemStack[] victimArmor) {
+        if (!plugin.getConfig().getBoolean("upgrades.repair-on-kill", true) || victimArmor == null) return;
+        ItemStack[] mine = killer.getInventory().getArmorContents();
+        int restored = 0, total = 0;
+        for (int i = 0; i < Math.min(mine.length, victimArmor.length); i++) {
+            ItemStack k = mine[i], v = victimArmor[i];
+            if (k == null || v == null || !(k.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable km)) continue;
+            int kMax = km.hasMaxDamage() ? km.getMaxDamage() : k.getType().getMaxDurability();
+            if (kMax <= 0 || km.getDamage() <= 0) continue;
+            double left = 1.0;
+            if (v.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable vm) {
+                int vMax = vm.hasMaxDamage() ? vm.getMaxDamage() : v.getType().getMaxDurability();
+                if (vMax > 0) left = Math.max(0, vMax - vm.getDamage()) / (double) vMax;
+            }
+            int add = Math.min(km.getDamage(), (int) Math.round(left * kMax));
+            if (add <= 0) continue;
+            km.setDamage(km.getDamage() - add);
+            k.setItemMeta(km);
+            restored += add;
+            total += kMax;
+        }
+        if (restored == 0) return;
+        killer.getInventory().setArmorContents(mine);
+        plugin.msg().send(killer, "books.repaired", "victim", victim, "percent", Math.max(1, Math.round(restored * 100f / total)));
+        killer.playSound(killer.getLocation(), Sound.BLOCK_ANVIL_USE, 0.5f, 1.6f);
+    }
+
     private static String pretty(Material m) {
         String[] w = m.name().toLowerCase().split("_");
         StringBuilder b = new StringBuilder();

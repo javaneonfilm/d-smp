@@ -45,17 +45,19 @@ public final class SquadHud {
     }
 
     /**
-     * Puts the HUD marker into a colour: red % 8 = 5 and green % 8 = 3 say "move me", blue % 8
-     * carries the rows to lift (boss bars above the cards) and whether this is the head.
-     * Changes each channel by at most 7 of 255, which nobody can see.
+     * Puts the HUD marker into a colour (see cz_hud.glsl): red % 8 = 5 and green % 8 = 3 say
+     * "move me", blue bits 0-1 are the boss bars above the cards, blue bit 2 marks the head, and
+     * red bit 3 / green bit 3 are the card's row. Changes each channel by at most 15 of 255.
      */
-    static int mark(int rgb, int above, boolean head) {
-        int r = (rgb >> 16 & 0xF8) | 5, g = (rgb >> 8 & 0xF8) | 3, b = (rgb & 0xF8) | (Math.min(above, 3) * 2 + (head ? 1 : 0));
+    static int mark(int rgb, int above, boolean head, int row) {
+        int r = (rgb >> 16 & 0xF0) | ((row >> 1 & 1) << 3) | 5;
+        int g = (rgb >> 8 & 0xF0) | ((row & 1) << 3) | 3;
+        int b = (rgb & 0xF8) | (head ? 4 : 0) | Math.min(above, 3);
         return r << 16 | g << 8 | b;
     }
 
-    static TextColor marked(int rgb, int above, boolean head) {
-        return TextColor.color(mark(rgb, above, head));
+    static TextColor marked(int rgb, int above, boolean head, int row) {
+        return TextColor.color(mark(rgb, above, head, row));
     }
 
     /** True when this player sees the squad as cards rather than on the sidebar. */
@@ -117,11 +119,11 @@ public final class SquadHud {
         othersWhenShown.put(p.getUniqueId(), others);
         int above = Math.min(others.size(), 3);
 
-        for (int i = 0; i < n; i++) mine.get(i).name(card(m, team.get(i), above));
+        for (int i = 0; i < n; i++) mine.get(i).name(card(m, team.get(i), above, i));
         for (BossBar b : mine) p.showBossBar(b);
     }
 
-    private Component card(Match m, UUID u, int above) {
+    private Component card(Match m, UUID u, int above, int row) {
         Match.MP mp = m.get(u);
         Player tp = Bukkit.getPlayer(u);
         String name = mp != null ? mp.name : tp != null ? tp.getName() : "?";
@@ -150,11 +152,11 @@ public final class SquadHud {
         if (skin != null) hb.id(u).profileProperties(skin);
         // Dead or gone: the head is darkened by its colour.
         Component head = Component.object(hb.build())
-            .color(marked(alive && tp != null ? 0xFFFFFF : 0x666666, above, true))
+            .color(marked(alive && tp != null ? 0xFFFFFF : 0x666666, above, true, row))
             .shadowColor(ShadowColor.none());
 
-        ShadowColor textShadow = ShadowColor.shadowColor(0xFF000000 | mark(0x202020, above, false));
-        return HudText.squadCard(head, name, marked(nameRgb, above, false), !alive, textShadow,
-            marked(0xA9AEB8, above, false), kills, hp, marked(hpRgb, above, false), marked(0xFFFFFF, above, false));
+        ShadowColor textShadow = ShadowColor.shadowColor(0xFF000000 | mark(0x202020, above, false, row));
+        return HudText.squadCard(head, name, marked(nameRgb, above, false, row), !alive, textShadow,
+            marked(0xA9AEB8, above, false, row), kills, hp, marked(hpRgb, above, false, row), marked(0xFFFFFF, above, false, row));
     }
 }

@@ -151,7 +151,7 @@ public final class MatchListener implements Listener {
         Match m = live();
         if (m == null || !m.isAlive(p.getUniqueId())) return;
         plugin.deploy().release(p);
-        settle(p, m, p.getLastDamageCause(), p.getKiller() == null ? null : p.getKiller().getUniqueId());
+        settle(p, m, p.getLastDamageCause(), p.getKiller() == null ? null : p.getKiller().getUniqueId(), armorOf(p));
     }
 
     /**
@@ -170,6 +170,7 @@ public final class MatchListener implements Listener {
             || p.getInventory().getItemInOffHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING) return;
         e.setCancelled(true);
         Location at = p.getLocation();
+        ItemStack[] armor = armorOf(p);
         plugin.deploy().release(p);
         if (p.isInsideVehicle()) p.leaveVehicle();
         for (ItemStack it : p.getInventory().getContents()) {
@@ -188,12 +189,19 @@ public final class MatchListener implements Listener {
         at.getWorld().spawnParticle(org.bukkit.Particle.POOF, at.clone().add(0, 1, 0), 12, 0.3, 0.5, 0.3, 0.02);
         UUID direct = null;
         if (e instanceof EntityDamageByEntityEvent be) direct = responsible(be.getDamager());
-        settle(p, m, e, direct);
+        settle(p, m, e, direct, armor);
         plugin.spectators().make(p, at);
     }
 
+    /** The victim's worn armor, copied before it vanishes, so the killer can repair from it. */
+    private static ItemStack[] armorOf(Player p) {
+        ItemStack[] a = p.getInventory().getArmorContents();
+        for (int i = 0; i < a.length; i++) a[i] = a[i] == null ? null : a[i].clone();
+        return a;
+    }
+
     /** Kill credit, the log line, the kill effect and the elimination, for both kinds of death. */
-    private void settle(Player p, Match m, EntityDamageEvent last, UUID direct) {
+    private void settle(Player p, Match m, EntityDamageEvent last, UUID direct, ItemStack[] victimArmor) {
         UUID killer = null;
         boolean zone = last != null && last.getDamageSource().getDamageType() == DamageType.OUTSIDE_BORDER;
         if (!zone) {
@@ -215,6 +223,7 @@ public final class MatchListener implements Listener {
             if (kp != null && !m.sameTeam(killer, p.getUniqueId())) {
                 plugin.cosmetics().playKill(kp, p.getLocation());
                 plugin.books().onKill(kp);
+                plugin.books().repairFrom(kp, p.getName(), victimArmor);
                 // The kill sound from the pack, for the killer only.
                 String snd = plugin.getConfig().getString("sounds.kill", "cartzone:kill");
                 if (snd != null && !snd.isBlank()) {

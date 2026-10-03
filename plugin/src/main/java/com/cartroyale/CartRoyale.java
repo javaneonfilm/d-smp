@@ -324,6 +324,9 @@ public final class CartRoyale extends JavaPlugin {
                 if (line.startsWith("server-ip:") && (t.endsWith("play.cartzone.vip") || t.endsWith(" cartzone.vip"))) line = "server-ip: d-smp.vip";
                 else if (t.equals("hoster-name: CartZone")) line = line.replace("CartZone", "Diamond SMP");
                 else if (t.equals("username: CartZone")) line = line.replace("CartZone", "Diamond SMP");
+                // There never was a site behind these, so the links go.
+                else if (t.equals("store-url: https://cartzone.vip/#depot")) line = line.substring(0, line.indexOf("store-url:")) + "store-url: ''";
+                else if (t.equals("site-url: https://cartzone.vip/#boards")) line = line.substring(0, line.indexOf("site-url:")) + "site-url: ''";
                 out.append(line).append('\n');
             }
             String fixed = out.substring(0, out.length() - 1);

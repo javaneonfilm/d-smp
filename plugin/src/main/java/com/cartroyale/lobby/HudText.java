@@ -108,24 +108,28 @@ public final class HudText {
 
     /** A bar {@code w} px wide, {@code on} px of it in the fill colour, the rest as faint track. */
     static Component bar(int w, int on, TextColor fill, TextColor track, ShadowColor shadow) {
+        return bar(FILL, TRACK, w, on, fill, track, shadow);
+    }
+
+    private static Component bar(char fillSet, char trackSet, int w, int on, TextColor fill, TextColor track, ShadowColor shadow) {
         on = Math.max(0, Math.min(w, on));
         return Component.text()
-            .append(Component.text(run(FILL, on), fill).font(FONT).shadowColor(shadow))
-            .append(Component.text(run(TRACK, w - on), track).font(FONT).shadowColor(shadow))
+            .append(Component.text(run(fillSet, on), fill).font(FONT).shadowColor(shadow))
+            .append(Component.text(run(trackSet, w - on), track).font(FONT).shadowColor(shadow))
             .build();
     }
 
     // ---------------- IP pill ----------------
 
-    /** The top-centre pill: minecart icon and the IP, centred on a rounded glass panel. */
+    /** The top-centre pill: the logo on both sides of the IP, centred on a rounded glass panel. */
     public static Component bar(Component ipText, String ipPlain) {
-        int content = ICON_ADVANCE + SPACE + width(ipText);
+        int content = ICON_ADVANCE + SPACE + width(ipText) + SPACE + ICON_ADVANCE - 1;
         int pad = Math.max(0, (IP_W - content) / 2);
         return Component.text()
             .append(Component.text(IP_PILL + shift(-(IP_W + 1) + pad) + ICON).font(FONT).color(NamedTextColor.WHITE).shadowColor(ShadowColor.none()))
             .append(Component.text(" "))
             .append(ipText)
-            .append(Component.text(shift(IP_W - pad - content)).font(FONT))
+            .append(Component.text(shift(SPACE) + ICON + shift(IP_W - pad - content - 1)).font(FONT).color(NamedTextColor.WHITE).shadowColor(ShadowColor.none()))
             .build();
     }
 
@@ -152,9 +156,13 @@ public final class HudText {
     // ---------------- squad cards ----------------
 
     /** Card width in GUI pixels; must match CZ_CARD_W in the pack's cz_hud.glsl. */
-    public static final int CARD_W = 126;
-    private static final int CARD_ADVANCE = CARD_W + 1, HEAD_X = 3, TEXT_X = 23, KILLS_ICON = 8, RIGHT_PAD = 5;
+    public static final int CARD_W = 136;
+    private static final int CARD_ADVANCE = CARD_W + 1, HEAD_X = 3, TEXT_X = 24, KILLS_ICON = 8, RIGHT_PAD = 6;
     private static final char CARD = '', KILLS = '';
+    /** Card text: the vanilla letters, drawn 3 px lower so they sit inside the card. */
+    private static final Key CARD_FONT = Key.key("cartzone", "card");
+    /** The card's health bar pieces: 2 px tall, 15 px below the title's top. */
+    private static final char CARD_FILL = '', CARD_TRACK = '';
 
     /**
      * One squad card for the top-left HUD: a glass panel, the player's head (drawn 2x by the
@@ -180,12 +188,12 @@ public final class HudText {
             .append(Component.text(CARD + shift(-CARD_ADVANCE + HEAD_X)).font(FONT).color(white).shadowColor(none))
             .append(head)
             .append(Component.text(shift(TEXT_X - HEAD_X - 8)).font(FONT))
-            .append(Component.text(shown, nameColor).shadowColor(textShadow)
+            .append(Component.text(shown, nameColor).font(CARD_FONT).shadowColor(textShadow)
                 .decoration(TextDecoration.STRIKETHROUGH, struck))
             .append(Component.text(shift(CARD_W - RIGHT_PAD - killsW - nameEnd) + KILLS).font(FONT).color(white).shadowColor(none))
-            .append(Component.text(k, killsColor).shadowColor(textShadow))
+            .append(Component.text(k, killsColor).font(CARD_FONT).shadowColor(textShadow))
             .append(Component.text(shift(-(CARD_W - RIGHT_PAD - TEXT_X)), white).font(FONT).shadowColor(none))
-            .append(bar(barW, on, hpColor, white, none))
+            .append(bar(CARD_FILL, CARD_TRACK, barW, on, hpColor, white, none))
             .append(Component.text(shift(RIGHT_PAD)).font(FONT))
             .build();
     }

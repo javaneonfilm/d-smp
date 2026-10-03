@@ -39,7 +39,7 @@ public final class HostGui {
         boolean admin = Ranks.isAdmin(p);
         plugin.store().tickets(p.getUniqueId()).thenAccept(tickets -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (!admin && tickets <= 0) {
-                plugin.msg().send(p, "host.no-ticket", "store", com.cartroyale.core.Msg.link(plugin.getConfig().getString("host.store-url", "https://cartzone.vip/#depot")));
+                noTicket(p);
                 return;
             }
             GameSettings s = drafts.computeIfAbsent(p.getUniqueId(), u -> {
@@ -173,7 +173,7 @@ public final class HostGui {
         }
         plugin.store().spendTicketAndQueue(p.getUniqueId(), g).thenAccept(id -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (id < 0) {
-                plugin.msg().send(p, "host.no-ticket", "store", com.cartroyale.core.Msg.link(plugin.getConfig().getString("host.store-url", "https://cartzone.vip/#depot")));
+                noTicket(p);
                 return;
             }
             done(p, plugin.games().queued(id, g, "ticket"));
@@ -188,5 +188,11 @@ public final class HostGui {
         plugin.msg().send(p, "host.queued", "id", row.id, "start", plugin.announcer().startLine(row));
         p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.8f, 1.2f);
         plugin.lobby().giveHotbar(p);
+    }
+
+    private void noTicket(Player p) {
+        plugin.msg().send(p, "host.no-ticket");
+        String store = plugin.getConfig().getString("host.store-url", "");
+        if (store != null && !store.isBlank()) plugin.msg().send(p, "host.no-ticket-store", "store", com.cartroyale.core.Msg.link(store));
     }
 }

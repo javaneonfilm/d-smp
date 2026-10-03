@@ -123,6 +123,7 @@ public final class ChestManager implements org.bukkit.event.Listener {
             for (var slot : plugin.loot().roll(mode, p.tier(), luckier, pearls, rng)) {
                 ItemStack it = slot.item().clone();
                 it.setAmount(slot.amount());
+                wearArmor(it, rng);
                 inv.setItem(slot.slot(), it);
             }
         }
@@ -229,5 +230,20 @@ public final class ChestManager implements org.bukkit.event.Listener {
 
     private static long key(int x, int y, int z) {
         return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
+    }
+
+    /**
+     * chests.random-armor-durability: armor in chests comes pre-worn, usually quite a bit.
+     * The durability left is 10-100%, squared toward the low end (median about 30%).
+     */
+    private void wearArmor(ItemStack it, Random rng) {
+        if (!plugin.getConfig().getBoolean("chests.random-armor-durability", true) || !com.cartroyale.util.Items.isArmor(it)) return;
+        if (!(it.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable d)) return;
+        int max = d.hasMaxDamage() ? d.getMaxDamage() : it.getType().getMaxDurability();
+        if (max <= 0) return;
+        double u = rng.nextDouble();
+        double left = 0.1 + 0.9 * u * u;
+        d.setDamage(Math.min(max - 1, (int) Math.round(max * (1 - left))));
+        it.setItemMeta(d);
     }
 }

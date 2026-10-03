@@ -54,7 +54,7 @@ host:
   ticket-hours: 6           # length of the temporary LuckPerms host group
   host-group: host
   revoke-cancels-game: true # a chargeback cancels the game the ticket paid for
-  store-url: https://cartzone.vip/#depot
+  store-url: ''             # where to buy Game Tickets; empty = no link
 
 schedule:
   create-ahead-minutes: 60  # scheduled games are created (and announced) this far ahead
@@ -88,6 +88,7 @@ match:
 
 chests:                     # amount, spacing and tier mix moved to loot.yml (/cart loot -> Chest settings)
   hologram-height: 1.35
+  random-armor-durability: true   # armor in chests comes worn: 10-100% left, usually low
   place-per-tick: 20
   scan-chunks-per-tick: 8
 
@@ -97,6 +98,7 @@ books:
   quickcharge-max: 3        # Quick Charge above 3 makes crossbows unusable in vanilla
   protection-max: 5         # Protection Books and kills raise worn armor up to this (none > I > ... > V)
 upgrades:
+  repair-on-kill: true      # a kill repairs your armor with what was left of the victim's, slot by slot
   armor-on-kill: true       # a kill gives the killer's worn armor +1 Protection (up to books.protection-max)
 
 sounds:
@@ -189,7 +191,7 @@ webhooks:
       '4': ''
 
 stats:
-  site-url: https://cartzone.vip/#boards
+  site-url: ''              # leaderboards page shown in /stats; empty = no link
   export:
     mode: 'OFF'             # WORKER (POST to url), FILE (plugins/CartZone/stats.json) or 'OFF' (keep the quotes)
     url: ''                 # the Cloudflare Worker endpoint, https only
