@@ -3,7 +3,6 @@ version: '${project.version}'
 main: com.cartroyale.CartRoyale
 api-version: '1.21.11'
 author: Cuda
-website: https://cartzone.vip
 description: Minecart PvP battle royale - hosted games, purge, ghast drops, loot, zone, cosmetics.
 softdepend: [LuckPerms, PlaceholderAPI, TAB, Vulcan]
 load: POSTWORLD

@@ -352,7 +352,7 @@ settings:
   # exemption after plugin velocity is a little longer than Vulcan's default.
   max-velocity-ticks: 80
   max-logs-file-size: 7500
-  server-name: 'CartZone'
+  server-name: 'Diamond SMP'
   async-alerts: true
   enable-api: true
   update-checker: true
