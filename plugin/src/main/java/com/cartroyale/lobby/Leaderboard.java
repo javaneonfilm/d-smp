@@ -18,7 +18,9 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Three player statues in the lobby for the top three by wins: their skin, scaled 1.75 / 1.5 /
@@ -34,6 +36,9 @@ public final class Leaderboard {
     private final CartRoyale plugin;
     private final UUID[] statue = new UUID[3], label = new UUID[3];
     private List<Store.Winner> top = new ArrayList<>();
+    /** Profiles with skin textures, looked up from Mojang once per player. */
+    private final Map<UUID, com.destroystokyo.paper.profile.PlayerProfile> skins = new ConcurrentHashMap<>();
+    private final java.util.Set<UUID> looking = ConcurrentHashMap.newKeySet();
 
     public Leaderboard(CartRoyale plugin) {
         this.plugin = plugin;
@@ -70,6 +75,7 @@ public final class Leaderboard {
             top = list;
             for (int i = 0; i < 3; i++) clear(i);
             ensure();
+            for (Store.Winner w : list) lookUp(w);
         }));
     }
 
@@ -131,10 +137,46 @@ public final class Leaderboard {
         label[i] = td.getUniqueId();
     }
 
-    /** The skin: the live profile if they're online, otherwise uuid + name and the client looks it up. */
-    private static ResolvableProfile profile(Store.Winner w) {
-        Player p = Bukkit.getPlayer(w.uuid());
-        if (p != null) return ResolvableProfile.resolvableProfile(p.getPlayerProfile());
-        return ResolvableProfile.resolvableProfile().uuid(w.uuid()).name(w.name()).build();
+    /**
+     * Fetches the winner's skin from Mojang off the main thread. A profile with only uuid + name
+     * counts as complete to the client, which then shows Steve/Alex, so the textures have to be on it.
+     */
+    private void lookUp(Store.Winner w) {
+        if (skins.containsKey(w.uuid()) || !looking.add(w.uuid())) return;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                var pp = Bukkit.createProfile(w.uuid(), w.name());
+                if (!pp.complete(true) || !pp.hasTextures()) {
+                    // Offline-mode uuids aren't real accounts; the name usually is.
+                    pp = Bukkit.createProfile(w.name());
+                    pp.complete(true);
+                }
+                if (pp.hasTextures()) {
+                    var found = pp;
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        skins.put(w.uuid(), found);
+                        for (int i = 0; i < 3; i++) {
+                            if (i < top.size() && top.get(i).uuid().equals(w.uuid())) clear(i);
+                        }
+                        ensure();
+                    });
+                }
+            } catch (Exception e) {
+                plugin.getLogger().fine("Skin lookup for " + w.name() + " failed: " + e.getMessage());
+            } finally {
+                looking.remove(w.uuid());
+            }
+        });
+    }
+
+    /** The skin: the fetched profile, the live one if they're online, else just the name for the client to look up. */
+    private ResolvableProfile profile(Store.Winner w) {
+        var pp = skins.get(w.uuid());
+        if (pp == null) {
+            Player p = Bukkit.getPlayer(w.uuid());
+            if (p != null && p.getPlayerProfile().hasTextures()) pp = p.getPlayerProfile();
+        }
+        if (pp != null) return ResolvableProfile.resolvableProfile(pp);
+        return ResolvableProfile.resolvableProfile().name(w.name()).build();
     }
 }

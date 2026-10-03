@@ -3,6 +3,9 @@ package com.cartroyale.lobby;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.ShadowColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 /**
  * UI-2: builds the top-centre IP bar title from the pack's cartzone:hud font. The bar glyph is
@@ -98,5 +101,48 @@ public final class HudText {
         }
         for (Component child : c.children()) w += width(child, bold);
         return w;
+    }
+
+    // ---------------- squad cards ----------------
+
+    /** Card width in GUI pixels; must match CZ_CARD_W in the pack's cz_hud.glsl. */
+    public static final int CARD_W = 126;
+    public static final int HP_SEGMENTS = 20;
+    private static final int CARD_ADVANCE = CARD_W + 1, HEAD_X = 2, TEXT_X = 21, HP_ADVANCE = 5, KILLS_ICON = 8, RIGHT_PAD = 4;
+    private static final char CARD = '', HP_ON = '', HP_OFF = '', KILLS = '';
+
+    /**
+     * One squad card for the top-left HUD: a dark panel, the player's head (drawn 2x by the
+     * shader), the name with their kills on the right, and a 20-segment health bar under it.
+     * Every colour must already carry the HUD marker (SquadHud.mark), and the pen ends exactly
+     * CARD_W to the right so the shader knows where the card starts.
+     */
+    public static Component squadCard(Component head, String name, TextColor nameColor, boolean struck, ShadowColor textShadow,
+                                      TextColor killsColor, int kills, int hpOn, TextColor hpColor, TextColor white) {
+        String k = String.valueOf(kills);
+        int killsW = KILLS_ICON + width(k);
+        int maxName = CARD_W - TEXT_X - RIGHT_PAD - killsW - 4;
+        String shown = name;
+        if (width(shown) > maxName) {
+            while (!shown.isEmpty() && width(shown + "..") > maxName) shown = shown.substring(0, shown.length() - 1);
+            shown += "..";
+        }
+        int nameEnd = TEXT_X + width(shown);
+        StringBuilder bar = new StringBuilder();
+        for (int i = 0; i < HP_SEGMENTS; i++) bar.append(i < hpOn ? HP_ON : HP_OFF);
+        int barEnd = TEXT_X + HP_SEGMENTS * HP_ADVANCE;
+        ShadowColor none = ShadowColor.none();
+        return Component.text()
+            .append(Component.text(CARD + shift(-CARD_ADVANCE + HEAD_X)).font(FONT).color(white).shadowColor(none))
+            .append(head)
+            .append(Component.text(shift(TEXT_X - HEAD_X - 8)).font(FONT))
+            .append(Component.text(shown, nameColor).shadowColor(textShadow)
+                .decoration(TextDecoration.STRIKETHROUGH, struck))
+            .append(Component.text(shift(CARD_W - RIGHT_PAD - killsW - nameEnd) + KILLS).font(FONT).color(white).shadowColor(none))
+            .append(Component.text(k, killsColor).shadowColor(textShadow))
+            .append(Component.text(shift(-(CARD_W - RIGHT_PAD - TEXT_X)), white).font(FONT).shadowColor(none))
+            .append(Component.text(bar.substring(0, hpOn), hpColor).font(FONT).shadowColor(none))
+            .append(Component.text(bar.substring(hpOn) + shift(CARD_W - barEnd), white).font(FONT).shadowColor(none))
+            .build();
     }
 }

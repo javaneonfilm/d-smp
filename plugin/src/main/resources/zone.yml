@@ -31,12 +31,12 @@ particles:
   every-ticks: 4
   max-per-player: 180
 
-# The wall players see. 'shader' = the hexagon wall from the resource pack (players whose pack
+# The wall players see. 'shader' = the CartZone wall from the resource pack (players whose pack
 # failed or was declined get the particles below instead); 'shader-all' = the wall for everyone,
 # never particles (use this if players install the pack themselves); 'particles' = old particles.
 # The pack counts as loaded when it comes from config.yml resource-pack or server.properties.
 wall:
   mode: shader
-  base-y: 0                 # the wall starts here and runs 350 blocks up (fades out ~50 above you)
+  base-y: 0                 # the wall starts here and runs 330 blocks up (fades out ~60 above you)
   reanchor-distance: 48     # each player's wall entity follows them in jumps of this many blocks
-  item-model: lodestone:border
+  item-model: cartzone:zone_wall

@@ -64,6 +64,42 @@
       ]
     },
     {
+      "type": "bitmap",
+      "file": "cartzone:font/card.png",
+      "ascent": 8,
+      "height": 18,
+      "chars": [
+        "\ue020"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/hp_on.png",
+      "ascent": -4,
+      "height": 4,
+      "chars": [
+        "\ue021"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/hp_off.png",
+      "ascent": -4,
+      "height": 4,
+      "chars": [
+        "\ue022"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/kills.png",
+      "ascent": 7,
+      "height": 7,
+      "chars": [
+        "\ue023"
+      ]
+    },
+    {
       "type": "space",
       "advances": {
         "\uf801": -1,

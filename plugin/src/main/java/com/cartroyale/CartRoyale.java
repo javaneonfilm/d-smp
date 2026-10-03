@@ -84,6 +84,7 @@ public final class CartRoyale extends JavaPlugin {
     private LootEditorGui lootEditor;
     private Lobby lobby;
     private com.cartroyale.hooks.VulcanHook vulcan;
+    private com.cartroyale.match.SquadHud squadHud;
     private Stats stats;
     private RankService rank;
     private GameManager games;
@@ -169,6 +170,7 @@ public final class CartRoyale extends JavaPlugin {
 
         offences = new com.cartroyale.mod.Offences(this);
         sidebar = new com.cartroyale.lobby.Sidebar(this);
+        squadHud = new com.cartroyale.match.SquadHud(this);
         chatFilter = new com.cartroyale.mod.ChatFilter(this);
         register(offences, chatFilter, new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
             presence = new Presence(this), new MatchListener(this), new ArenaRules(this),
@@ -419,6 +421,7 @@ public final class CartRoyale extends JavaPlugin {
     public LootEditorGui lootEditor() { return lootEditor; }
     public Lobby lobby() { return lobby; }
     public com.cartroyale.hooks.VulcanHook vulcan() { return vulcan; }
+    public com.cartroyale.match.SquadHud squadHud() { return squadHud; }
     public Stats stats() { return stats; }
     public RankService rank() { return rank; }
     public GameManager games() { return games; }

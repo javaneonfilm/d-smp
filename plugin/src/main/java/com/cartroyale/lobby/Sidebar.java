@@ -128,7 +128,8 @@ public final class Sidebar {
         Match.MP me = m.get(p.getUniqueId());
         for (String line : plugin.msg().rawList("board.game")) {
             if (line.trim().equals("<squad>")) {
-                out.addAll(squad(m, p));
+                // Pack players see their squad as cards in the top-left corner (SquadHud).
+                if (plugin.squadHud() == null || !plugin.squadHud().active(p)) out.addAll(squad(m, p));
                 continue;
             }
             out.add(plugin.msg().parse(line, "id", m.id(), "phase", plugin.msg().plain("phases." + m.state.name().toLowerCase()),

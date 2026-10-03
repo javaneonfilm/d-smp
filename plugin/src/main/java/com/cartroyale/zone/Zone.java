@@ -161,7 +161,9 @@ public final class Zone {
         plan = planFor(mc, m.row.s.minutes);
         startedAt = System.currentTimeMillis();
         tick = 0;
-        wall.model(yml.get().getString("wall.item-model", "lodestone:border"));
+        String model = yml.get().getString("wall.item-model", "cartzone:zone_wall");
+        // Older zone.yml files still name the borrowed wall, which the pack no longer has.
+        wall.model("lodestone:border".equals(model) ? "cartzone:zone_wall" : model);
         wasGrace = graceMs() > 0;
         lastTickSound = -1;
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1, 1);

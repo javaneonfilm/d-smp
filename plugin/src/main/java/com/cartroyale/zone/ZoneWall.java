@@ -22,8 +22,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * The hexagon zone wall from the resource pack (resourcepack/zone-wall). The pack's shader turns one
- * flat quad into a cylinder: quad centre = circle centre, quad side = radius, wall runs 350 up.
+ * The zone wall from the resource pack (resourcepack/shaders, cz_wall.glsl). The pack's shader turns
+ * one flat quad into a cylinder: quad centre = circle centre, quad side = diameter, and the wall
+ * runs 330 blocks up from the quad.
  *
  * Each player gets their own display, seen only by them, parked near them so it stays inside
  * entity tracking range on a big map; a translation in the transformation puts the quad on the
@@ -38,7 +39,7 @@ final class ZoneWall {
     private final Map<UUID, ItemDisplay> walls = new HashMap<>();
     private final Map<UUID, ItemDisplay> retiring = new HashMap<>();
     private final Map<UUID, float[]> sent = new HashMap<>();
-    private String model = "lodestone:border";
+    private String model = "cartzone:zone_wall";
 
     ZoneWall(CartRoyale plugin) {
         this.plugin = plugin;
@@ -69,6 +70,8 @@ final class ZoneWall {
             walls.put(p.getUniqueId(), d);
             return true;
         }
+        // A player who rejoined is a new Player object that hasn't been shown the display yet.
+        if (!p.canSee(d)) p.showEntity(plugin, d);
         float[] t = shape(d, c, baseY);
         float[] last = sent.get(p.getUniqueId());
         if (last == null || !java.util.Arrays.equals(last, t)) {
@@ -135,7 +138,7 @@ final class ZoneWall {
     }
 
     private static Transformation transformation(float[] t) {
-        return new Transformation(new Vector3f(t[0], t[1], t[2]), new AxisAngle4f(), new Vector3f(t[3], 1f, t[3]), new AxisAngle4f());
+        return new Transformation(new Vector3f(t[0], t[1], t[2]), new AxisAngle4f(), new Vector3f(t[3] * 2f, 1f, t[3] * 2f), new AxisAngle4f());
     }
 
     private ItemStack item() {

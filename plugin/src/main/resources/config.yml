@@ -159,6 +159,11 @@ lobby-items:
     enabled: true
     slot: 8
 
+# Squad cards in the top-left corner during team games (head, name, kills, health). Needs the
+# resource pack; players without it see their squad on the sidebar.
+squad-hud:
+  enabled: true
+
 # Vulcan / AntiGamingChair: don't flag what CartZone does to players on purpose.
 anticheat:
   # Ignore all flags in the lobby (elytra perk, grapple, wind charges, void rescue).

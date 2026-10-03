@@ -4,9 +4,9 @@ Built by `py resourcepack/tools/build_pack.py` (needs Pillow). Output: `resource
 
 | | |
 |---|---|
-| SHA-1 | `7b1e17c94f81bcb94fbeb032b0c1aeca9d97d28d` |
-| Size | 129807 bytes |
-| pack_format | 75 (1.21.11), accepted range 64-99 |
+| SHA-1 | `831ac97e654ca18d86e6e820b10d2d3118bf5697` |
+| Size | 126572 bytes |
+| pack_format | 75 (1.21.11), accepted range 75-99 |
 
 ## What is in it
 - **One Time Shield** model (`item_model` `cartzone:one_time_shield`), with a separate blocking pose.
@@ -23,7 +23,7 @@ It changes no vanilla textures other than the two pink boss bar sprites.
    resource-pack:
      enabled: true
      url: '<the direct link>'
-     sha1: '7b1e17c94f81bcb94fbeb032b0c1aeca9d97d28d'
+     sha1: '831ac97e654ca18d86e6e820b10d2d3118bf5697'
      required: true
    ```
 3. `/cart reload`, then rejoin. `/cart diag` shows whether the pack is configured.

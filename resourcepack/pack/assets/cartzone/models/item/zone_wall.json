@@ -1,0 +1,31 @@
+{
+  "textures": {
+    "wall": "cartzone:item/zone_wall",
+    "particle": "cartzone:item/zone_wall"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        8,
+        0
+      ],
+      "to": [
+        16,
+        8,
+        16
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wall"
+        }
+      }
+    }
+  ]
+}

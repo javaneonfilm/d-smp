@@ -8,8 +8,9 @@ Contents, all original art drawn here:
   minecart icon (font cartzone:hud). Nothing else on the server uses a pink bar.
 - Upgrade books: armor / quickcharge / sharpness textures from resourcepack/books/ (his art).
 - Kill sound: resourcepack/sounds/kill.ogg (kill1 from the Mace.VIP pack), event cartzone:kill.
-- Zone wall: the hexagon circle-border shader from the Mace.VIP pack, copied from
-  resourcepack/zone-wall/ (see SOURCE.txt there). Item model lodestone:border.
+- Zone wall: our own shader (resourcepack/shaders, cz_wall.glsl). The plugin shows an item display
+  with item model cartzone:zone_wall; the shader turns its flat square into the cylinder wall.
+- Squad cards: cz_hud.glsl moves marked boss bar titles to the top-left corner (SquadHud.java).
 Output: resourcepack/pack/ (the files) and cartzone-pack.zip + SHA-1 in docs/RESOURCEPACK.md.
 """
 import hashlib
@@ -25,7 +26,7 @@ ROOT = os.path.dirname(HERE)                 # cartroyale/resourcepack
 PROJECT = os.path.dirname(ROOT)              # cartroyale
 OUT = os.path.join(ROOT, "pack")
 ZIP = os.path.join(ROOT, "cartzone-pack.zip")
-ZONE_WALL = os.path.join(ROOT, "zone-wall")
+SHADERS = os.path.join(ROOT, "shaders")
 
 # Keep in sync with plugin/src/main/java/com/cartroyale/lobby/HudText.java
 BAR_W, BAR_H, BAR_ASCENT = 150, 13, 9
@@ -188,6 +189,58 @@ def hex_cells():
     }
 
 
+# Squad cards (top-left HUD). Keep in sync with HudText.squadCard and cz_hud.glsl.
+CARD_W, CARD_H = 126, 18
+WALL_MARKER = (204, 18, 52, 251)   # cz_wall.glsl CZ_WALL_MARKER
+
+
+def squad_card():
+    """126x18: dark rounded panel, red edge on the left. The last row stays empty (gap between cards)."""
+    img = Image.new("RGBA", (CARD_W, CARD_H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    w, h = CARD_W - 1, CARD_H - 2
+    d.rectangle([1, 0, w - 1, h], fill=(6, 6, 10, 150))
+    d.line([0, 1, 0, h - 1], fill=(6, 6, 10, 150))
+    d.line([w, 1, w, h - 1], fill=(6, 6, 10, 150))
+    d.line([1, 0, w - 1, 0], fill=(60, 60, 70, 170))           # top edge
+    d.line([0, 2, 0, h - 2], fill=(230, 40, 28, 235))          # red accent
+    return img
+
+
+def hp_segment(on):
+    """5x4, the last column empty so each segment advances 5 with a 1 px gap. White gets tinted."""
+    img = Image.new("RGBA", (5, 4), (0, 0, 0, 0))
+    rows = [(255, 255, 255, 255), (228, 228, 228, 255), (228, 228, 228, 255), (176, 176, 176, 255)] if on         else [(78, 78, 84, 210), (42, 42, 48, 210), (42, 42, 48, 210), (34, 34, 40, 210)]
+    for y, c in enumerate(rows):
+        for x in range(4):
+            img.putpixel((x, y), c)
+    return img
+
+
+def kills_icon():
+    """7x7 sword: blade from the top right, gold crossguard, brown grip bottom left."""
+    img = Image.new("RGBA", (7, 7), (0, 0, 0, 0))
+    art = [
+        ".....WE",
+        "....WWE",
+        "...WWE.",
+        "G.WWE..",
+        ".GWE...",
+        ".HG....",
+        "H..G...",
+    ]
+    pal = {"W": (240, 240, 245, 255), "E": (150, 150, 165, 255), "G": (255, 190, 50, 255), "H": (125, 82, 48, 255)}
+    for y, row in enumerate(art):
+        for x, ch in enumerate(row):
+            if ch in pal:
+                img.putpixel((x, y), pal[ch])
+    return img
+
+
+def wall_marker():
+    return Image.new("RGBA", (4, 4), WALL_MARKER)
+
+
 def invisible_bar():
     return Image.new("RGBA", (182, 5), (0, 0, 0, 0))
 
@@ -208,6 +261,11 @@ def hud_font():
             {"type": "bitmap", "file": "cartzone:font/hex_grace.png", "ascent": -2, "height": 10, "chars": [""]},
             {"type": "bitmap", "file": "cartzone:font/hex_edge.png", "ascent": -2, "height": 10, "chars": [""]},
             {"type": "bitmap", "file": "cartzone:font/hex_warn.png", "ascent": -2, "height": 10, "chars": [""]},
+            # Squad cards: panel from 1 px above the title line, health bar 11 px below its top.
+            {"type": "bitmap", "file": "cartzone:font/card.png", "ascent": 8, "height": CARD_H, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/hp_on.png", "ascent": -4, "height": 4, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/hp_off.png", "ascent": -4, "height": 4, "chars": [""]},
+            {"type": "bitmap", "file": "cartzone:font/kills.png", "ascent": 7, "height": 7, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
     }
@@ -219,10 +277,10 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     write_json("pack.mcmeta", {"pack": {
-        "description": "CartZone - IP bar, shield, books, zone wall",
+        "description": "CartZone - HUD, books, zone wall",
         # 1.21.11 is format 75; 1.21.9+ reads the min/max range, older clients read pack_format.
-        "pack_format": 75, "min_format": 64, "max_format": 99},
-        # 26.x moved item rendering to core/item, so newer clients get the ported wall shader.
+        "pack_format": 75, "min_format": 75, "max_format": 99},
+        # 26.x moved item rendering to core/item (and 26.2 text to core/text), so newer clients get their own copies.
         "overlays": {"entries": [
             {"min_format": 84, "max_format": 87, "directory": "overlay_26_1"},
             {"min_format": 88, "max_format": 1000, "directory": "overlay_26"}]}})
@@ -242,6 +300,10 @@ def main():
         {"type": "bitmap", "file": "cartzone:font/rank_" + n + ".png", "ascent": 8, "height": 9, "chars": [c]}
         for n, c in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", ""), ("media", ""), ("creator", "")]]})
     save_png("assets/cartzone/textures/font/cart.png", cart_icon())
+    save_png("assets/cartzone/textures/font/card.png", squad_card())
+    save_png("assets/cartzone/textures/font/hp_on.png", hp_segment(True))
+    save_png("assets/cartzone/textures/font/hp_off.png", hp_segment(False))
+    save_png("assets/cartzone/textures/font/kills.png", kills_icon())
     write_json("assets/cartzone/font/hud.json", hud_font())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_progress.png", invisible_bar())
@@ -259,11 +321,19 @@ def main():
         shutil.copyfile(os.path.join(ROOT, "sounds", snd + ".ogg"), os.path.join(OUT, "assets", "cartzone", "sounds", snd + ".ogg"))
     write_json("assets/cartzone/sounds.json", {snd: {"category": "master", "sounds": ["cartzone:" + snd]} for snd in ("kill", "purge")})
 
-    for base, _, names in os.walk(ZONE_WALL):
+    # Zone wall: one flat square in the marker colour; cz_wall.glsl does the rest. The UVs stay
+    # inside the texture so the vertex shader never samples a neighbouring sprite in the atlas.
+    save_png("assets/cartzone/textures/item/zone_wall.png", wall_marker())
+    write_json("assets/cartzone/models/item/zone_wall.json", {
+        "textures": {"wall": "cartzone:item/zone_wall", "particle": "cartzone:item/zone_wall"},
+        "elements": [{"from": [0, 8, 0], "to": [16, 8, 16],
+                      "faces": {"up": {"uv": [4, 4, 12, 12], "texture": "#wall"}}}]})
+    write_json("assets/cartzone/items/zone_wall.json", {"model": {"type": "minecraft:model", "model": "cartzone:item/zone_wall"}})
+
+    # Shaders (all ours): the zone wall and the squad card mover, for 1.21.11 and the 26.x overlays.
+    for base, _, names in os.walk(SHADERS):
         for n in names:
-            if n == "SOURCE.txt":
-                continue
-            rel = os.path.relpath(os.path.join(base, n), ZONE_WALL)
+            rel = os.path.relpath(os.path.join(base, n), SHADERS)
             os.makedirs(os.path.dirname(os.path.join(OUT, rel)), exist_ok=True)
             shutil.copyfile(os.path.join(base, n), os.path.join(OUT, rel))
 
@@ -295,7 +365,7 @@ Built by `py resourcepack/tools/build_pack.py` (needs Pillow). Output: `resource
 |---|---|
 | SHA-1 | `{sha1}` |
 | Size | {size} bytes |
-| pack_format | 75 (1.21.11), accepted range 64-99 |
+| pack_format | 75 (1.21.11), accepted range 75-99 |
 
 ## What is in it
 - **One Time Shield** model (`item_model` `cartzone:one_time_shield`), with a separate blocking pose.
