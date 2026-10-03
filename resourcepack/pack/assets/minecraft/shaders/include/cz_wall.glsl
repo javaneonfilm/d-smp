@@ -9,6 +9,7 @@
 // Needs ProjMat and ModelViewMat, so import projection.glsl and dynamictransforms.glsl first.
 
 const float CZ_WALL_HEIGHT = 330.0;              // blocks above the square
+const float CZ_WALL_VIEW = 128.0;               // how far away the wall can be seen (8 chunks)
 const ivec4 CZ_WALL_MARKER = ivec4(204, 18, 52, 251);
 
 bool cz_is_wall(vec4 texel) {
@@ -74,53 +75,54 @@ vec4 cz_hex_layer(float angle, float radius, float h, float w, float aa, float t
     float breathe = sin(time * 1.7 - row * 0.55 + r * 0.8);
     float inner = 0.3 + 0.05 * breathe;
 
-    vec3 bg = vec3(1.0, 0.38, 0.08);
-    vec3 lit = vec3(1.0, 0.58, 0.16);
-    vec3 rim = vec3(0.7, 0.16, 0.04);
-    vec3 edge = vec3(1.0, 0.74, 0.3);
+    vec3 bg = vec3(0.5, 0.82, 1.0);
+    vec3 lit = vec3(0.62, 0.9, 1.0);
+    vec3 rim = vec3(0.3, 0.62, 0.85);
+    vec3 edge = vec3(0.8, 0.98, 1.0);
 
     float inside = 1.0 - smoothstep(inner - aa, inner + aa, e);
     vec3 col = mix(bg, lit, inside);
-    float a = mix(0.34, 0.55, inside);
+    float a = mix(0.05, 0.1, inside);
     // a darker band just outside the lit middle
     float band = smoothstep(inner, inner + 0.08, e) * (1.0 - smoothstep(0.4, 0.47, e));
-    col = mix(col, rim, band * 0.6);
-    a += band * 0.1;
+    col = mix(col, rim, band * 0.35);
+    a += band * 0.03;
     // thin light ring around the lit middle, and a bright outline on the cell edge
     float ring = 1.0 - smoothstep(0.0, aa * 1.5 + 0.012, abs(e - inner));
-    float outline = smoothstep(0.5 - aa * 2.0 - 0.03, 0.5, e);
-    col = mix(col, edge, max(ring * 0.5, outline * 0.85));
-    a = max(a, max(ring * 0.5, outline * 0.65));
+    float outline = smoothstep(0.5 - aa * 2.0 - 0.018, 0.5, e);
+    col = mix(col, edge, max(ring * 0.4, outline));
+    a = max(a, max(ring * 0.14, outline * 0.65));
 
     // Now and then a cell flares up.
     float flare = smoothstep(0.92, 1.0, sin(time * 0.9 + r * 60.0)) * (1.0 - e * 1.6);
-    col = mix(col, vec3(1.0, 0.82, 0.45), flare * 0.7);
-    a = max(a, flare * 0.7);
+    col = mix(col, vec3(0.88, 1.0, 1.0), flare * 0.7);
+    a = max(a, flare * 0.45);
     return vec4(col, a);
 }
 
-// The look: orange hexagon cells with breathing lit centres, bright outlines and the odd flare.
-// Close up the cells are 3 blocks wide; far away they grow to 9 so the pattern stays readable.
+// The look: a light blue glass of hexagons, thin bright outlines, faint breathing centres and the
+// odd flare. Close up the cells are 1.6 blocks wide; further out they grow to 4.8 so it stays readable.
 vec4 cz_wall_paint(vec3 rel, float radius, float dist, float lift, float time) {
     float h = rel.y;
     if (h < 0.0 || h > CZ_WALL_HEIGHT) return vec4(0.0);
     float angle = atan(rel.z, rel.x) / 6.2831853 + 0.5;
 
     float aaNear = clamp(dist * 0.0012, 0.01, 0.12);
-    vec4 c = cz_hex_layer(angle, radius, h, 3.0, aaNear, time);
-    float far = smoothstep(45.0, 110.0, dist);
+    vec4 c = cz_hex_layer(angle, radius, h, 1.6, aaNear, time);
+    float far = smoothstep(40.0, 100.0, dist);
     if (far > 0.0) {
-        vec4 big = cz_hex_layer(angle, radius, h, 9.0, clamp(dist * 0.0005, 0.01, 0.1), time);
+        vec4 big = cz_hex_layer(angle, radius, h, 4.8, clamp(dist * 0.0005, 0.01, 0.1), time);
         c = mix(c, big, far);
     }
 
     // A glow where the wall meets the ground or the sea.
     float foot = exp(-h * 0.35);
-    c.rgb = mix(c.rgb, vec3(1.0, 0.45, 0.1), foot * 0.5);
-    c.a += foot * 0.35;
+    c.rgb = mix(c.rgb, vec3(0.6, 0.92, 1.0), foot * 0.5);
+    c.a += foot * 0.3;
 
-    // Far walls a bit softer, and it fades out a good way above the player.
-    c.a *= mix(1.0, 0.8, smoothstep(60.0, 320.0, dist));
+    // Only shown up to 8 chunks away (fading out over the last chunk), and it fades out a good
+    // way above the player.
+    c.a *= 1.0 - smoothstep(CZ_WALL_VIEW - 16.0, CZ_WALL_VIEW, dist);
     c.a *= 1.0 - smoothstep(30.0, 90.0, lift);
     c.a *= 1.0 - smoothstep(CZ_WALL_HEIGHT - 40.0, CZ_WALL_HEIGHT, h);
     return vec4(c.rgb, clamp(c.a, 0.0, 0.9));

@@ -85,6 +85,7 @@ public final class CartRoyale extends JavaPlugin {
     private Lobby lobby;
     private com.cartroyale.hooks.VulcanHook vulcan;
     private com.cartroyale.match.SquadHud squadHud;
+    private ArenaRules arenaRules;
     private Stats stats;
     private RankService rank;
     private GameManager games;
@@ -173,7 +174,7 @@ public final class CartRoyale extends JavaPlugin {
         squadHud = new com.cartroyale.match.SquadHud(this);
         chatFilter = new com.cartroyale.mod.ChatFilter(this);
         register(offences, chatFilter, new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
-            presence = new Presence(this), new MatchListener(this), new ArenaRules(this),
+            presence = new Presence(this), new MatchListener(this), arenaRules = new ArenaRules(this),
             books = new com.cartroyale.loot.UpgradeBooks(this), chests);
         CartCommand cart = new CartCommand(this);
         bind("cart", cart);
@@ -308,23 +309,31 @@ public final class CartRoyale extends JavaPlugin {
         }
     }
 
+    /**
+     * The server became Diamond SMP (d-smp.vip). config.yml keeps its own copy of every default, so
+     * the old CartZone values are swapped here, only where they are still the old defaults.
+     */
     private void migrateServerIp() {
         java.io.File f = new java.io.File(getDataFolder(), "config.yml");
+        if (!f.exists()) return;
         try {
             String txt = java.nio.file.Files.readString(f.toPath());
             StringBuilder out = new StringBuilder();
             for (String line : txt.split("\n", -1)) {
-                if (line.startsWith("server-ip:") && line.contains("play.cartzone.vip")) line = "server-ip: cartzone.vip";
+                String t = line.trim();
+                if (line.startsWith("server-ip:") && (t.endsWith("play.cartzone.vip") || t.endsWith(" cartzone.vip"))) line = "server-ip: d-smp.vip";
+                else if (t.equals("hoster-name: CartZone")) line = line.replace("CartZone", "Diamond SMP");
+                else if (t.equals("username: CartZone")) line = line.replace("CartZone", "Diamond SMP");
                 out.append(line).append('\n');
             }
             String fixed = out.substring(0, out.length() - 1);
             if (!fixed.equals(txt)) {
                 java.nio.file.Files.writeString(f.toPath(), fixed);
                 reloadConfig();
-                getLogger().info("config.yml: server-ip changed from play.cartzone.vip to cartzone.vip.");
+                getLogger().info("config.yml: switched the server IP and names to Diamond SMP (d-smp.vip).");
             }
         } catch (java.io.IOException e) {
-            getLogger().warning("Could not update server-ip in config.yml: " + e.getMessage());
+            getLogger().warning("Could not update config.yml for the Diamond SMP rename: " + e.getMessage());
         }
     }
 
@@ -422,6 +431,7 @@ public final class CartRoyale extends JavaPlugin {
     public Lobby lobby() { return lobby; }
     public com.cartroyale.hooks.VulcanHook vulcan() { return vulcan; }
     public com.cartroyale.match.SquadHud squadHud() { return squadHud; }
+    public ArenaRules arenaRules() { return arenaRules; }
     public Stats stats() { return stats; }
     public RankService rank() { return rank; }
     public GameManager games() { return games; }

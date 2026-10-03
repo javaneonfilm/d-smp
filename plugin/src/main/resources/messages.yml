@@ -1,10 +1,10 @@
-# CartZone messages. MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
+# Diamond SMP messages (the CartZone plugin). MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
 # Placeholders look like <name>. <prefix> inserts the prefix below.
 # The discord.* entries are plain Discord markdown, not MiniMessage.
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 4
+messages-version: 5
 
 prefix: '<accent>●</accent> '
 
@@ -75,15 +75,15 @@ categories:
 
 # ------------------------------------------------------------------ joining / lobby
 access:
-  no-game: "<accent><b><sc>cartzone</sc></b>
+  no-game: "<accent><b><sc>diamond smp</sc></b>
 
 <fg>No game right now.
 <sub>The next one gets posted on our Discord."
-  next-game: "<accent><b><sc>cartzone</sc></b>
+  next-game: "<accent><b><sc>diamond smp</sc></b>
 
 <fg>Next game is #<id> at <hl><start></hl>.
 <sub>You can join <minutes> minutes before it starts."
-  in-progress: "<accent><b><sc>cartzone</sc></b>
+  in-progress: "<accent><b><sc>diamond smp</sc></b>
 
 <fg>Game #<id> already started.
 <sub>Check Discord for the next one."
@@ -97,12 +97,12 @@ chat:
   spectator-format: '<dim><sc>spec</sc></dim> <sub><name> <dim>›</dim> <sub><message>'
 
 ip-bar:
-  plain: '<accent><b><sc>cartzone</sc></b></accent> <dim>·</dim> <fg><ip>'
+  plain: '<accent><b><sc>diamond smp</sc></b></accent> <dim>·</dim> <fg><ip>'
   styled: '<fg><sc><ip></sc>'
 
 tab:
   header: "
-<accent><b><sc>cartzone</sc></b></accent>
+<accent><b><sc>diamond smp</sc></b></accent>
 <sub><sc><ip></sc>
 "
   footer: "
@@ -112,7 +112,7 @@ tab:
 # The sidebar. <tab> pushes the rest of the line to the right edge. In board.game a line that is
 # only <squad> becomes your squad list (team games, players without the resource pack).
 board:
-  title: '<accent><b><sc>cartzone'
+  title: '<accent><b><sc>diamond smp'
   lobby:
     - ''
     - ' <sub><sc>online</sc><tab><fg><online> '
@@ -327,7 +327,7 @@ loot:
   added: '<prefix><fg>Added <item> to <tier>.'
 
 pack:
-  prompt: '<fg>CartZone uses a small resource pack for the HUD, badges and items.'
+  prompt: '<fg>Diamond SMP uses a small resource pack for the HUD, badges and items.'
   declined-kick: "<accent><b>You need the resource pack</b>\n\n<fg>Turn on server resource packs for this server and rejoin."
   failed: '<prefix><sub>The resource pack didn''t load. Game still works, just looks plainer.'
   misconfigured: 'Resource pack is on but resource-pack.url or resource-pack.sha1 is missing or wrong.'
@@ -363,8 +363,8 @@ items:
     lore: ['<sub>Block with it in your offhand.', '<sub>Stops one hit of anything,', '<sub>even a cart blowing up.', '<dim>Stacks to 16']
   books:
     armor:
-      name: '<#C0C0C0><b><sc>Armor Upgrade</b>'
-      lore: ['<sub>Your armor goes up a tier.', '<sub>iron > diamond > netherite', '<dim>Used when you pick it up']
+      name: '<accent><b><sc>Protection Book</b>'
+      lore: ['<sub>+1 Protection on all the armor you wear.', '<sub>none > I > II > III > IV > V', '<dim>Used when you pick it up']
     sharpness:
       name: '<#4FE3E8><b><sc>Sharpness Book</b>'
       lore: ['<sub>+1 Sharpness on your sword, axe or spear', '<dim>Used when you pick it up']
@@ -373,8 +373,8 @@ items:
       lore: ['<sub>+1 Quick Charge on your crossbow', '<dim>Used when you pick it up']
 
 books:
-  armor-applied: '<prefix><fg>Armor upgraded to <hl><item></hl>.'
-  armor-waiting: '<prefix><sub>Holding onto the Armor Upgrade until you''re wearing something below netherite.'
+  armor-applied: '<prefix><fg>Your armor has <hl><item></hl> now.'
+  armor-waiting: '<prefix><sub>Holding onto the Protection Book until you wear armor below Protection V.'
   armor-tier: '<tier>'
   kill-upgrade: '<prefix><fg>Kill. Armor''s now <hl><item></hl>.'
   sharpness-applied: '<prefix><fg><hl><item></hl>.'
@@ -451,13 +451,13 @@ webhook:
   test-disabled: '<prefix><sub>Webhooks are off (webhooks.enabled in config.yml).'
   test-bad-url: '<prefix><sub>The webhook URL in secrets.yml has to start with https://'
   test-title: 'Webhook test'
-  test-body: 'If you can read this, CartZone can post here. Sent by <who>.'
+  test-body: 'If you can read this, Diamond SMP can post here. Sent by <who>.'
   hint-url: 'The webhook URL is wrong or the webhook was deleted. Make a new one and paste it into secrets.yml.'
   hint-400: 'Discord didn''t like the message itself, check the server console.'
   hint-network: 'Looks like the server can''t reach Discord. Try again in a bit.'
 
 diag:
-  head: '<accent><b><sc>cartzone diag'
+  head: '<accent><b><sc>diamond smp diag'
   state: '<sub>State <fg><state></fg>, game <fg><game></fg>, players <fg><players></fg>, alive <fg><alive>'
   next: '<sub>Next <fg><next></fg> <sub>(<queued> queued)'
   eligible: '<sub>Would get in right now: <fg><n></fg> <sub>(min <min>), whitelist <fg><whitelist>'
@@ -485,13 +485,13 @@ cmd:
 
 help:
   player:
-    - '<accent><b><sc>cartzone</sc></b>'
+    - '<accent><b><sc>diamond smp</sc></b>'
     - '<fg>/cart host <sub>host a game with your ticket'
     - '<fg>/team invite|accept|leave|list <sub>team up after the purge'
     - '<fg>/tc [message] <sub>team chat, or /tc on its own to toggle it'
     - '<fg>/spectate <sub>follow someone while spectating'
   admin:
-    - '<accent><b><sc>cartzone admin</sc></b>'
+    - '<accent><b><sc>diamond smp admin</sc></b>'
     - '<fg>/cart host | start [now] | stop | queue | cancel <id> | schedule'
     - '<fg>/cart schedule pause [12h|3d] | resume <sub>stop or restart the scheduled games'
     - '<fg>/cart kit set|preview <lt|ht> <sub>and</sub> /kitready'
@@ -605,7 +605,7 @@ gui:
     tier-title: '<ink><b><tier></b> <dim>(<page>/<pages>)'
     help: '<fg><sc>How this works'
     help-lore: ['<sub>Click an item in your inventory to add it.', '<sub>Left / right: min / max +1', '<sub>Shift: -1 instead', '<sub>Q: rarity, F: pearl flag', '<sub>Ctrl+Q: remove']
-    specials: '<hl><sc>Add a CartZone item'
+    specials: '<hl><sc>Add a special item'
     specials-lore: ['<sub>One Time Shield and the books']
     specials-title: '<ink><b><sc>Add to <tier></b> <dim>(click one)'
     settings: '<hl><b><sc>Chest settings'
@@ -671,7 +671,7 @@ offence:
   muted: '<prefix><accent>You''re muted for <length></accent> <sub>(<type>). Ends <until>.'
   still-muted: '<prefix><sub>You''re muted for another <fg><left></fg>.'
   ban-reason: '<type> (<length>, #<id>)'
-  ban-screen: "<accent><b>You're banned from CartZone</b>\n\n<fg><type>, <length>\n<sub>Ends: <fg><until>\n\n<dim>Ban #<id>, you can appeal on our Discord."
+  ban-screen: "<accent><b>You're banned from Diamond SMP</b>\n\n<fg><type>, <length>\n<sub>Ends: <fg><until>\n\n<dim>Ban #<id>, you can appeal on our Discord."
   blocked: '<prefix><accent>That message didn''t go through.'
   staff-applied: "<accent>[#<id>]</accent> <fg><player></fg> <sub>got a <fg><length> <action></fg> for <fg><type></fg> <sub>from <by> <dim>(<reason>)</dim> <click:run_command:'/offence undo <id>'><hover:show_text:'Undo #<id>'><coin>[Undo]</coin></hover></click>"
   staff-undone: '<ok>[#<id>]</ok> <sub><by> undid <fg><player></fg><sub>''s <type>. It doesn''t count anymore.'

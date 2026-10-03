@@ -112,7 +112,7 @@ public final class Sidebar {
         Match m = plugin.games().match();
         boolean inGame = m != null && m.state.inArena();
         Store.Profile st = stats.getOrDefault(p.getUniqueId(), new Store.Profile(0, 0, 0, 0));
-        String ip = plugin.getConfig().getString("server-ip", "cartzone.vip");
+        String ip = plugin.getConfig().getString("server-ip", "d-smp.vip");
         List<Component> out = new ArrayList<>();
         if (!inGame) {
             GameRow next = plugin.games().next();

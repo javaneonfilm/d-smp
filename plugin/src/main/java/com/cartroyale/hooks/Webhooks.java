@@ -83,8 +83,8 @@ public final class Webhooks {
             plugin.msg().send(to, "webhook.test-bad-url");
             return;
         }
-        Embed e = new Embed(plugin.msg().plain("webhook.test-title"), plugin.msg().plain("webhook.test-body", "who", to.getName()), 0xFF0000,
-            plugin.getConfig().getString("server-ip", "cartzone.vip"));
+        Embed e = new Embed(plugin.msg().plain("webhook.test-title"), plugin.msg().plain("webhook.test-body", "who", to.getName()), 0x80ADC0,
+            plugin.getConfig().getString("server-ip", "d-smp.vip"));
         String role = plugin.getConfig().getString("webhooks.events-role-id", "").trim();
         boolean roleOk = role.matches("\\d{5,25}");
         StringBuilder json = new StringBuilder("{");

@@ -25,16 +25,16 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 /**
  * Loot books that use themselves up the moment they land in a player's inventory in the arena:
- * Armor Upgrade raises every worn armor piece one material (iron to diamond to netherite),
- * Sharpness and Quick Charge add a level to a sword/axe/spear or crossbow. A book that has
- * nothing to work on yet (no crossbow, armor maxed) waits in the inventory and fires as soon as
- * it can. Kills upgrade the killer's armor the same way (upgrades.armor-on-kill).
+ * the Protection Book adds a Protection level to every worn armor piece (none, then I up to V,
+ * books.protection-max), Sharpness and Quick Charge add a level to a sword/axe/spear or crossbow.
+ * A book that has nothing to work on yet (no crossbow, armor maxed) waits in the inventory and
+ * fires as soon as it can. Kills upgrade the killer's armor the same way (upgrades.armor-on-kill).
+ * The ARMOR kind keeps its old id so existing loot tables still hand it out.
  * In the lobby books stay plain items, so admins can carry them into the loot editor.
  */
 public final class UpgradeBooks implements Listener {
@@ -54,11 +54,6 @@ public final class UpgradeBooks implements Listener {
             return null;
         }
     }
-
-    /** Armor ladder. Gold and copper sit beside chainmail/iron in strength, so they step up to the next real tier. */
-    private static final Map<String, String> NEXT = Map.of(
-        "LEATHER", "CHAINMAIL", "COPPER", "IRON", "GOLDEN", "IRON", "CHAINMAIL", "IRON", "IRON", "DIAMOND", "DIAMOND", "NETHERITE");
-    private static final String[] PIECES = {"_HELMET", "_CHESTPLATE", "_LEGGINGS", "_BOOTS"};
 
     private final CartRoyale plugin;
     private final Set<UUID> queued = new HashSet<>();
@@ -175,32 +170,24 @@ public final class UpgradeBooks implements Listener {
         return null;
     }
 
-    /** Every worn armor piece one material up. Returns the new material name, or null if all are maxed. */
+    /** +1 Protection on every worn armor piece below the cap. Returns e.g. "Protection III", or null if nothing changed. */
     public String upgradeArmor(Player p) {
+        int cap = plugin.getConfig().getInt("books.protection-max", 5);
         PlayerInventory inv = p.getInventory();
-        String best = null;
+        int best = 0;
         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
             ItemStack it = inv.getItem(slot);
             if (it == null || it.getType().isAir()) continue;
-            Material next = next(it.getType());
-            if (next == null) continue;
-            inv.setItem(slot, it.withType(next));
-            best = next.name().substring(0, next.name().indexOf('_'));
+            int lvl = it.getEnchantmentLevel(Enchantment.PROTECTION);
+            if (lvl >= cap) continue;
+            it.addUnsafeEnchantment(Enchantment.PROTECTION, lvl + 1);
+            inv.setItem(slot, it);
+            best = Math.max(best, lvl + 1);
         }
-        return best == null ? null : plugin.msg().plain("books.armor-tier", "tier", best.charAt(0) + best.substring(1).toLowerCase());
+        return best == 0 ? null : plugin.msg().plain("books.armor-tier", "tier", "Protection " + roman(best));
     }
 
-    private static Material next(Material m) {
-        String n = m.name();
-        for (String piece : PIECES) {
-            if (!n.endsWith(piece)) continue;
-            String up = NEXT.get(n.substring(0, n.length() - piece.length()));
-            return up == null ? null : Material.matchMaterial(up + piece);
-        }
-        return null;
-    }
-
-    /** upgrades.armor-on-kill: a kill steps the killer's armor up one tier. */
+    /** upgrades.armor-on-kill: a kill gives the killer's armor +1 Protection. */
     public void onKill(Player killer) {
         if (!plugin.getConfig().getBoolean("upgrades.armor-on-kill", true)) return;
         String tier = upgradeArmor(killer);

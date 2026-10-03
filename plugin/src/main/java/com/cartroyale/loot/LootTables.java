@@ -184,7 +184,8 @@ public final class LootTables {
     /** Rolls one chest of the given pool (game mode) and tier into slot/item pairs. */
     public List<LootRoller.Slot<ItemStack>> roll(Mode mode, int tier, boolean luckier, boolean pearls, Random rng) {
         List<LootRoller.Entry<ItemStack>> table = new ArrayList<>();
-        for (Entry e : tier(mode, tier)) table.add(new LootRoller.Entry<>(e.item, e.rarity, e.min, e.max, e.pearl));
+        // Gear from chests wears out like normal, even if it was saved unbreakable.
+        for (Entry e : tier(mode, tier)) table.add(new LootRoller.Entry<>(com.cartroyale.util.Items.breakable(e.item.clone()), e.rarity, e.min, e.max, e.pearl));
         var opts = new LootRoller.Options(minSlots, maxSlots, 27, weights, luckier, lucky, pearls);
         return LootRoller.roll(table, opts, rng);
     }

@@ -15,7 +15,7 @@ import java.util.List;
 /** HOOK-1..4 plus the daily "today's games" post. All wording comes from messages.yml (discord.*). */
 public final class Announcer {
 
-    private static final int RED = 0xFF0000;
+    private static final int BRAND = 0x80ADC0; // Diamond SMP light blue
 
     private final CartRoyale plugin;
 
@@ -24,7 +24,7 @@ public final class Announcer {
     }
 
     private String ip() {
-        return plugin.getConfig().getString("server-ip", "cartzone.vip");
+        return plugin.getConfig().getString("server-ip", "d-smp.vip");
     }
 
     private String title(long id) {
@@ -62,20 +62,20 @@ public final class Announcer {
         String desc = plugin.msg().plain("discord.hosted",
             "map", map, "team_size", teamSize(s.squad), "duration", s.minutes + (plugin.getConfig().getInt("match.grace-seconds", 120) + 59) / 60, "cap", s.purgeCap,
             "mode", modeName(s), "modifiers", modifiers(s), "start_unix", s.startAt / 1000, "ip", ip());
-        plugin.hooks().send(new Webhooks.Embed(title(g.id), desc, RED, plugin.msg().plain("discord.hosted-by", "hoster", s.hosterName)), true);
+        plugin.hooks().send(new Webhooks.Embed(title(g.id), desc, BRAND, plugin.msg().plain("discord.hosted-by", "hoster", s.hosterName)), true);
     }
 
     /** HOOK-2: pings the events role. */
     public void warning(GameRow g) {
         String desc = plugin.msg().plain("discord.warning", "ip", ip(), "start_unix", g.s.startAt / 1000);
-        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.warning-title"), desc, RED,
+        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.warning-title"), desc, BRAND,
             plugin.msg().plain("discord.hosted-by", "hoster", g.s.hosterName)), true);
     }
 
     /** HOOK-3: no ping. */
     public void purge(GameRow g, int online) {
         String desc = plugin.msg().plain("discord.purge", "online", online);
-        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.purge-title"), desc, RED,
+        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.purge-title"), desc, BRAND,
             plugin.msg().plain("discord.hosted-by", "hoster", g.s.hosterName)), false);
     }
 
@@ -85,7 +85,7 @@ public final class Announcer {
         for (String n : winners) w.append('`').append(n).append("` ");
         String desc = plugin.msg().plain(winners.isEmpty() ? "discord.results-none" : "discord.results",
             "winners", w.toString().trim(), "winner_kills", winnerKills, "mvp", mvp == null ? "-" : mvp, "mvp_kills", mvpKills);
-        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.results-title", "id", g.id), desc, RED, null), false);
+        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.results-title", "id", g.id), desc, BRAND, null), false);
     }
 
     /** The owner's daily post: "Game 1: 16:00 Duos". Times use Discord timestamps so each reader sees local time. */
@@ -99,7 +99,7 @@ public final class Announcer {
                 "team_size", teamSize(g.s.squad), "mode", modeName(g.s), "emoji", emoji == null ? "" : emoji).stripTrailing());
         }
         String date = LocalDate.ofInstant(Instant.now(), zone).toString();
-        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.daily-title", "date", date), String.join("\n", lines), RED,
+        plugin.hooks().send(new Webhooks.Embed(plugin.msg().plain("discord.daily-title", "date", date), String.join("\n", lines), BRAND,
             plugin.msg().plain("discord.daily-footer", "ip", ip())), plugin.getConfig().getBoolean("webhooks.daily-post.ping", false));
     }
 

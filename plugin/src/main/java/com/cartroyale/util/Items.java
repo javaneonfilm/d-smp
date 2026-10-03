@@ -88,4 +88,13 @@ public final class Items {
         for (int i = 0; i < Math.min(len, parts.length); i++) out[i] = fromB64(parts[i]);
         return out;
     }
+
+    /** Takes "unbreakable" off an item, so armor, weapons and tools wear out and break. */
+    @SuppressWarnings("UnstableApiUsage")
+    public static ItemStack breakable(ItemStack it) {
+        if (it != null && it.hasData(io.papermc.paper.datacomponent.DataComponentTypes.UNBREAKABLE)) {
+            it.unsetData(io.papermc.paper.datacomponent.DataComponentTypes.UNBREAKABLE);
+        }
+        return it;
+    }
 }

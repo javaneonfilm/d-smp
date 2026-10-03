@@ -147,8 +147,8 @@ def shield_blocking_model():
 # ---------------------------------------------------------------- HUD
 
 # Glass look: dark see-through fill, a faint light edge, corners rounded by 3 px.
-GLASS_FILL = (14, 16, 22, 150)
-GLASS_EDGE = (255, 255, 255, 38)
+GLASS_FILL = (14, 37, 69, 150)      # logo navy #0E2545
+GLASS_EDGE = (128, 173, 192, 90)    # logo light blue #80ADC0
 
 
 def glass(w, h, radius=3):
@@ -176,8 +176,8 @@ def zone_panel():
 
 
 def cart_icon():
-    """His TNT minecart picture, kept at 4x (42x40) so the font scales it down cleanly to 10 px."""
-    return Image.open(os.path.join(ROOT, "ranks", "cart_icon.png")).convert("RGBA")
+    """The Diamond SMP logo (16x16, resourcepack/brand), drawn 10 px tall next to the IP."""
+    return Image.open(os.path.join(ROOT, "brand", "logo16.png")).convert("RGBA")
 
 
 # Squad cards (top-left HUD). Keep in sync with HudText.squadCard and cz_hud.glsl.
@@ -198,7 +198,7 @@ def bar_piece(w, track):
 
 
 def kills_icon():
-    """7x7 sword: blade from the top right, gold crossguard, brown grip bottom left."""
+    """7x7 diamond sword: blade from the top right, teal crossguard, brown grip bottom left."""
     img = Image.new("RGBA", (7, 7), (0, 0, 0, 0))
     art = [
         ".....WE",
@@ -209,7 +209,7 @@ def kills_icon():
         ".HG....",
         "H..G...",
     ]
-    pal = {"W": (240, 240, 245, 255), "E": (150, 150, 165, 255), "G": (255, 190, 50, 255), "H": (125, 82, 48, 255)}
+    pal = {"W": (196, 223, 228, 255), "E": (94, 151, 170, 255), "G": (24, 97, 111, 255), "H": (125, 82, 48, 255)}
     for y, row in enumerate(art):
         for x, ch in enumerate(row):
             if ch in pal:
@@ -254,14 +254,14 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     write_json("pack.mcmeta", {"pack": {
-        "description": "CartZone - HUD, books, zone wall",
+        "description": "Diamond SMP - HUD, books, zone wall",
         # 1.21.11 is format 75; 1.21.9+ reads the min/max range, older clients read pack_format.
         "pack_format": 75, "min_format": 75, "max_format": 99},
         # 26.x moved item rendering to core/item (and 26.2 text to core/text), so newer clients get their own copies.
         "overlays": {"entries": [
             {"min_format": 84, "max_format": 87, "directory": "overlay_26_1"},
             {"min_format": 88, "max_format": 1000, "directory": "overlay_26"}]}})
-    save_png("pack.png", Image.open(os.path.join(PROJECT, "site", "assets", "logo.png")).convert("RGBA").resize((128, 128), Image.LANCZOS))
+    save_png("pack.png", Image.open(os.path.join(ROOT, "brand", "logo16.png")).convert("RGBA").resize((128, 128), Image.NEAREST))
 
     # The One Time Shield uses the vanilla shield look again (his call), so no shield model here.
 

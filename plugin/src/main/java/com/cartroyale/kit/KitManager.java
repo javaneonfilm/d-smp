@@ -51,7 +51,7 @@ public final class KitManager {
         yml.save();
     }
 
-    /** Clears the player and gives the kit. Armor becomes unbreakable (KIT-4). */
+    /** Clears the player and gives the kit. Armor and tools can wear out and break. */
     public void apply(Player p, Mode m) {
         PlayerInventory inv = p.getInventory();
         inv.clear();
@@ -73,8 +73,7 @@ public final class KitManager {
     @SuppressWarnings("UnstableApiUsage")
     public static ItemStack prep(ItemStack it) {
         if (it == null || it.getType() == Material.AIR) return null;
-        if (Items.isArmor(it)) it.setData(DataComponentTypes.UNBREAKABLE);
-        return it;
+        return Items.breakable(it);
     }
 
     public ItemStack[] preview(Mode m) {

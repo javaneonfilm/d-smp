@@ -21,7 +21,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
@@ -34,7 +33,7 @@ import java.util.UUID;
 
 /**
  * In-match player rules: kill credit (including TNT carts, WORLD-4), friendly fire (TEAM-2),
- * unbreakable armor that vanishes on death (KIT-4), death to spectator (DEATH-1) and
+ * armor that vanishes on death (KIT-4; it wears out and can break like normal), death to spectator (DEATH-1) and
  * disconnects counting as eliminations.
  */
 public final class MatchListener implements Listener {
@@ -135,12 +134,6 @@ public final class MatchListener implements Listener {
         Match.MP mp = m.get(victim.getUniqueId());
         mp.lastDamager = attacker;
         mp.lastDamageAt = System.currentTimeMillis();
-    }
-
-    /** KIT-4: armor never loses durability in a match. */
-    @EventHandler(ignoreCancelled = true)
-    public void onArmorWear(PlayerItemDamageEvent e) {
-        if (plugin.arenas().isArena(e.getPlayer().getWorld()) && Items.isArmor(e.getItem())) e.setCancelled(true);
     }
 
     // ---------------- death ----------------

@@ -4,8 +4,8 @@ Built by `py resourcepack/tools/build_pack.py` (needs Pillow). Output: `resource
 
 | | |
 |---|---|
-| SHA-1 | `4601076f50cab1b9d411c6aa7fb474da645bc5d8` |
-| Size | 128946 bytes |
+| SHA-1 | `97d4c2d50b227ee0fd932d333039be15827040e0` |
+| Size | 102822 bytes |
 | pack_format | 75 (1.21.11), accepted range 75-99 |
 
 ## What is in it
@@ -23,7 +23,7 @@ It changes no vanilla textures other than the two pink boss bar sprites.
    resource-pack:
      enabled: true
      url: '<the direct link>'
-     sha1: '4601076f50cab1b9d411c6aa7fb474da645bc5d8'
+     sha1: '97d4c2d50b227ee0fd932d333039be15827040e0'
      required: true
    ```
 3. `/cart reload`, then rejoin. `/cart diag` shows whether the pack is configured.

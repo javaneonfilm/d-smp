@@ -38,18 +38,18 @@ public final class Msg {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
 
-    /** The glass palette. */
+    /** The glass palette, in Diamond SMP's colours (taken from the logo). */
     public static final Map<String, Integer> PALETTE = Map.of(
-        "accent", 0xFF6A3D,   // brand orange-red
-        "hl", 0xFFB86B,       // highlighted values: times, names in a sentence
-        "fg", 0xF2F4F7,       // main text
-        "sub", 0xA9AEB8,      // secondary text
-        "dim", 0x626875,      // hints, separators
+        "accent", 0x8CC8DC,   // diamond light blue
+        "hl", 0xC4DFE4,       // highlighted values: times, names in a sentence
+        "fg", 0xEFF6F8,       // main text
+        "sub", 0x8FB0BE,      // secondary text
+        "dim", 0x4F7F92,      // hints, separators
         "ok", 0x4ADE80,
         "warn", 0xFACC15,
-        "bad", 0xFF4D4D,
+        "bad", 0xFF5D5D,
         "coin", 0xFFC94A,
-        "ink", 0x2A2D35);     // menu titles, which sit on Minecraft's light grey
+        "ink", 0x0E2545);     // menu titles, which sit on Minecraft's light grey
 
     private static final String SMALL = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ";
 

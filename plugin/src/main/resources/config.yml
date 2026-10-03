@@ -1,7 +1,7 @@
 # CartZone - main config. Reload with /cart reload (worlds and the database need a restart).
 # Secrets (Discord webhook URL, stats token) do NOT go here. They live in secrets.yml.
 
-server-ip: cartzone.vip
+server-ip: d-smp.vip
 # Shown in the webhook title, e.g. "Game #12 (EU)". It is the server's region, not the domain.
 region: EU
 # Wall-clock times: schedule, Host GUI times, daily shop reset. Any Java zone id (UTC, Europe/Berlin...).
@@ -58,7 +58,7 @@ host:
 
 schedule:
   create-ahead-minutes: 60  # scheduled games are created (and announced) this far ahead
-  hoster-name: CartZone
+  hoster-name: Diamond SMP
 
 deploy:
   distance: 300             # blocks the ghasts fly before dropping everyone
@@ -95,8 +95,9 @@ chests:                     # amount, spacing and tier mix moved to loot.yml (/c
 books:
   sharpness-max: 5          # highest Sharpness a Sharpness Book can reach
   quickcharge-max: 3        # Quick Charge above 3 makes crossbows unusable in vanilla
+  protection-max: 5         # Protection Books and kills raise worn armor up to this (none > I > ... > V)
 upgrades:
-  armor-on-kill: true       # a kill upgrades the killer's worn armor one tier (iron > diamond > netherite)
+  armor-on-kill: true       # a kill gives the killer's worn armor +1 Protection (up to books.protection-max)
 
 sounds:
   kill: cartzone:kill       # played to the killer (from the resource pack); '' turns it off
@@ -173,7 +174,7 @@ anticheat:
 
 webhooks:
   enabled: true
-  username: CartZone
+  username: Diamond SMP
   events-role-id: ''        # right-click the @Events role with Developer Mode on, Copy Role ID
   flag: ''                  # optional text before the title; plain text, no emoji
   warning-minutes: 5

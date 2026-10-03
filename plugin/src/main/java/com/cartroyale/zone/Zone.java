@@ -284,7 +284,7 @@ public final class Zone {
             : zoneTotal <= 0 ? 0 : Math.max(0, Math.min(1, 1 - elapsed / zoneTotal));
         // Grace counts down in green (yellow for the last 30 s, blinking red for the last 10);
         // after that the bar is the zone's time left, red while it is shrinking.
-        int color = !grace ? (s.shrinking() || closed ? 0xFF4D4D : 0xFF6A3D)
+        int color = !grace ? (s.shrinking() || closed ? 0xFF5D5D : 0x8CC8DC)
             : secs <= 10 ? ((tick / 10) % 2 == 0 ? 0xFF4D4D : 0x626875) : secs <= 30 ? 0xFACC15 : 0x4ADE80;
         if (grace && secs <= 5 && secs != lastTickSound) {
             lastTickSound = secs;
@@ -308,7 +308,7 @@ public final class Zone {
         double base = Math.atan2(dz, dx);
         double arc = c.r() <= 0 ? Math.PI : Math.min(Math.PI, view / Math.max(1, c.r()));
         double step = spacing / Math.max(1, c.r());
-        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(0xFF0000), 1.6f);
+        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(0x8CC8DC), 1.6f);
         int drawn = 0, cap = yml.get().getInt("particles.max-per-player", 180);
         for (double a = base - arc; a <= base + arc && drawn < cap; a += step) {
             double x = c.x() + Math.cos(a) * c.r(), z = c.z() + Math.sin(a) * c.r();
