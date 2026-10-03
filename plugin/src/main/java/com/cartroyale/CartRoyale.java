@@ -174,7 +174,7 @@ public final class CartRoyale extends JavaPlugin {
         squadHud = new com.cartroyale.match.SquadHud(this);
         chatFilter = new com.cartroyale.mod.ChatFilter(this);
         register(offences, chatFilter, new GuiListener(), new OneTimeShield(this), deploy, spectators, cosmetics, lobby,
-            presence = new Presence(this), new MatchListener(this), arenaRules = new ArenaRules(this),
+            presence = new Presence(this), new MatchListener(this), arenaRules = new ArenaRules(this), new com.cartroyale.match.TotemLimit(this),
             books = new com.cartroyale.loot.UpgradeBooks(this), chests);
         CartCommand cart = new CartCommand(this);
         bind("cart", cart);

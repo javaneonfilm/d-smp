@@ -254,12 +254,13 @@ public final class CartCommand implements TabExecutor {
     // ---------------- kits ----------------
 
     private boolean kit(CommandSender s, String[] a) {
-        // "/cart kit set <mode> <player>" saves another player's inventory (usable from the console).
-        Player p = a.length > 3 ? Bukkit.getPlayerExact(a[3]) : s instanceof Player self ? self : null;
-        if (p == null) return a.length > 3 ? usage(s, "/cart kit <set|preview> <lt|ht> [player]") : notPlayer(s);
-        if (a.length < 3) return usage(s, "/cart kit <set|preview> <lt|ht>");
-        Mode mode = Mode.parse(a[2]);
-        if (mode == null) return usage(s, "/cart kit <set|preview> <lt|ht>");
+        // One kit for every game. "/cart kit set [player]" saves another player's inventory (usable
+        // from the console); an old "lt"/"ht" argument before the name is still accepted.
+        int at = a.length > 2 && (a[2].equalsIgnoreCase("lt") || a[2].equalsIgnoreCase("ht")) ? 3 : 2;
+        Player p = a.length > at ? Bukkit.getPlayerExact(a[at]) : s instanceof Player self ? self : null;
+        if (p == null) return a.length > at ? usage(s, "/cart kit <set|preview> [player]") : notPlayer(s);
+        if (a.length < 2) return usage(s, "/cart kit <set|preview>");
+        Mode mode = Mode.LT;
         switch (a[1].toLowerCase(Locale.ROOT)) {
             case "set" -> {
                 plugin.kits().save(mode, p);
@@ -279,7 +280,7 @@ public final class CartCommand implements TabExecutor {
                 if (items[40] != null) gui.set(41, items[40]);
                 gui.open(p);
             }
-            default -> usage(s, "/cart kit <set|preview> <lt|ht>");
+            default -> usage(s, "/cart kit <set|preview>");
         }
         return true;
     }
@@ -430,9 +431,9 @@ public final class CartCommand implements TabExecutor {
         return true;
     }
 
-    /** Entry count of one tier in both pools, "lt|ht". */
+    /** Entry count of one loot tier. */
     private String pools(int t) {
-        return plugin.loot().tier(com.cartroyale.game.Mode.LT, t).size() + "|" + plugin.loot().tier(com.cartroyale.game.Mode.HT, t).size();
+        return String.valueOf(plugin.loot().tier(com.cartroyale.game.Mode.LT, t).size());
     }
 
     /** ZONE-4 preview: draws every phase circle around the admin for 15 seconds. */
@@ -581,7 +582,7 @@ public final class CartCommand implements TabExecutor {
         lines.add(plugin.msg().plain("diag.arena", "world", plugin.arenas().world() == null ? "NOT LOADED" : plugin.arenas().worldName(),
             "map", String.valueOf(plugin.arenas().loadedMap()), "template", mc != null && plugin.arenas().hasTemplate(mc.name) ? "yes" : "no",
             "spots", mc != null && plugin.arenas().spotsFile(mc.name).exists() ? "cached" : "not scanned"));
-        lines.add(plugin.msg().plain("diag.kits", "lt", plugin.kits().has(Mode.LT) ? "set" : "MISSING", "ht", plugin.kits().has(Mode.HT) ? "set" : "MISSING"));
+        lines.add(plugin.msg().plain("diag.kits", "lt", plugin.kits().has(Mode.LT) ? "set" : "MISSING"));
         lines.add(plugin.msg().plain("diag.loot", "t1", pools(1), "t2", pools(2), "t3", pools(3),
             "chests", plugin.chests().report()));
         lines.add(plugin.msg().plain("diag.deploy", "report", plugin.deploy().report()));
@@ -616,7 +617,7 @@ public final class CartCommand implements TabExecutor {
         List<String> opts = switch (a[0].toLowerCase(Locale.ROOT)) {
             case "start" -> a.length == 2 ? List.of("now") : List.of();
             case "cancel" -> a.length == 2 ? plugin.games().queue().stream().map(g -> String.valueOf(g.id)).toList() : List.of();
-            case "kit" -> a.length == 2 ? List.of("set", "preview") : a.length == 3 ? List.of("lt", "ht") : List.of();
+            case "kit" -> a.length == 2 ? List.of("set", "preview") : List.of();
             case "arena" -> a.length == 2 ? List.of("info", "list", "save", "load", "tp", "setspawn", "setcenter", "setborder", "setdeploy")
                 : a.length == 3 && a[1].equalsIgnoreCase("load") ? plugin.arenas().maps() : List.of();
             case "zone" -> a.length == 2 ? List.of("info", "start", "final", "preview") : List.of();

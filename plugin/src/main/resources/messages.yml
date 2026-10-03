@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 6
+messages-version: 7
 
 prefix: '<accent>●</accent> '
 
@@ -19,7 +19,6 @@ discord:
     - Team size: **<team_size>**
     - Length: **<duration> min**
     - Player cap: **<cap>**
-    - Mode: **<mode>**
     - Modifiers: <modifiers>
 
     Starts <t:<start_unix>:R> on `<ip>`
@@ -53,9 +52,9 @@ team-size:
 
 modes:
   lt:
-    name: 'LT Cart'
+    name: 'Standard'
   ht:
-    name: 'HT Cart'
+    name: 'Standard'
 
 modifiers:
   no_fall_damage:
@@ -70,7 +69,7 @@ modifiers:
 
 categories:
   kill: 'Kill Effects'
-  explosion: 'Cart Explosions'
+  explosion: 'Explosions'
   suffix: 'Suffixes'
 
 # ------------------------------------------------------------------ joining / lobby
@@ -195,7 +194,7 @@ titles:
   end-sub: '<sub><winners> <sc>won'
 
 game:
-  hosted: '<prefix><hl><hoster></hl> <fg>is hosting game #<id>: <mode>, <team_size>, <start>.'
+  hosted: '<prefix><hl><hoster></hl> <fg>is hosting game #<id>: <team_size>, <start>.'
   window-open: '<prefix><fg>Game #<id> starts at <hl><start></hl>. <sub><players> online, <cap> spots.'
   purge-start: '<prefix><fg>Purge time. <sub><online> players for <cap> spots.'
   purge-cutting: '<prefix><sub>Cutting <accent><count></accent> of you...'
@@ -238,7 +237,7 @@ teams:
   list: '<prefix><fg>Team (<count>/<size>): <hl><members>'
 
 deploy:
-  boarded: '<prefix><fg>You''re on. <sub><mode>, sneak to jump off early.'
+  boarded: '<prefix><fg>You''re on. <sub>Sneak to jump off early.'
   riding-bar: '<fg><sc>sneak to drop</sc> <dim>·</dim> <sub><sc>auto drop in</sc> <hl><seconds>s'
   dropped: '<fg>Gliding. <sub>Elytra comes off when you land.'
   landed: '<ok>Landed. <fg>Chestplate''s back on.'
@@ -259,7 +258,7 @@ zone:
   grace-over-title: '<accent><b><sc>pvp on'
   grace-over-sub: '<sub><sc>the zone starts moving'
   grace-no-pvp: '<ok>PvP turns on in <fg><seconds>s'
-  grace-no-carts: '<ok>TNT carts don''t go off until PvP is on (<fg><seconds>s</fg>)'
+  grace-no-carts: '<ok>Explosions don''t go off until PvP is on (<fg><seconds>s</fg>)'
   bar-waiting: '<fg><sc>zone</sc> <phase>/<phases> <dim>·</dim> <sub><sc>moves in</sc> <hl><seconds>s</hl> <dim>·</dim> <sub><sc>r</sc><radius>'
   bar-shrinking: '<accent><sc>zone shrinking</sc> <sub><seconds>s <dim>·</dim> <sub><sc>r</sc><radius>'
   bar-orbit: '<accent><sc>final zone moving</sc> <dim>·</dim> <sub><sc>r</sc><radius>'
@@ -270,6 +269,9 @@ zone:
   info-line: '<sub> <n>. wait <wait>s, shrink <shrink>s to r<r> at <x>,<z> <dim>·</dim> <sub><dmg> dmg <dim>·</dim> <sub>done at <at>'
   info-closed: '<sub> After that the zone is closed and everyone takes damage.'
   info-orbit: '<sub> After that the circle moves around <x>,<z> (r <r>, <speed> blocks/s).'
+
+match:
+  totem-limit: '<warn>You can only carry <max> totem.'
 
 spectate:
   now: '<prefix><sub>You''re spectating. <fg>/spectate</fg> to follow someone.'
@@ -303,7 +305,7 @@ host:
   no-ticket-store: '<sub>Get one here: <accent><u><store></u></accent>'
   too-soon: '<prefix><sub>Pick a time at least <minutes> min from now.'
   slot-taken: '<prefix><sub>There''s already a game within <minutes> min of that. Pick another time.'
-  kit-missing-warning: '<prefix><hl>Heads up, there''s no <mode> kit set yet. Ask an admin.'
+  kit-missing-warning: '<prefix><hl>Heads up, there''s no kit set yet. Ask an admin.'
   queued: '<prefix><ok>Game #<id> is set for <start>.</ok> <sub>Posted on Discord.'
   failed: '<prefix><accent>Couldn''t queue that game, try again.'
 
@@ -319,11 +321,11 @@ tickets:
   list-line: '<sub> <delta> <fg><source></fg> tx <tx> <dim><when>'
 
 kits:
-  saved: '<prefix><ok><mode> kit saved from your inventory.'
-  missing: 'No <mode> kit is set, so players boarded with nothing. Do /kitready then /cart kit set <mode>.'
-  missing-admin: '<prefix><sub>No <mode> kit set yet.'
+  saved: '<prefix><ok>Kit saved from your inventory.'
+  missing: 'No kit is set, so players boarded with nothing. Do /kitready then /cart kit set.'
+  missing-admin: '<prefix><sub>No kit set yet.'
   ready-confirm: '<prefix><hl>This wipes your inventory. Run /kitready again within 10s if you''re sure.'
-  ready-done: '<prefix><fg>Inventory cleared. Set up the kit, then <hl>/cart kit set lt</hl> or <hl>ht</hl>.'
+  ready-done: '<prefix><fg>Inventory cleared. Set up the kit, then <hl>/cart kit set</hl>.'
 
 loot:
   added: '<prefix><fg>Added <item> to <tier>.'
@@ -362,7 +364,7 @@ items:
     lore: ['<sub>Comes off when you land']
   one-time-shield:
     name: '<hl><sc>One Time Shield'
-    lore: ['<sub>Block with it in your offhand.', '<sub>Stops one hit of anything,', '<sub>even a cart blowing up.', '<dim>Stacks to 16']
+    lore: ['<sub>Block with it in your offhand.', '<sub>Stops one hit of anything,', '<sub>even an explosion.', '<dim>Stacks to 16']
   books:
     armor:
       name: '<accent><b><sc>Protection Book</b>'
@@ -428,7 +430,7 @@ admin:
   already-running: '<prefix><sub>Game #<id> is already going (<state>).'
   queue-live: '<prefix><fg>Live: #<id> <sub>(<state>, <players> players, <alive> alive)'
   queue-empty: '<prefix><sub>Nothing queued.'
-  queue-line: '<sub> #<id> <fg><start></fg> <sub><hoster>, <mode>, <team_size>, cap <cap> <dim>(<source>)'
+  queue-line: '<sub> #<id> <fg><start></fg> <sub><hoster>, <team_size>, cap <cap> <dim>(<source>)'
   reloaded: '<prefix><ok>Reloaded.'
   lobby-set: '<prefix><fg>Lobby spawn set.'
   play-on: '<prefix><fg>You''ll play in games now instead of spectating.'
@@ -465,8 +467,8 @@ diag:
   next: '<sub>Next <fg><next></fg> <sub>(<queued> queued)'
   eligible: '<sub>Would get in right now: <fg><n></fg> <sub>(min <min>), whitelist <fg><whitelist>'
   arena: '<sub>Arena <fg><world></fg>, map <fg><map></fg>, template <fg><template></fg>, chest spots <fg><spots>'
-  kits: '<sub>Kits: LT <fg><lt></fg>, HT <fg><ht>'
-  loot: '<sub>Loot entries (LT|HT): <fg><t1>/<t2>/<t3></fg> <sub>chests: <fg><chests>'
+  kits: '<sub>Kit <fg><lt>'
+  loot: '<sub>Loot entries (bronze/silver/gold): <fg><t1>/<t2>/<t3></fg> <sub>chests: <fg><chests>'
   deploy: '<sub>Deploy: <fg><report>'
   zone: '<sub>Zone <fg><running></fg>, <fg><minutes> min'
   zone-wall: '<sub>Zone wall: shader for <fg><walls></fg> player(s), the rest get particles'
@@ -497,7 +499,7 @@ help:
     - '<accent><b><sc>diamond smp admin</sc></b>'
     - '<fg>/cart host | start [now] | stop | queue | cancel <id> | schedule'
     - '<fg>/cart schedule pause [12h|3d] | resume <sub>stop or restart the scheduled games'
-    - '<fg>/cart kit set|preview <lt|ht> <sub>and</sub> /kitready'
+    - '<fg>/cart kit set|preview <sub>and</sub> /kitready'
     - '<fg>/cart arena info|list|tp|load|save <name>|setspawn|setcenter|setborder <r>|setdeploy'
     - '<fg>/cart zone info|start <r>|final|preview'
     - '<fg>/cart chests info|include <r>|exclude <r>|clearzones|scan|test [players]|clear'
@@ -510,7 +512,7 @@ help:
     - '<fg>/cart play | build | spectate | free | shield [n] | shop | reload | setlobby'
     - '<fg>/offence [player] <sub>mutes and bans'
     - '<fg>/cart diag <sub>what''s wrong, on one screen'
-    - '<fg>/cart selftest <sub>blows up a TNT cart and checks the block rules'
+    - '<fg>/cart selftest <sub>sets off an explosion and checks the block rules'
     - '<fg>/cart test [player] [minutes] <sub>practice game, solo is fine'
 
 schedule:
@@ -518,7 +520,7 @@ schedule:
   resumed: '<prefix><fg>Scheduled games are back on.'
   paused-reason: 'schedule paused by <by>'
   today-head: "<prefix><fg>Today's games (<count>):"
-  today-line: '<sub> Game <n>: <fg><time></fg> <hl><team_size></hl> <sub><mode> <dim><id>'
+  today-line: '<sub> Game <n>: <fg><time></fg> <hl><team_size></hl> <dim><id>'
 
 # ------------------------------------------------------------------ GUIs
 gui:
@@ -548,7 +550,7 @@ gui:
     next-free: '<fg><sc>Next free time'
     next-free-lore: ['<dim>Jumps to the next open slot']
     summary: '<fg><sc>Summary'
-    summary-lore: ['<sub>Mode: <fg><mode>', '<sub>Team size: <fg><team_size>', '<sub>Cap: <fg><cap>', '<sub>Modifiers: <fg><modifiers>', '<sub>Map: <fg><map>', '<sub>Starts: <fg><time>', '<sub>Zone closes after: <fg><duration> min']
+    summary-lore: ['<sub>Team size: <fg><team_size>', '<sub>Cap: <fg><cap>', '<sub>Modifiers: <fg><modifiers>', '<sub>Map: <fg><map>', '<sub>Starts: <fg><time>', '<sub>Zone closes after: <fg><duration> min']
     cancel: '<accent><sc>Cancel'
     cancel-lore: ['<dim>Nothing gets spent']
     finish: '<ok><b><sc>Done</b>'
@@ -566,7 +568,7 @@ gui:
     head: '<fg><player>'
     lore: ['<sub>Kills: <fg><kills>', '<sub>Health: <fg><health>', '<dim>Click to follow']
   kit:
-    title: '<ink><b><mode> kit'
+    title: '<ink><b><sc>Kit'
   cosmetics:
     title: '<ink><b><sc>Cosmetics'
     locker: '<fg><b><sc>Locker'
@@ -596,8 +598,8 @@ gui:
     empty-lore: ['<sub>Get cosmetics in the Daily Shop.']
   loot:
     title: '<ink><b><sc>Loot'
-    pool: '<fg><b><pool> loot'
-    pool-lore: ['<sub>Chests in <pool> games use', '<sub>the three tiers on this row.']
+    pool: '<fg><b><sc>Loot'
+    pool-lore: ['<sub>Every game uses the three', '<sub>chest tiers on this row.']
     tier-1: '<#CD7F32><b><sc>★ Bronze'
     tier-2: '<#C0C0C0><b><sc>★★ Silver'
     tier-3: '<coin><b><sc>★★★ Gold'
@@ -637,7 +639,7 @@ gui:
   schedule:
     title: '<ink><b><sc>Schedule</b> <dim>(<zone>)'
     entry: '<fg><line>'
-    entry-line: '<time> <days>, <team_size>, <mode>'
+    entry-line: '<time> <days>, <team_size>'
     entry-lore: ['<sub>Cap: <fg><cap>', '<sub>Map: <fg><map>', '<sub>Modifiers: <fg><modifiers>', '<sub>On: <fg><enabled>', '<dim>Click to edit']
     add: '<ok><sc>Add a game'
     add-lore: ['<dim>Makes a daily 16:00 game you can edit']
@@ -659,7 +661,7 @@ gui:
     until-resumed: 'you turn it back on'
 
 selftest:
-  start: '<prefix><fg>Self-test: blowing up a TNT cart at <hl><where></hl> in the arena...'
+  start: '<prefix><fg>Self-test: setting off an explosion at <hl><where></hl> in the arena...'
   pass: '<ok>PASS</ok> <fg><check></fg> <sub>(<detail>)'
   fail: '<accent>FAIL</accent> <fg><check></fg> <sub>(<detail>)'
   drops: '<sub>Dropped items: <fg><drops>'

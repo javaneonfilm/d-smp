@@ -78,7 +78,8 @@ elytra:
   allow-fireworks: false
 
 match:
-  grace-seconds: 120        # after everyone lands: no PvP (carts included) and the zone holds still
+  grace-seconds: 120        # after everyone lands: no PvP (explosions included) and the zone holds still
+  max-totems: 1             # Totems of Undying a player can carry in a game (offhand included)
   zone-close-minutes: 20    # then the zone is fully closed this long later (unless the host picks 20-40)
   hard-timeout-extra-minutes: 5
   end-kick-seconds: 10

@@ -64,12 +64,6 @@ public final class HostGui {
         if (admin) max = plugin.getConfig().getInt("host.limits.admin-max-cap", 200);
         final int capMin = min, capMax = max;
 
-        gui.set(10, button(s.mode == com.cartroyale.game.Mode.LT ? Material.MINECART : Material.TNT_MINECART, "gui.host.mode",
-            "gui.host.mode-lore", "value", a.modeName(s)), e -> {
-            s.mode = s.mode.next();
-            render(p, s, admin, tickets);
-        });
-
         int slot = 12;
         Material[] icons = {Material.FEATHER, Material.GOLDEN_APPLE, Material.ENDER_PEARL};
         for (Modifier m : Modifier.values()) {

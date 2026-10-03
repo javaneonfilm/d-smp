@@ -28,15 +28,15 @@ public final class LootEditorGui {
         this.plugin = plugin;
     }
 
-    /** Two pools, one per game mode (LT row, HT row), each with bronze/silver/gold, plus chest settings. */
+    /** The loot pool (bronze/silver/gold) plus chest settings. Only the LT pool is used now. */
     public void openTiers(Player p) {
         Gui gui = new Gui(4, plugin.msg().get("gui.loot.title"));
         Material[] icons = {Material.COPPER_BLOCK, Material.IRON_BLOCK, Material.GOLD_BLOCK};
-        Mode[] modes = Mode.values();
+        Mode[] modes = {Mode.LT};
         for (int r = 0; r < modes.length; r++) {
             Mode md = modes[r];
             int row = 9 + r * 9;
-            gui.set(row + 1, Items.make(md == Mode.LT ? Material.MINECART : Material.TNT_MINECART,
+            gui.set(row + 1, Items.make(Material.CHEST,
                 plugin.msg().item("gui.loot.pool", "pool", md.name()), plugin.msg().lore("gui.loot.pool-lore", "pool", md.name())));
             for (int t = 1; t <= 3; t++) {
                 int tier = t;

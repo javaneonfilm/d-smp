@@ -106,10 +106,6 @@ public final class ScheduleGui {
             e.days.addAll(next);
             changed(p, e);
         });
-        gui.set(12, btn(Material.TNT_MINECART, "gui.host.mode", "gui.host.mode-lore", "value", plugin.announcer().modeName(s)), c -> {
-            e.mode = e.mode.next();
-            changed(p, e);
-        });
         gui.set(13, btn(Material.PLAYER_HEAD, "gui.host.squad", "gui.host.squad-lore", "value", plugin.announcer().teamSize(e.squad)), c -> {
             List<Integer> sizes = plugin.getConfig().getIntegerList("teams.sizes");
             if (sizes.isEmpty()) sizes = List.of(1, 2, 4);

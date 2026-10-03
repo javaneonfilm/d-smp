@@ -1,21 +1,18 @@
 package com.cartroyale.game;
 
-/** The two game modes. Each has its own kit. */
+/**
+ * There is one game mode now (no carts): every game uses the kit and loot that used to be "LT".
+ * HT stays in the enum only so old kits.yml / loot.yml / database rows still load; anything that
+ * asks for a mode gets LT.
+ */
 public enum Mode {
     LT, HT;
 
     public Mode next() {
-        return values()[(ordinal() + 1) % values().length];
+        return LT;
     }
 
     public static Mode parse(String s) {
-        if (s == null) return null;
-        String t = s.trim().toUpperCase();
-        if (t.endsWith("_CART")) t = t.substring(0, t.length() - 5);
-        try {
-            return valueOf(t);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return LT;
     }
 }

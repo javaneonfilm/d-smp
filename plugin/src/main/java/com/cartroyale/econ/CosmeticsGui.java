@@ -139,7 +139,7 @@ public final class CosmeticsGui {
         }
         if (list.isEmpty()) gui.set(22, Items.make(Material.BARRIER, plugin.msg().item("gui.locker.empty"), plugin.msg().lore("gui.locker.empty-lore")));
         String[] cats = Cosmetics.CATEGORIES.toArray(new String[0]);
-        Material[] icons = {Material.IRON_SWORD, Material.TNT_MINECART, Material.NAME_TAG};
+        Material[] icons = {Material.IRON_SWORD, Material.TNT, Material.NAME_TAG};
         for (int i = 0; i < cats.length; i++) {
             String cat = cats[i];
             ItemStack tab = Items.make(icons[i], plugin.msg().item(cat.equals(category) ? "gui.locker.tab-on" : "gui.locker.tab",
