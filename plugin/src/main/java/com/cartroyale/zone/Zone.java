@@ -278,24 +278,19 @@ public final class Zone {
         net.kyori.adventure.text.Component title = plugin.msg().get(key, "time", String.format("%d:%02d", secs / 60, secs % 60),
             "phase", s.phase() + 1, "phases", plan.phases().size(),
             "radius", (int) Math.round(s.circle().r()), "target", (int) Math.round(s.target().r()));
-        // Grace: the cells count the grace down in green. After that they count the zone down in red.
         double zoneTotal = ZoneMath.totalSeconds(plan);
         double elapsed = (System.currentTimeMillis() - startedAt) / 1000.0 - graceMs() / 1000.0;
         double left = grace ? graceSecondsLeft() / Math.max(1.0, graceMs() / 1000.0)
             : zoneTotal <= 0 ? 0 : Math.max(0, Math.min(1, 1 - elapsed / zoneTotal));
-        int cells = com.cartroyale.lobby.HudText.HEX_CELLS;
-        int full = (int) Math.ceil(left * cells - 1e-9);
-        int edge = !grace && s.shrinking() && full > 0 ? full - 1 : -1;
-        char lit = com.cartroyale.lobby.HudText.HEX_FULL;
-        if (grace) {
-            lit = secs <= 10 ? ((tick / 10) % 2 == 0 ? com.cartroyale.lobby.HudText.HEX_FULL : com.cartroyale.lobby.HudText.HEX_EMPTY)
-                : secs <= 30 ? com.cartroyale.lobby.HudText.HEX_WARN : com.cartroyale.lobby.HudText.HEX_GRACE;
-            if (secs <= 5 && secs != lastTickSound) {
-                lastTickSound = secs;
-                for (Player p : world.getPlayers()) p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 1.4f);
-            }
+        // Grace counts down in green (yellow for the last 30 s, blinking red for the last 10);
+        // after that the bar is the zone's time left, red while it is shrinking.
+        int color = !grace ? (s.shrinking() || closed ? 0xFF4D4D : 0xFF6A3D)
+            : secs <= 10 ? ((tick / 10) % 2 == 0 ? 0xFF4D4D : 0x626875) : secs <= 30 ? 0xFACC15 : 0x4ADE80;
+        if (grace && secs <= 5 && secs != lastTickSound) {
+            lastTickSound = secs;
+            for (Player p : world.getPlayers()) p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 1.4f);
         }
-        hexBar.name(com.cartroyale.lobby.HudText.zoneBar(title, full, edge, lit));
+        hexBar.name(com.cartroyale.lobby.HudText.zoneBar(title, left, net.kyori.adventure.text.format.TextColor.color(color)));
         bar.name(title);
         bar.color(grace ? (secs <= 30 ? BossBar.Color.YELLOW : BossBar.Color.GREEN) : BossBar.Color.RED);
         bar.progress((float) left);

@@ -2,41 +2,83 @@ package com.cartroyale.lobby;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * UI-2: builds the top-centre IP bar title from the pack's cartzone:hud font. The bar glyph is
- * drawn first, then the pen is moved back with negative-space glyphs so the minecart icon and the
- * IP sit centred on it. Sizes must match resourcepack/tools/build_pack.py.
+ * Boss bar titles drawn with the pack's cartzone:hud font: the IP pill, the zone panel and the
+ * squad cards. Glyphs are drawn and then the pen is moved with space glyphs, so every title has a
+ * known width and its parts line up. Sizes must match resourcepack/tools/build_pack.py.
  */
 public final class HudText {
 
     private static final Key FONT = Key.key("cartzone", "hud");
-    private static final int BAR_W = 150, ICON_ADVANCE = 11, SPACE = 4;
-    private static final char ICON = '\uE000', BAR = '\uE001';
+    private static final char ICON = '', IP_PILL = '', ZONE_PANEL = '';
+    private static final int IP_W = 120, ICON_ADVANCE = 11, SPACE = 4, ZONE_W = 182, ZONE_BAR_W = 160;
+    /** Bar pieces 1, 2, 4 ... 128 px wide: solid (tinted by the text colour) and the faint track. */
+    private static final char FILL = '', TRACK = '';
+
+    private static final Map<Character, Integer> WIDTHS = loadWidths();
 
     private HudText() {
     }
 
-    public static Component bar(Component ipText, String ipPlain) {
-        int content = ICON_ADVANCE + SPACE + width(ipPlain);
-        int pad = Math.max(0, (BAR_W - content) / 2);
-        String glyphs = shift(-pad) + BAR + shift(-(BAR_W + 1) + pad) + ICON;
-        return Component.text()
-            .append(Component.text(glyphs).font(FONT).color(NamedTextColor.WHITE))
-            .append(Component.text(" "))
-            .append(ipText)
-            .build();
+    // ---------------- text widths ----------------
+
+    private static Map<Character, Integer> loadWidths() {
+        Map<Character, Integer> m = new HashMap<>();
+        var in = HudText.class.getResourceAsStream("/font-widths.txt");
+        if (in == null) return m;
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.US_ASCII))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                if (line.isBlank() || line.startsWith("#")) continue;
+                String[] p = line.trim().split(" ");
+                m.put((char) Integer.parseInt(p[0], 16), Integer.parseInt(p[1]));
+            }
+        } catch (Exception ignored) {
+            // Widths fall back to 6 px, which is right for most letters.
+        }
+        return m;
+    }
+
+    /** Pixel advance of text in the default Minecraft font. */
+    static int width(String s) {
+        int w = 0;
+        for (char c : s.toCharArray()) w += WIDTHS.getOrDefault(c, 6);
+        return w;
+    }
+
+    /** Pixel width of a component in the default font, bold counted (+1 per character). */
+    public static int width(Component c) {
+        return width(c, false);
+    }
+
+    private static int width(Component c, boolean boldParent) {
+        var st = c.style().decoration(TextDecoration.BOLD);
+        boolean bold = st == TextDecoration.State.TRUE || (st == TextDecoration.State.NOT_SET && boldParent);
+        int w = 0;
+        if (c instanceof TextComponent tc && c.style().font() == null) {
+            w += width(tc.content()) + (bold ? tc.content().length() : 0);
+        }
+        for (Component child : c.children()) w += width(child, bold);
+        return w;
     }
 
     /** Any horizontal move, composed from the pack's power-of-two space glyphs. */
-    static String shift(int px) {
+    public static String shift(int px) {
         StringBuilder sb = new StringBuilder();
         int n = Math.abs(px);
-        char base = px < 0 ? '\uF801' : '\uF821';
+        char base = px < 0 ? '' : '';
         for (int bit = 7; bit >= 0; bit--) {
             while (n >= (1 << bit)) {
                 sb.append((char) (base + bit));
@@ -46,79 +88,82 @@ public final class HudText {
         return sb.toString();
     }
 
-    /** Pixel advance of plain ASCII in the default Minecraft font. */
-    static int width(String s) {
-        int w = 0;
-        for (char c : s.toCharArray()) {
-            w += switch (c) {
-                case 'i', '.', ',', ':', ';', '!', '\'', '|' -> 2;
-                case 'l', '`' -> 3;
-                case 'I', 't', ' ', '"', '(', ')', '*', '[', ']', '{', '}' -> 4;
-                case 'f', 'k', '<', '>' -> 5;
-                case '@', '~' -> 7;
-                default -> 6;
-            };
-        }
-        return w;
+    /** {@link #shift} as a component in the HUD font, ready to append. */
+    public static Component space(int px) {
+        return Component.text(shift(px)).font(FONT);
     }
 
-    // ---------------- zone boss bar ----------------
-
-    public static final int HEX_CELLS = 16, HEX_ADVANCE = 10;
-    public static final char HEX_FULL = '', HEX_EMPTY = '', HEX_GRACE = '', HEX_EDGE = '', HEX_WARN = '';
-
-    /**
-     * The zone bar for players with the pack: a row of hexagon cells where the (invisible) vanilla
-     * bar sits, and the title centred above it. {@code full} cells are lit; {@code edge} marks the
-     * cell draining right now (-1 for none); {@code lit} is the glyph for lit cells (colour).
-     */
-    public static Component zoneBar(Component title, int full, int edge, char lit) {
-        StringBuilder row = new StringBuilder();
-        for (int i = 0; i < HEX_CELLS; i++) {
-            row.append(i == edge ? HEX_EDGE : i < full ? lit : HEX_EMPTY);
+    /** A bar run exactly {@code px} wide from the power-of-two pieces (each piece advances 1 extra, taken back). */
+    static String run(char first, int px) {
+        StringBuilder sb = new StringBuilder();
+        int n = Math.max(0, px);
+        for (int bit = 7; bit >= 0; bit--) {
+            while (n >= (1 << bit)) {
+                sb.append((char) (first + bit)).append('');
+                n -= 1 << bit;
+            }
         }
-        int w = HEX_CELLS * HEX_ADVANCE, t = width(title);
-        // Row first, then step back so the title is centred over it, then forward to the row's end.
+        return sb.toString();
+    }
+
+    /** A bar {@code w} px wide, {@code on} px of it in the fill colour, the rest as faint track. */
+    static Component bar(int w, int on, TextColor fill, TextColor track, ShadowColor shadow) {
+        on = Math.max(0, Math.min(w, on));
         return Component.text()
-            .append(Component.text(row + shift(-(w + t) / 2)).font(FONT).color(NamedTextColor.WHITE))
-            .append(title)
-            .append(Component.text(shift((w - t) / 2)).font(FONT))
+            .append(Component.text(run(FILL, on), fill).font(FONT).shadowColor(shadow))
+            .append(Component.text(run(TRACK, w - on), track).font(FONT).shadowColor(shadow))
             .build();
     }
 
-    /** Pixel width of a component in the default font, bold counted (+1 per character). */
-    static int width(Component c) {
-        return width(c, false);
+    // ---------------- IP pill ----------------
+
+    /** The top-centre pill: minecart icon and the IP, centred on a rounded glass panel. */
+    public static Component bar(Component ipText, String ipPlain) {
+        int content = ICON_ADVANCE + SPACE + width(ipText);
+        int pad = Math.max(0, (IP_W - content) / 2);
+        return Component.text()
+            .append(Component.text(IP_PILL + shift(-(IP_W + 1) + pad) + ICON).font(FONT).color(NamedTextColor.WHITE).shadowColor(ShadowColor.none()))
+            .append(Component.text(" "))
+            .append(ipText)
+            .append(Component.text(shift(IP_W - pad - content)).font(FONT))
+            .build();
     }
 
-    private static int width(Component c, boolean boldParent) {
-        var st = c.style().decoration(net.kyori.adventure.text.format.TextDecoration.BOLD);
-        boolean bold = st == net.kyori.adventure.text.format.TextDecoration.State.TRUE
-            || (st == net.kyori.adventure.text.format.TextDecoration.State.NOT_SET && boldParent);
-        int w = 0;
-        if (c instanceof net.kyori.adventure.text.TextComponent tc) {
-            w += width(tc.content()) + (bold ? tc.content().length() : 0);
-        }
-        for (Component child : c.children()) w += width(child, bold);
-        return w;
+    // ---------------- zone panel ----------------
+
+    /**
+     * The zone panel where the (invisible) vanilla bar sits: the title centred on the first line
+     * and a slim bar under it, {@code fraction} of it lit in {@code color}.
+     */
+    public static Component zoneBar(Component title, double fraction, TextColor color) {
+        int t = width(title);
+        int titleX = (ZONE_W - t) / 2, barX = (ZONE_W - ZONE_BAR_W) / 2;
+        int on = (int) Math.round(Math.max(0, Math.min(1, fraction)) * ZONE_BAR_W);
+        ShadowColor none = ShadowColor.none();
+        return Component.text()
+            .append(Component.text(ZONE_PANEL + shift(-(ZONE_W + 1) + titleX)).font(FONT).color(NamedTextColor.WHITE).shadowColor(none))
+            .append(title)
+            .append(Component.text(shift(barX - titleX - t)).font(FONT))
+            .append(bar(ZONE_BAR_W, on, color, TextColor.color(0xFFFFFF), none))
+            .append(Component.text(shift(ZONE_W - barX - ZONE_BAR_W)).font(FONT))
+            .build();
     }
 
     // ---------------- squad cards ----------------
 
     /** Card width in GUI pixels; must match CZ_CARD_W in the pack's cz_hud.glsl. */
     public static final int CARD_W = 126;
-    public static final int HP_SEGMENTS = 20;
-    private static final int CARD_ADVANCE = CARD_W + 1, HEAD_X = 2, TEXT_X = 21, HP_ADVANCE = 5, KILLS_ICON = 8, RIGHT_PAD = 4;
-    private static final char CARD = '', HP_ON = '', HP_OFF = '', KILLS = '';
+    private static final int CARD_ADVANCE = CARD_W + 1, HEAD_X = 3, TEXT_X = 23, KILLS_ICON = 8, RIGHT_PAD = 5;
+    private static final char CARD = '', KILLS = '';
 
     /**
-     * One squad card for the top-left HUD: a dark panel, the player's head (drawn 2x by the
-     * shader), the name with their kills on the right, and a 20-segment health bar under it.
-     * Every colour must already carry the HUD marker (SquadHud.mark), and the pen ends exactly
-     * CARD_W to the right so the shader knows where the card starts.
+     * One squad card for the top-left HUD: a glass panel, the player's head (drawn 2x by the
+     * shader), the name with their kills on the right, and a slim health bar under it filled to
+     * {@code health} (0-1). Every colour must already carry the HUD marker (SquadHud.mark), and
+     * the pen ends exactly CARD_W to the right so the shader knows where the card starts.
      */
     public static Component squadCard(Component head, String name, TextColor nameColor, boolean struck, ShadowColor textShadow,
-                                      TextColor killsColor, int kills, int hpOn, TextColor hpColor, TextColor white) {
+                                      TextColor killsColor, int kills, double health, TextColor hpColor, TextColor white) {
         String k = String.valueOf(kills);
         int killsW = KILLS_ICON + width(k);
         int maxName = CARD_W - TEXT_X - RIGHT_PAD - killsW - 4;
@@ -128,9 +173,8 @@ public final class HudText {
             shown += "..";
         }
         int nameEnd = TEXT_X + width(shown);
-        StringBuilder bar = new StringBuilder();
-        for (int i = 0; i < HP_SEGMENTS; i++) bar.append(i < hpOn ? HP_ON : HP_OFF);
-        int barEnd = TEXT_X + HP_SEGMENTS * HP_ADVANCE;
+        int barW = CARD_W - TEXT_X - RIGHT_PAD;
+        int on = health <= 0 ? 0 : Math.max(1, (int) Math.round(Math.min(1, health) * barW));
         ShadowColor none = ShadowColor.none();
         return Component.text()
             .append(Component.text(CARD + shift(-CARD_ADVANCE + HEAD_X)).font(FONT).color(white).shadowColor(none))
@@ -141,8 +185,8 @@ public final class HudText {
             .append(Component.text(shift(CARD_W - RIGHT_PAD - killsW - nameEnd) + KILLS).font(FONT).color(white).shadowColor(none))
             .append(Component.text(k, killsColor).shadowColor(textShadow))
             .append(Component.text(shift(-(CARD_W - RIGHT_PAD - TEXT_X)), white).font(FONT).shadowColor(none))
-            .append(Component.text(bar.substring(0, hpOn), hpColor).font(FONT).shadowColor(none))
-            .append(Component.text(bar.substring(hpOn) + shift(CARD_W - barEnd), white).font(FONT).shadowColor(none))
+            .append(bar(barW, on, hpColor, white, none))
+            .append(Component.text(shift(RIGHT_PAD)).font(FONT))
             .build();
     }
 }

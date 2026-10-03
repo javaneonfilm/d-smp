@@ -129,19 +129,20 @@ public final class SquadHud {
         int kills = mp == null ? 0 : mp.kills;
 
         int nameRgb;
-        int hpOn = 0, hpRgb = 0x55FF55;
+        double hp = 0;
+        int hpRgb = 0x4ADE80;
         if (!alive) {
-            nameRgb = 0xFF3333;
+            nameRgb = 0xFF4D4D;
         } else if (tp == null) {
-            nameRgb = 0x777777;
+            nameRgb = 0x626875;
         } else {
             TextColor rc = plugin.nametags().rank(tp).color();
-            nameRgb = rc == null ? 0xFFFFFF : rc.value();
+            nameRgb = rc == null ? 0xF2F4F7 : rc.value();
             var attr = tp.getAttribute(Attribute.MAX_HEALTH);
             double max = attr == null ? 20 : attr.getValue();
             double f = Math.max(0, Math.min(1, tp.getHealth() / Math.max(1, max)));
-            hpOn = tp.getHealth() > 0 ? Math.max(1, (int) Math.ceil(f * HudText.HP_SEGMENTS)) : 0;
-            hpRgb = f > 0.75 ? 0x55FF55 : f > 0.5 ? 0xFFEE44 : f > 0.25 ? 0xFF9922 : 0xFF3333;
+            hp = tp.getHealth() > 0 ? f : 0;
+            hpRgb = f > 0.75 ? 0x4ADE80 : f > 0.5 ? 0xFACC15 : f > 0.25 ? 0xFF8A3D : 0xFF4D4D;
         }
 
         PlayerHeadObjectContents.Builder hb = ObjectContents.playerHead().name(name);
@@ -154,6 +155,6 @@ public final class SquadHud {
 
         ShadowColor textShadow = ShadowColor.shadowColor(0xFF000000 | mark(0x202020, above, false));
         return HudText.squadCard(head, name, marked(nameRgb, above, false), !alive, textShadow,
-            marked(0xBBBBBB, above, false), kills, hpOn, marked(hpRgb, above, false), marked(0xFFFFFF, above, false));
+            marked(0xA9AEB8, above, false), kills, hp, marked(hpRgb, above, false), marked(0xFFFFFF, above, false));
     }
 }

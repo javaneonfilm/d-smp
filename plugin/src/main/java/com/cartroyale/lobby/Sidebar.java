@@ -8,7 +8,6 @@ import com.cartroyale.util.Times;
 import com.cartroyale.zone.ZoneMath;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -118,7 +117,7 @@ public final class Sidebar {
         if (!inGame) {
             GameRow next = plugin.games().next();
             for (String line : plugin.msg().rawList("board.lobby")) {
-                out.add(plugin.msg().parse(line, "online", Bukkit.getOnlinePlayers().size(), "wins", st.wins(), "kills", st.kills(),
+                out.add(row(p, line, "online", Bukkit.getOnlinePlayers().size(), "wins", st.wins(), "kills", st.kills(),
                     "coins", st.coins(), "ip", ip,
                     "next", next == null ? plugin.msg().plain("board.no-game") : "#" + next.id + "  " + Times.clock(next.s.startAt, plugin.zoneId()),
                     "next_rel", next == null ? "" : Times.relative(next.s.startAt)));
@@ -132,10 +131,26 @@ public final class Sidebar {
                 if (plugin.squadHud() == null || !plugin.squadHud().active(p)) out.addAll(squad(m, p));
                 continue;
             }
-            out.add(plugin.msg().parse(line, "id", m.id(), "phase", plugin.msg().plain("phases." + m.state.name().toLowerCase()),
+            out.add(row(p, line, "id", m.id(), "phase", plugin.msg().plain("phases." + m.state.name().toLowerCase()),
                 "alive", m.aliveCount(), "kills", me == null ? 0 : me.kills, "zone", zoneLine(), "ip", ip));
         }
         return out;
+    }
+
+    /** Inner width the label/value rows are padded to, in pixels. */
+    private static final int ROW_W = 100;
+
+    /**
+     * One sidebar line. {@code <tab>} splits it into a label and a value, and the value is pushed
+     * to the right edge with the pack's space glyphs (a plain space without the pack).
+     */
+    private Component row(Player viewer, String line, Object... kv) {
+        int i = line.indexOf("<tab>");
+        if (i < 0) return plugin.msg().parse(line, kv);
+        if (!plugin.presence().hasPack(viewer.getUniqueId())) return plugin.msg().parse(line.replace("<tab>", " "), kv);
+        Component left = plugin.msg().parse(line.substring(0, i), kv), right = plugin.msg().parse(line.substring(i + 5), kv);
+        int gap = Math.max(4, ROW_W - HudText.width(left) - HudText.width(right));
+        return Component.text().append(left).append(HudText.space(gap)).append(right).build();
     }
 
     private String zoneLine() {
@@ -163,15 +178,15 @@ public final class Sidebar {
             Player tp = Bukkit.getPlayer(u);
             Component name;
             if (!mp.alive) {
-                name = Component.text(mp.name, NamedTextColor.RED).decorate(TextDecoration.STRIKETHROUGH);
+                name = Component.text(mp.name, TextColor.color(0xFF4D4D)).decorate(TextDecoration.STRIKETHROUGH);
             } else if (tp == null) {
-                name = Component.text(mp.name, NamedTextColor.DARK_GRAY);
+                name = Component.text(mp.name, TextColor.color(0x626875));
             } else {
                 double max = tp.getAttribute(Attribute.MAX_HEALTH) == null ? 20 : tp.getAttribute(Attribute.MAX_HEALTH).getValue();
                 double f = tp.getHealth() / Math.max(1, max);
-                TextColor c = f > 0.75 ? TextColor.color(0x55FF55) : f > 0.5 ? TextColor.color(0xFFEE44)
-                    : f > 0.25 ? TextColor.color(0xFF9922) : TextColor.color(0xFF3333);
-                name = Component.text(mp.name, c).append(Component.text(" " + (int) Math.ceil(tp.getHealth()), NamedTextColor.DARK_GRAY));
+                TextColor c = f > 0.75 ? TextColor.color(0x4ADE80) : f > 0.5 ? TextColor.color(0xFACC15)
+                    : f > 0.25 ? TextColor.color(0xFF8A3D) : TextColor.color(0xFF4D4D);
+                name = Component.text(mp.name, c).append(Component.text(" " + (int) Math.ceil(tp.getHealth()), TextColor.color(0x626875)));
             }
             out.add(Component.text(" ").append(name));
         }

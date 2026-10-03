@@ -29,7 +29,8 @@ ZIP = os.path.join(ROOT, "cartzone-pack.zip")
 SHADERS = os.path.join(ROOT, "shaders")
 
 # Keep in sync with plugin/src/main/java/com/cartroyale/lobby/HudText.java
-BAR_W, BAR_H, BAR_ASCENT = 150, 13, 9
+IP_W, IP_H, IP_ASCENT = 120, 12, 9
+ZONE_W, ZONE_H, ZONE_ASCENT = 182, 18, 9
 ICON_W, ICON_H, ICON_ASCENT = 9, 8, 7
 
 RED = (255, 0, 0, 255)
@@ -145,48 +146,38 @@ def shield_blocking_model():
 
 # ---------------------------------------------------------------- HUD
 
-def bar_background():
-    """Black at 50% opacity, corners cut by one pixel."""
-    img = Image.new("RGBA", (BAR_W, BAR_H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    w, h = BAR_W - 1, BAR_H - 1
-    d.rectangle([1, 0, w - 1, h], fill=(0, 0, 0, 128))
-    d.point([(0, y) for y in range(1, h)] + [(w, y) for y in range(1, h)], fill=(0, 0, 0, 128))
+# Glass look: dark see-through fill, a faint light edge, corners rounded by 3 px.
+GLASS_FILL = (14, 16, 22, 150)
+GLASS_EDGE = (255, 255, 255, 38)
+
+
+def glass(w, h, radius=3):
+    """A rounded glass panel w x h."""
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    big = Image.new("L", (w * 4, h * 4), 0)
+    ImageDraw.Draw(big).rounded_rectangle([0, 0, w * 4 - 1, h * 4 - 1], radius * 4, fill=255)
+    mask = big.resize((w, h), Image.LANCZOS).point(lambda v: 255 if v >= 128 else 0)
+    inner = Image.new("L", (w * 4, h * 4), 0)
+    ImageDraw.Draw(inner).rounded_rectangle([4, 4, w * 4 - 5, h * 4 - 5], max(1, radius - 1) * 4, fill=255)
+    inner_mask = inner.resize((w, h), Image.LANCZOS).point(lambda v: 255 if v >= 128 else 0)
+    for y in range(h):
+        for x in range(w):
+            if mask.getpixel((x, y)):
+                img.putpixel((x, y), GLASS_FILL if inner_mask.getpixel((x, y)) else GLASS_EDGE)
     return img
+
+
+def ip_pill():
+    return glass(IP_W, IP_H)
+
+
+def zone_panel():
+    return glass(ZONE_W, ZONE_H)
 
 
 def cart_icon():
     """His TNT minecart picture, kept at 4x (42x40) so the font scales it down cleanly to 10 px."""
     return Image.open(os.path.join(ROOT, "ranks", "cart_icon.png")).convert("RGBA")
-
-
-# Zone boss bar: a row of hexagon cells drawn where the (invisible PINK) bar would be.
-HEX_ROWS = [1, 5, 9, 9, 9, 9, 9, 9, 5, 1]   # pointy-top hexagon, 9 x 10
-
-
-def hex_cell(fill, top, rim):
-    """One 9x10 hexagon: rim colour on the outline, fill inside, a lighter band near the top."""
-    w, h = 9, len(HEX_ROWS)
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    for y, rw in enumerate(HEX_ROWS):
-        x0 = (w - rw) // 2
-        prev = HEX_ROWS[y - 1] if y > 0 else 0
-        nxt = HEX_ROWS[y + 1] if y < h - 1 else 0
-        for x in range(x0, x0 + rw):
-            d = abs(x - w // 2)
-            edge = y in (0, h - 1) or x in (x0, x0 + rw - 1) or d > prev // 2 or d > nxt // 2
-            img.putpixel((x, y), rim if edge else (top if y == 2 else fill))
-    return img
-
-
-def hex_cells():
-    return {
-        "hex_full.png": hex_cell((214, 32, 20, 235), (255, 92, 70, 235), (90, 8, 4, 235)),     # zone time left
-        "hex_empty.png": hex_cell((0, 0, 0, 110), (0, 0, 0, 110), (0, 0, 0, 170)),             # time used up
-        "hex_grace.png": hex_cell((52, 190, 70, 235), (130, 240, 140, 235), (12, 70, 20, 235)),  # grace period
-        "hex_edge.png": hex_cell((255, 150, 40, 240), (255, 210, 120, 240), (110, 50, 6, 240)),  # the cell draining now
-        "hex_warn.png": hex_cell((240, 200, 40, 240), (255, 240, 140, 240), (100, 80, 6, 240)),  # grace almost over
-    }
 
 
 # Squad cards (top-left HUD). Keep in sync with HudText.squadCard and cz_hud.glsl.
@@ -195,26 +186,15 @@ WALL_MARKER = (204, 18, 52, 251)   # cz_wall.glsl CZ_WALL_MARKER
 
 
 def squad_card():
-    """126x18: dark rounded panel, red edge on the left. The last row stays empty (gap between cards)."""
+    """126x18 glass card; the last row stays empty so stacked cards have a gap."""
     img = Image.new("RGBA", (CARD_W, CARD_H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    w, h = CARD_W - 1, CARD_H - 2
-    d.rectangle([1, 0, w - 1, h], fill=(6, 6, 10, 150))
-    d.line([0, 1, 0, h - 1], fill=(6, 6, 10, 150))
-    d.line([w, 1, w, h - 1], fill=(6, 6, 10, 150))
-    d.line([1, 0, w - 1, 0], fill=(60, 60, 70, 170))           # top edge
-    d.line([0, 2, 0, h - 2], fill=(230, 40, 28, 235))          # red accent
+    img.paste(glass(CARD_W, CARD_H - 1), (0, 0))
     return img
 
 
-def hp_segment(on):
-    """5x4, the last column empty so each segment advances 5 with a 1 px gap. White gets tinted."""
-    img = Image.new("RGBA", (5, 4), (0, 0, 0, 0))
-    rows = [(255, 255, 255, 255), (228, 228, 228, 255), (228, 228, 228, 255), (176, 176, 176, 255)] if on         else [(78, 78, 84, 210), (42, 42, 48, 210), (42, 42, 48, 210), (34, 34, 40, 210)]
-    for y, c in enumerate(rows):
-        for x in range(4):
-            img.putpixel((x, y), c)
-    return img
+def bar_piece(w, track):
+    """w x 3 bar piece. Solid white (tinted by the text colour) or the faint track."""
+    return Image.new("RGBA", (w, 3), (255, 255, 255, 70) if track else (255, 255, 255, 255))
 
 
 def kills_icon():
@@ -254,17 +234,14 @@ def hud_font():
     return {
         "providers": [
             {"type": "bitmap", "file": "cartzone:font/cart.png", "ascent": 8, "height": 10, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/bar.png", "ascent": BAR_ASCENT, "height": BAR_H, "chars": [""]},
-            # Hex cells sit 9 px below the title's top, exactly where the vanilla bar would be.
-            {"type": "bitmap", "file": "cartzone:font/hex_full.png", "ascent": -2, "height": 10, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/hex_empty.png", "ascent": -2, "height": 10, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/hex_grace.png", "ascent": -2, "height": 10, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/hex_edge.png", "ascent": -2, "height": 10, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/hex_warn.png", "ascent": -2, "height": 10, "chars": [""]},
-            # Squad cards: panel from 1 px above the title line, health bar 11 px below its top.
+            {"type": "bitmap", "file": "cartzone:font/ip_pill.png", "ascent": IP_ASCENT, "height": IP_H, "chars": [""]},
+            # Zone panel from 2 px above the title line; its bar sits 11 px below the title's top.
+            {"type": "bitmap", "file": "cartzone:font/zone_panel.png", "ascent": ZONE_ASCENT, "height": ZONE_H, "chars": [""]},
+            # Squad cards: panel from 1 px above the title line.
             {"type": "bitmap", "file": "cartzone:font/card.png", "ascent": 8, "height": CARD_H, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/hp_on.png", "ascent": -4, "height": 4, "chars": [""]},
-            {"type": "bitmap", "file": "cartzone:font/hp_off.png", "ascent": -4, "height": 4, "chars": [""]},
+            # Bar pieces 1-128 px (E040-E047 solid, E048-E04F track), 11 px below the title's top.
+        ] + [{"type": "bitmap", "file": f"cartzone:font/bar_{'track' if t else 'fill'}_{1 << i}.png", "ascent": -4, "height": 3,
+              "chars": [chr(0xE040 + (8 if t else 0) + i)]} for t in (0, 1) for i in range(8)] + [
             {"type": "bitmap", "file": "cartzone:font/kills.png", "ascent": 7, "height": 7, "chars": [""]},
             {"type": "space", "advances": advances},
         ]
@@ -288,9 +265,11 @@ def main():
 
     # The One Time Shield uses the vanilla shield look again (his call), so no shield model here.
 
-    save_png("assets/cartzone/textures/font/bar.png", bar_background())
-    for name, img in hex_cells().items():
-        save_png("assets/cartzone/textures/font/" + name, img)
+    save_png("assets/cartzone/textures/font/ip_pill.png", ip_pill())
+    save_png("assets/cartzone/textures/font/zone_panel.png", zone_panel())
+    for i in range(8):
+        save_png(f"assets/cartzone/textures/font/bar_fill_{1 << i}.png", bar_piece(1 << i, False))
+        save_png(f"assets/cartzone/textures/font/bar_track_{1 << i}.png", bar_piece(1 << i, True))
 
     # Rank badges in the DEFAULT font, so they work as plain characters anywhere: chat,
     # nametags, the tab list and the TAB plugin. Keep the chars in sync with config.yml rank-tags.
@@ -301,8 +280,6 @@ def main():
         for n, c in [("vip", ""), ("vipplus", ""), ("host", ""), ("mod", ""), ("admin", ""), ("media", ""), ("creator", "")]]})
     save_png("assets/cartzone/textures/font/cart.png", cart_icon())
     save_png("assets/cartzone/textures/font/card.png", squad_card())
-    save_png("assets/cartzone/textures/font/hp_on.png", hp_segment(True))
-    save_png("assets/cartzone/textures/font/hp_off.png", hp_segment(False))
     save_png("assets/cartzone/textures/font/kills.png", kills_icon())
     write_json("assets/cartzone/font/hud.json", hud_font())
     save_png("assets/minecraft/textures/gui/sprites/boss_bar/pink_background.png", invisible_bar())

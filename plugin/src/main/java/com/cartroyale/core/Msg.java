@@ -3,7 +3,11 @@ package com.cartroyale.core;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Modifying;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,17 +19,67 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.logging.Logger;
 
 /**
  * Every player-facing string lives in messages.yml as MiniMessage. Placeholders are passed as
  * key/value pairs and written in the file as {@code <key>}. Values are inserted unparsed, so a
  * player name can never inject formatting.
+ *
+ * The look is set here too: {@code <sc>} turns text into small caps, and the palette tags
+ * ({@code <accent> <hl> <fg> <sub> <dim> <ok> <warn> <bad> <coin> <ink>}) keep every message on the same
+ * colours, so the whole server can be recoloured from {@link #PALETTE}.
  */
 public final class Msg {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
+
+    /** The glass palette. */
+    public static final Map<String, Integer> PALETTE = Map.of(
+        "accent", 0xFF6A3D,   // brand orange-red
+        "hl", 0xFFB86B,       // highlighted values: times, names in a sentence
+        "fg", 0xF2F4F7,       // main text
+        "sub", 0xA9AEB8,      // secondary text
+        "dim", 0x626875,      // hints, separators
+        "ok", 0x4ADE80,
+        "warn", 0xFACC15,
+        "bad", 0xFF4D4D,
+        "coin", 0xFFC94A,
+        "ink", 0x2A2D35);     // menu titles, which sit on Minecraft's light grey
+
+    private static final String SMALL = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ";
+
+    /** Letters to small caps (digits and symbols stay). */
+    public static String smallCaps(String s) {
+        StringBuilder sb = new StringBuilder(s.length());
+        for (char c : s.toCharArray()) {
+            if (c >= 'a' && c <= 'z') sb.append(SMALL.charAt(c - 'a'));
+            else if (c >= 'A' && c <= 'Z') sb.append(SMALL.charAt(c - 'A'));
+            else sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    private static final Pattern SC = Pattern.compile("<sc>(.*?)(?:</sc>|$)", Pattern.DOTALL);
+    private static final Pattern PALETTE_TAG = Pattern.compile("</?(accent|hl|fg|sub|dim|ok|warn|bad|coin|ink)>");
+
+    /** {@code <sc>}: rewrites every bit of text inside it, placeholders included. */
+    private static final Modifying SMALL_CAPS = (current, depth) -> current instanceof TextComponent tc
+        ? Component.text(smallCaps(tc.content()), tc.style())
+        : current.children(List.of());
+
+    private static final TagResolver STYLE;
+
+    static {
+        TagResolver.Builder b = TagResolver.builder();
+        b.tag("sc", SMALL_CAPS);
+        for (var e : PALETTE.entrySet()) b.tag(e.getKey(), Tag.styling(TextColor.color(e.getValue())));
+        STYLE = b.build();
+    }
 
     private final JavaPlugin plugin;
     private final Logger log;
@@ -113,17 +167,25 @@ public final class Msg {
         to.sendActionBar(get(key, kv));
     }
 
-    /** Plain text of a key with placeholders, for places that take a String (Discord). */
+    /**
+     * Plain text of a key with placeholders, for places that take a String (Discord, values put
+     * into other lines). {@code <sc>} still becomes small caps; palette tags are dropped.
+     */
     public String plain(String key, Object... kv) {
         String s = raw(key);
         for (int i = 0; i + 1 < kv.length; i += 2) {
             s = s.replace("<" + kv[i] + ">", String.valueOf(kv[i + 1]));
         }
-        return s;
+        Matcher m = SC.matcher(s);
+        StringBuilder out = new StringBuilder();
+        while (m.find()) m.appendReplacement(out, Matcher.quoteReplacement(smallCaps(m.group(1))));
+        m.appendTail(out);
+        return PALETTE_TAG.matcher(out).replaceAll("");
     }
 
     private TagResolver resolver(Object... kv) {
         TagResolver.Builder b = TagResolver.builder();
+        b.resolver(STYLE);
         b.resolver(Placeholder.parsed("prefix", yml.getString("prefix", "")));
         for (int i = 0; i + 1 < kv.length; i += 2) {
             String k = String.valueOf(kv[i]);

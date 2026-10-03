@@ -11,56 +11,20 @@
     },
     {
       "type": "bitmap",
-      "file": "cartzone:font/bar.png",
+      "file": "cartzone:font/ip_pill.png",
       "ascent": 9,
-      "height": 13,
+      "height": 12,
       "chars": [
         "\ue001"
       ]
     },
     {
       "type": "bitmap",
-      "file": "cartzone:font/hex_full.png",
-      "ascent": -2,
-      "height": 10,
+      "file": "cartzone:font/zone_panel.png",
+      "ascent": 9,
+      "height": 18,
       "chars": [
-        "\ue010"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "cartzone:font/hex_empty.png",
-      "ascent": -2,
-      "height": 10,
-      "chars": [
-        "\ue011"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "cartzone:font/hex_grace.png",
-      "ascent": -2,
-      "height": 10,
-      "chars": [
-        "\ue012"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "cartzone:font/hex_edge.png",
-      "ascent": -2,
-      "height": 10,
-      "chars": [
-        "\ue013"
-      ]
-    },
-    {
-      "type": "bitmap",
-      "file": "cartzone:font/hex_warn.png",
-      "ascent": -2,
-      "height": 10,
-      "chars": [
-        "\ue014"
+        "\ue002"
       ]
     },
     {
@@ -74,20 +38,146 @@
     },
     {
       "type": "bitmap",
-      "file": "cartzone:font/hp_on.png",
+      "file": "cartzone:font/bar_fill_1.png",
       "ascent": -4,
-      "height": 4,
+      "height": 3,
       "chars": [
-        "\ue021"
+        "\ue040"
       ]
     },
     {
       "type": "bitmap",
-      "file": "cartzone:font/hp_off.png",
+      "file": "cartzone:font/bar_fill_2.png",
       "ascent": -4,
-      "height": 4,
+      "height": 3,
       "chars": [
-        "\ue022"
+        "\ue041"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_fill_4.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue042"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_fill_8.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue043"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_fill_16.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue044"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_fill_32.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue045"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_fill_64.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue046"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_fill_128.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue047"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_1.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue048"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_2.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue049"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_4.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue04a"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_8.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue04b"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_16.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue04c"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_32.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue04d"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_64.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue04e"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cartzone:font/bar_track_128.png",
+      "ascent": -4,
+      "height": 3,
+      "chars": [
+        "\ue04f"
       ]
     },
     {
