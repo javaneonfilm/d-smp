@@ -12,25 +12,25 @@ const SITE = {
   demo: true              // sample data until real data arrives. With api set, real data replaces it automatically.
 };
 
-// The three things you sell.
-//  - url:   your checkout link for that product, e.g. https://yourstore.tebex.io/package/123
-//           Until you set one, the button shows "Coming soon" and nobody can pay.
-//  - price: only what is DISPLAYED here. The real charge is whatever you set at checkout, so keep them identical.
+// The three things you sell. Payment runs through your own PayPal (worker/README.md).
+//  - id:    the product id in worker/worker.js (PRODUCTS) and in the plugin's config.yml (webstore.products)
+//  - price: shown until the real price loads from the Worker. The real price is set in worker/worker.js.
 //  - perks: only list what you can really deliver in-game. Keep them cosmetic or access-only (no pay-to-win).
+//  Until SITE.api is set and the Worker has PayPal set up, the buttons say "Coming soon".
 const SHOP = [
   {
-    art: "chat", name: "VIP", blurb: "Get in more often.",
-    price: "€9.99", per: "30 days", cta: "Buy VIP", url: "",
+    id: "vip", art: "chat", name: "VIP", blurb: "Get in more often.",
+    price: "€9.99", per: "30 days", cta: "Buy VIP",
     perks: ["Much lower chance of being purged when the lobby is full", "Wind charges in the lobby", "[VIP] tag in chat and the tab list"]
   },
   {
-    art: "immune", name: "VIP+", blurb: "Always get in.", featured: true, badge: "Most popular",
-    price: "€19.99", per: "30 days", cta: "Buy VIP+", url: "",
+    id: "vipplus", art: "immune", name: "VIP+", blurb: "Always get in.", featured: true, badge: "Most popular",
+    price: "€19.99", per: "30 days", cta: "Buy VIP+",
     perks: ["Everything in VIP", "Never purged, so you always get in", "Elytra and wind charges in the lobby", "[VIP+] tag in chat and the tab list"]
   },
   {
-    art: "pass", name: "Game Ticket", blurb: "Host your own game.",
-    price: "€4.99", per: "per game", cta: "Buy a game", url: "",
+    id: "ticket", art: "pass", name: "Game Ticket", blurb: "Host your own game.",
+    price: "€4.99", per: "per game", cta: "Buy a game",
     perks: ["Pick the squad size, player cap, modifiers and length", "Set it up in-game right after buying, and Discord announces it", "Host rank for your game"]
   }
 ];
@@ -137,24 +137,83 @@ const ART = {
   immune: `<div class="tier__art"><p class="mc"><span class="dim">Purge</span>: 80 players removed</p><p class="mc"><b class="tg-vipplus">[VIP+]</b> <i>DeepCut</i>: still here</p><p class="mc"><b class="tg-vipplus">[VIP+]</b> <i>Shardling</i>: never purged</p></div>`,
   pass: `<div class="tier__art art-pass"><div class="pass"><div><small>Admit one</small><b>Your<br>game</b></div><span class="no">01</span></div></div>`
 };
-const safeUrl = u => (/^https?:\/\//i.test(u || "") ? u : "");
 $("#tiers").innerHTML = SHOP.map((p, i) => {
-  const url = safeUrl(p.url);
-  const buy = url
-    ? `<a class="btn ${p.featured ? "btn--gem" : "btn--buy"} buy" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(p.cta)}</a>`
-    : `<button class="btn btn--off buy" type="button" disabled>Coming soon</button>`;
+  const buy = `<button class="btn btn--off buy" type="button" data-buy="${esc(p.id)}" disabled>Coming soon</button>`;
   return `<article class="tier${p.featured ? " tier--feat" : ""} rv" style="--d:${i}">
     ${p.badge ? `<span class="tier__badge">${esc(p.badge)}</span>` : ""}
     ${ART[p.art] || ""}
     <div class="tier__body">
       <h3>${esc(p.name)}</h3>
       <p class="tier__sub">${esc(p.blurb)}</p>
-      <div class="tier__price"><b>${esc(p.price)}</b><small>${esc(p.per)}</small></div>
+      <div class="tier__price"><b data-price="${esc(p.id)}">${esc(p.price)}</b><small>${esc(p.per)}</small></div>
       <ul class="perks">${p.perks.map(x => `<li><svg class="ico"><use href="#i-check"/></svg>${esc(x)}</li>`).join("")}</ul>
       ${buy}
     </div>
   </article>`;
 }).join("");
+
+/* ---------- checkout (PayPal or card, through the Worker) ---------- */
+const apiBase = () => (SITE.api || "").replace(/\/+$/, "").replace(/\/stats$/, "");
+const euro = c => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" }).format(c / 100);
+let prices = {};
+async function openStore() {
+  if (!/^(https:\/\/|http:\/\/(127\.0\.0\.1|localhost):)/.test(SITE.api || "")) return;
+  try {
+    prices = await getJSON(apiBase() + "/products");
+  } catch (e) { return; }
+  SHOP.forEach(p => {
+    const real = prices[p.id];
+    if (!real) return;
+    p.price = euro(real.amount);
+    const priceEl = $(`[data-price="${p.id}"]`);
+    if (priceEl) priceEl.textContent = p.price;
+    const b = $(`[data-buy="${p.id}"]`);
+    if (b) {
+      b.disabled = false;
+      b.className = `btn ${p.featured ? "btn--gem" : "btn--buy"} buy`;
+      b.textContent = p.cta;
+    }
+  });
+}
+
+const dlg = $("#buy"), buyForm = $("#buy-form"), buyErr = $("#buy-err"), buyName = $("#buy-name");
+let buying = null;
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-buy]");
+  if (!b || b.disabled) return;
+  buying = SHOP.find(p => p.id === b.dataset.buy);
+  $("#buy-title").textContent = buying.name;
+  $("#buy-price").textContent = buying.price + (!buying.per ? "" : /^per /.test(buying.per) ? " " + buying.per : " for " + buying.per);
+  buyErr.hidden = true;
+  try { buyName.value = localStorage.getItem("dsmp-name") || ""; } catch (err) { /* storage blocked */ }
+  dlg.showModal();
+  (buyName.value ? $("#buy-waiver") : buyName).focus();
+});
+$("#buy-close").addEventListener("click", () => dlg.close());
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+buyForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const method = e.submitter && e.submitter.value === "card" ? "card" : "paypal";
+  const name = buyName.value.trim();
+  const fail = msg => { buyErr.textContent = msg; buyErr.hidden = false; setBusy(false); };
+  const setBusy = on => $$(".buy-dlg__pay .btn").forEach(b => { b.disabled = on; b.classList.toggle("is-busy", on && b === e.submitter); });
+  if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) return fail("That isn't a Minecraft username (3 to 16 letters, numbers or _).");
+  if (!$("#buy-waiver").checked) return fail("Please tick the box first.");
+  setBusy(true);
+  buyErr.hidden = true;
+  try { localStorage.setItem("dsmp-name", name); } catch (err) { /* storage blocked */ }
+  try {
+    const r = await fetch(apiBase() + "/checkout", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product: buying.id, name, waiver: true, method })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.url) { location.href = d.url; return; }
+    fail(d.error || "Something went wrong. Try again in a minute.");
+  } catch (err) {
+    fail("Couldn't reach the store. Check your connection and try again.");
+  }
+});
 
 /* ---------- copy IP + toast ---------- */
 const toastEl = $("#toast");
@@ -228,6 +287,17 @@ async function loadStatus() {
 }
 loadStatus();
 setInterval(() => { if (!document.hidden) loadStatus(); }, 60000);
+openStore();
+
+/* back from PayPal */
+(function () {
+  const q = new URLSearchParams(location.search);
+  if (!q.has("paid")) return;
+  setTimeout(() => toast(q.get("paid") === "1"
+    ? "Payment received, thank you! It arrives in-game within a minute."
+    : "The payment didn't go through, so you weren't charged."), 400);
+  history.replaceState(null, "", location.pathname + location.hash);
+})();
 
 /* ---------- mobile menu ---------- */
 const nav = $("#nav"), burger = $("#burger");

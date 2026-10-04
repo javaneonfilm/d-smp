@@ -87,6 +87,7 @@ public final class CartRoyale extends JavaPlugin {
     private com.cartroyale.match.SquadHud squadHud;
     private ArenaRules arenaRules;
     private Stats stats;
+    private com.cartroyale.stats.WebStore webStore;
     private RankService rank;
     private GameManager games;
     private boolean started;
@@ -190,6 +191,7 @@ public final class CartRoyale extends JavaPlugin {
         register(teamChat);
 
         stats = new Stats(this);
+        webStore = new com.cartroyale.stats.WebStore(this);
         leaderboard = new com.cartroyale.lobby.Leaderboard(this);
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             getLogger().info(com.cartroyale.hooks.papi.PapiHook.register(this) ? "PlaceholderAPI: %cartzone_*% placeholders registered." : "PlaceholderAPI: could not register %cartzone_*%.");
@@ -490,6 +492,7 @@ public final class CartRoyale extends JavaPlugin {
     public com.cartroyale.match.SquadHud squadHud() { return squadHud; }
     public ArenaRules arenaRules() { return arenaRules; }
     public Stats stats() { return stats; }
+    public com.cartroyale.stats.WebStore webStore() { return webStore; }
     public RankService rank() { return rank; }
     public GameManager games() { return games; }
 }

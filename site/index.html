@@ -27,6 +27,8 @@
   <symbol id="i-chest" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M3 12h18M12 11v3"/><path d="M5 8l2-3h10l2 3"/></symbol>
   <symbol id="i-hex" viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 18h18M4 18l-1-10 5 4 4-7 4 7 5-4-1 10"/></symbol>
 </svg>
 
@@ -198,7 +200,7 @@
       <p class="sec__sub">Ranks, lobby perks and your own games. Nothing that changes a fight.</p>
     </header>
     <div class="tiers" id="tiers"></div>
-    <p class="buynote rv">Checkout opens in a new tab. Use your exact Minecraft username so the purchase lands on the right account. Ranks arrive automatically within a few minutes. Problems with an order? <a href="#" data-discord>Ask in Discord</a>.</p>
+    <p class="buynote rv">Pay with PayPal or any debit or credit card, no PayPal account needed. Use your exact Minecraft username: your purchase arrives in-game within a minute, even if you're offline. Problems with an order? <a href="#" data-discord>Ask in Discord</a>.</p>
   </div>
 </section>
 
@@ -285,6 +287,24 @@
     <span>Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang.</span>
   </div>
 </footer>
+
+<dialog class="buy-dlg" id="buy" aria-labelledby="buy-title">
+  <form class="buy-dlg__in" id="buy-form" novalidate>
+    <button class="buy-dlg__x" id="buy-close" type="button" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button>
+    <p class="kicker">Checkout</p>
+    <h3 id="buy-title">VIP</h3>
+    <p class="buy-dlg__price" id="buy-price"></p>
+    <label class="fld" for="buy-name">Your Minecraft username</label>
+    <input class="fld__in" id="buy-name" name="name" autocomplete="nickname" autocapitalize="off" spellcheck="false" maxlength="16" placeholder="e.g. Notch">
+    <label class="chk"><input type="checkbox" id="buy-waiver"><span>Deliver it right away. I understand I lose my right to cancel (withdraw) once it's delivered.</span></label>
+    <p class="buy-dlg__err" id="buy-err" role="alert" hidden></p>
+    <div class="buy-dlg__pay">
+      <button class="btn btn--gem" type="submit" value="paypal">Pay with PayPal</button>
+      <button class="btn btn--glass" type="submit" value="card">Pay with card</button>
+    </div>
+    <p class="buy-dlg__note"><svg class="ico"><use href="#i-lock"/></svg>Secure payment on PayPal's page. Paying by card doesn't need a PayPal account.</p>
+  </form>
+</dialog>
 
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

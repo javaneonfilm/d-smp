@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 14
+messages-version: 15
 
 prefix: '<accent>●</accent> '
 
@@ -307,6 +307,11 @@ stats:
   self: "<prefix><fg>Your stats\n<sub>Coins <coin><coins></coin>  Kills <fg><kills></fg>  Wins <fg><wins></fg>  Games <fg><played></fg>"
   self-site: '<sub>Leaderboards: <accent><u><site></u></accent>'
 
+webstore:
+  delivered: '<prefix><ok>Thanks for supporting the server!</ok> <fg>Your <hl><item></hl> is here.'
+  admin-sold: '<fg><player> bought <hl><item></hl> on the website.'
+  admin-revoked: '<fg>Took <hl><item></hl> back from <player> (refund or chargeback).'
+
 # ------------------------------------------------------------------ hosting / tickets
 host:
   no-ticket: '<prefix><sub>You need a Game Ticket to host.'
@@ -485,6 +490,7 @@ diag:
   zone-wall: '<sub>Zone wall: shader for <fg><walls></fg> player(s), the rest get particles'
   webhook: '<sub>Discord <fg><status></fg>, events role <fg><role>'
   stats: '<sub>Website stats <fg><status>'
+  webstore: '<sub>Web store <fg><status>'
   pack: '<sub>Resource pack <fg><enabled></fg>, <fg><url>'
   pack-you: '<sub>Your pack: <fg><state>'
   perms: '<sub>Permissions <fg><lp></fg>, database <fg><db>'

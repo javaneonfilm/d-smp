@@ -184,6 +184,28 @@ anticheat:
   # Ignore flags this long after the plugin launches someone (grapple pull).
   launch-exempt-ms: 4000
 
+# The web store on the website (PayPal, money goes to your own PayPal account). Paid orders are
+# picked up from the Worker (worker/README.md) and these console commands run for them, also while
+# the buyer is offline. {uuid} {name} {order} {product}. revoke runs on a full refund or chargeback.
+# Prices are set in worker/worker.js (PRODUCTS), not here.
+webstore:
+  enabled: true
+  poll-seconds: 30
+  url: ''                   # empty = the same Worker as stats.export.url
+  products:
+    vip:
+      name: VIP
+      buy: ['lp user {uuid} parent addtemp vip 30d accumulate']
+      revoke: ['lp user {uuid} parent remove vip']
+    vipplus:
+      name: VIP+
+      buy: ['lp user {uuid} parent addtemp vipplus 30d accumulate']
+      revoke: ['lp user {uuid} parent remove vipplus']
+    ticket:
+      name: Game Ticket
+      buy: ['cart ticket give {uuid} 1 {order}']
+      revoke: ['cart ticket revoke {uuid} 1 {order}']
+
 webhooks:
   enabled: true
   username: d-smp.vip
