@@ -199,26 +199,54 @@ async function saveOrder(env, orderId, customId, cap) {
 }
 
 // Mojang profile: { uuid, name } (dashed uuid, correct capitals), null if no such account,
-// undefined if Mojang couldn't be reached.
-async function mojang(name) {
-  const urls = [
-    "https://api.mojang.com/users/profiles/minecraft/" + encodeURIComponent(name),
-    "https://api.minecraftservices.com/minecraft/profile/lookup/name/" + encodeURIComponent(name)
-  ];
-  let reached = false;
-  for (const u of urls) {
-    try {
-      const r = await fetch(u, { headers: { "Accept": "application/json" } });
-      if (r.status === 204 || r.status === 404) { reached = true; continue; }
-      if (!r.ok) continue;
-      const p = await r.json();
-      if (p && /^[0-9a-f]{32}$/i.test(p.id || "")) {
-        const id = p.id.toLowerCase();
-        return { uuid: `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`, name: p.name || name };
-      }
-    } catch (e) { /* try the next one */ }
+// undefined if nobody could be reached. Mojang often refuses requests from Cloudflare, so two
+// public lookup services are asked after it. Each returns a profile, null (no such player) or
+// undefined (couldn't tell).
+const LOOKUPS = [
+  async name => {
+    const r = await fetch("https://api.mojang.com/users/profiles/minecraft/" + encodeURIComponent(name), { headers: { "Accept": "application/json" } });
+    if (r.status === 204 || r.status === 404) return null;
+    if (!r.ok) return undefined;
+    const p = await r.json();
+    return p && p.id ? { id: p.id, name: p.name } : undefined;
+  },
+  async name => {
+    const r = await fetch("https://playerdb.co/api/player/minecraft/" + encodeURIComponent(name), { headers: { "User-Agent": "d-smp.vip store" } });
+    const p = await r.json().catch(() => null);
+    if (p && p.code === "player.found" && p.data && p.data.player) return { id: p.data.player.raw_id || p.data.player.id, name: p.data.player.username };
+    if (p && (p.code === "minecraft.invalid_username" || p.code === "player.not_found")) return null;
+    return undefined;
+  },
+  async name => {
+    const r = await fetch("https://api.minetools.eu/uuid/" + encodeURIComponent(name));
+    if (!r.ok) return undefined;
+    const p = await r.json().catch(() => null);
+    if (p && p.status === "OK" && p.id) return { id: p.id, name: p.name };
+    if (p && p.status === "ERR" && p.id === null) return null;
+    return undefined;
   }
-  return reached ? null : undefined;
+];
+
+async function mojang(name) {
+  let missing = 0;
+  for (const look of LOOKUPS) {
+    let p;
+    try {
+      p = await look(name);
+    } catch (e) {
+      p = undefined;
+    }
+    if (p === null) {
+      // Two sources saying "no such player" is enough (one could be out of date).
+      if (++missing >= 2) return null;
+      continue;
+    }
+    const id = p && String(p.id || "").replace(/-/g, "").toLowerCase();
+    if (id && /^[0-9a-f]{32}$/.test(id)) {
+      return { uuid: `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`, name: p.name || name };
+    }
+  }
+  return missing ? null : undefined;
 }
 
 // ------------------------------------------------------------------ store: PayPal webhooks
