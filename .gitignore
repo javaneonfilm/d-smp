@@ -8,3 +8,5 @@ tools/bots/node_modules/
 CartZone.jar
 server-upload/
 CartZone-server-files.zip
+.wrangler/
+node_modules/
