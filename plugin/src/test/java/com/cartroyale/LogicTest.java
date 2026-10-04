@@ -246,6 +246,26 @@ class LogicTest {
         assertEquals(100, Math.hypot(a.circle().x() - p.orbitCenterX(), a.circle().z() - p.orbitCenterZ()), 1e-6);
     }
 
+    @Test
+    void finalCircleRoamsAtItsSizeThenClosesOnTime() {
+        List<ZoneMath.Phase> ph = List.of(new ZoneMath.Phase(60, 60, 100, 2, 20), new ZoneMath.Phase(30, 30, 6, 3, 20));
+        double[] oc = ZoneMath.orbitCenter(150, 80, 0, 0, 25);
+        var p = new ZoneMath.Plan(new ZoneMath.Circle(0, 0, 350), 150, 80, ph, 25, 1.5, oc[0], oc[1], 270, 30);
+        double end = ZoneMath.totalSeconds(p);
+        // Roaming at radius 6, moving at 1.5 blocks/s.
+        var a = ZoneMath.at(p, end + 60);
+        var b = ZoneMath.at(p, end + 61);
+        assertEquals(6, a.circle().r(), 1e-9);
+        assertTrue(a.orbiting());
+        assertEquals(1.5, Math.hypot(a.circle().x() - b.circle().x(), a.circle().z() - b.circle().z()), 0.01);
+        // Halfway through the close it is half the size, and closed 5 minutes after the phases end.
+        assertEquals(3, ZoneMath.at(p, end + 285).circle().r(), 1e-6);
+        var closed = ZoneMath.at(p, end + 300);
+        assertEquals(0, closed.circle().r(), 1e-9);
+        assertEquals(0, closed.secondsLeftInStep(), 1e-9);
+        assertEquals(end + 300, ZoneMath.endSeconds(p), 1e-9);
+    }
+
     // ---------------- DAILY SHOP ----------------
 
     private static List<ShopMath.Item> cosmetics() {

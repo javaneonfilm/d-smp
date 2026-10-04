@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HappyGhast;
 import org.bukkit.entity.Player;
@@ -57,6 +58,9 @@ public final class Deployment implements Listener {
         final HappyGhast ghast;
         final Location start;
         final List<UUID> riders = new ArrayList<>();
+        /** One-ghast mode: each rider sits on an invisible seat that moves with the ghast. */
+        final Map<UUID, ArmorStand> seats = new HashMap<>();
+        final Map<UUID, Vector> seatOffset = new HashMap<>();
         Location last;
         int stuckTicks;
 
@@ -174,7 +178,11 @@ public final class Deployment implements Listener {
         double spacing = cfg.getDouble("deploy.spacing", 9), rowGap = cfg.getDouble("deploy.row-gap", 12);
         int perRow = Math.max(1, cfg.getInt("deploy.per-row", 8));
 
-        List<List<UUID>> loads = pack(m, seats);
+        // deploy.one-ghast: everyone rides one big ghast (a happy ghast only has 4 seats, so the rest
+        // sit on invisible seats on its back). Otherwise teams are packed 4 to a ghast.
+        boolean one = cfg.getBoolean("deploy.one-ghast", true);
+        if (one) teleportMode = true;
+        List<List<UUID>> loads = one ? List.of(everyone(m)) : pack(m, seats);
         int used = Math.min(perRow, loads.size());
         List<Location> spots = new ArrayList<>();
         for (int i = 0; i < loads.size(); i++) {
@@ -196,7 +204,7 @@ public final class Deployment implements Listener {
             @Override
             public void run() {
                 for (int n = 0; n < perTick && next < spots.size(); n++, next++) {
-                    spawnRide(m, w, spots.get(next), loads.get(next), cfg.getBoolean("deploy.harness", false), ns);
+                    spawnRide(m, w, spots.get(next), loads.get(next), cfg.getBoolean("deploy.harness", false), one, ns);
                 }
                 if (next >= spots.size()) {
                     task.cancel();
@@ -208,7 +216,7 @@ public final class Deployment implements Listener {
         }, 0, 1);
     }
 
-    private void spawnRide(Match m, World w, Location loc, List<UUID> riders, boolean harness, long[] ns) {
+    private void spawnRide(Match m, World w, Location loc, List<UUID> riders, boolean harness, boolean big, long[] ns) {
         long a = System.nanoTime();
         w.getChunkAt(loc);
         HappyGhast g = w.spawn(loc, HappyGhast.class, gh -> {
@@ -224,6 +232,12 @@ public final class Deployment implements Listener {
         Ride r = new Ride(g, loc.clone());
         long b = System.nanoTime();
         ns[0] += b - a;
+        if (big) {
+            boardBig(m, w, r, loc, riders);
+            ns[1] += System.nanoTime() - b;
+            rides.add(r);
+            return;
+        }
         for (UUID u : riders) {
             Player p = Bukkit.getPlayer(u);
             if (p == null) continue;
@@ -232,6 +246,53 @@ public final class Deployment implements Listener {
         }
         ns[1] += System.nanoTime() - b;
         rides.add(r);
+    }
+
+    /** Every rider in team order, so squads sit together on the one ghast. */
+    private static List<UUID> everyone(Match m) {
+        List<UUID> out = new ArrayList<>();
+        for (List<UUID> t : m.teams) for (UUID u : t) if (Bukkit.getPlayer(u) != null && m.isAlive(u)) out.add(u);
+        return out;
+    }
+
+    /**
+     * One-ghast mode: the ghast is scaled up to fit everyone (up to deploy.one-ghast-max-scale)
+     * and the riders sit in a grid on its back, each on an invisible marker armor stand.
+     */
+    private void boardBig(Match m, World w, Ride r, Location loc, List<UUID> riders) {
+        int n = Math.max(1, riders.size());
+        int k = (int) Math.ceil(Math.sqrt(n));
+        double spacing = 1.2;
+        double scale = Math.max(1.5, Math.min(plugin.getConfig().getDouble("deploy.one-ghast-max-scale", 6), (k * spacing + 1) / 4.0));
+        var attr = r.ghast.getAttribute(Attribute.SCALE);
+        if (attr != null) attr.setBaseValue(scale);
+        spacing = Math.min(spacing, (4 * scale - 1) / k);
+        Vector side = new Vector(-dir.getZ(), 0, dir.getX());
+        double top = 4 * scale + 0.05;
+        for (int i = 0; i < riders.size(); i++) {
+            Player p = Bukkit.getPlayer(riders.get(i));
+            if (p == null) continue;
+            int row = i / k, col = i % k;
+            Vector off = side.clone().multiply((col - (k - 1) / 2.0) * spacing)
+                .add(dir.clone().multiply(((k - 1) / 2.0 - row) * spacing)).setY(top);
+            Location at = loc.clone().add(off);
+            ArmorStand seat = w.spawn(at, ArmorStand.class, a -> {
+                a.setMarker(true);
+                a.setInvisible(true);
+                a.setGravity(false);
+                a.setInvulnerable(true);
+                a.setSilent(true);
+                a.setPersistent(false);
+                a.getPersistentDataContainer().set(Keys.ARENA_OBJECT, PersistentDataType.STRING, "game-" + m.id());
+            });
+            prepare(p, m);
+            p.teleport(at);
+            if (!seat.addPassenger(p)) plugin.adminAlert("deploy.mount-failed", "player", p.getName());
+            plugin.msg().send(p, "deploy.boarded", "mode", plugin.announcer().modeName(m.s()));
+            r.riders.add(p.getUniqueId());
+            r.seats.put(p.getUniqueId(), seat);
+            r.seatOffset.put(p.getUniqueId(), off);
+        }
     }
 
     /** First-fit: whole teams stay together on one ghast; spare seats take solo players. */
@@ -263,6 +324,14 @@ public final class Deployment implements Listener {
     }
 
     private void board(Player p, Match m, HappyGhast g, Location loc) {
+        prepare(p, m);
+        p.teleport(loc.clone().add(0, 4.5, 0));
+        if (!g.addPassenger(p)) plugin.adminAlert("deploy.mount-failed", "player", p.getName());
+        plugin.msg().send(p, "deploy.boarded", "mode", plugin.announcer().modeName(m.s()));
+    }
+
+    /** Full health, the kit, and the drop elytra in place of the chestplate. */
+    private void prepare(Player p, Match m) {
         p.closeInventory();
         p.setGameMode(GameMode.SURVIVAL);
         for (PotionEffect e : p.getActivePotionEffects()) p.removePotionEffect(e.getType());
@@ -279,9 +348,6 @@ public final class Deployment implements Listener {
         ItemStack chest = p.getInventory().getChestplate();
         p.getInventory().setChestplate(tempElytra());
         gliders.put(p.getUniqueId(), new Glider(chest == null ? null : chest.clone()));
-        p.teleport(loc.clone().add(0, 4.5, 0));
-        if (!g.addPassenger(p)) plugin.adminAlert("deploy.mount-failed", "player", p.getName());
-        plugin.msg().send(p, "deploy.boarded", "mode", plugin.announcer().modeName(m.s()));
     }
 
     private ItemStack tempElytra() {
@@ -343,6 +409,11 @@ public final class Deployment implements Listener {
         if (teleportMode) {
             target.setYaw(r.start.getYaw());
             g.teleport(target, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+            for (var e : r.seats.entrySet()) {
+                ArmorStand seat = e.getValue();
+                if (!seat.isValid() || seat.getPassengers().isEmpty()) continue;
+                seat.teleport(target.clone().add(r.seatOffset.get(e.getKey())), TeleportFlag.EntityState.RETAIN_PASSENGERS);
+            }
             return;
         }
         Vector v = target.toVector().subtract(now.toVector());
@@ -369,7 +440,9 @@ public final class Deployment implements Listener {
                 Glider gl = gliders.get(u);
                 if (p != null && gl != null && gl.riding) {
                     ejecting.add(u);
-                    r.ghast.removePassenger(p);
+                    ArmorStand seat = r.seats.get(u);
+                    if (seat != null) seat.removePassenger(p);
+                    else r.ghast.removePassenger(p);
                     ejecting.remove(u);
                     dropped(p, gl);
                 }
@@ -436,6 +509,10 @@ public final class Deployment implements Listener {
 
     private void removeGhasts() {
         for (Ride r : rides) {
+            for (ArmorStand seat : r.seats.values()) {
+                seat.eject();
+                seat.remove();
+            }
             r.ghast.eject();
             r.ghast.remove();
         }

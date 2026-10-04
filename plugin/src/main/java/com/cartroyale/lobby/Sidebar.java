@@ -160,6 +160,7 @@ public final class Sidebar {
         ZoneMath.State s = z.now();
         if (s == null) return plugin.msg().plain("board.zone-off");
         int secs = (int) Math.ceil(s.secondsLeftInStep());
+        if (z.inFinalStage(s) && secs > 0) return plugin.msg().plain("board.zone-final", "time", Times.mmss(secs));
         if (s.shrinking()) return plugin.msg().plain("board.zone-shrinking", "time", Times.mmss(secs));
         if (secs <= 0) return plugin.msg().plain("board.zone-closed");
         return plugin.msg().plain("board.zone-waiting", "time", Times.mmss(secs));

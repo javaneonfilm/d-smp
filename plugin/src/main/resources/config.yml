@@ -63,6 +63,8 @@ schedule:
 deploy:
   distance: 300             # blocks the ghasts fly before dropping everyone
   speed: 0.6                # blocks per tick (12 blocks/s)
+  one-ghast: true           # everyone rides one big ghast (the rest of these ghast settings are for false)
+  one-ghast-max-scale: 6    # how big that ghast may get to fit everyone (6 fits about 100 players)
   riders-per-ghast: 4
   spacing: 9
   row-gap: 12

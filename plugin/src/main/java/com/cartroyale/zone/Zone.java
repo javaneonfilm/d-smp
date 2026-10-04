@@ -90,7 +90,8 @@ public final class Zone {
         double prev = startR;
         for (int i = 0; i < n; i++) {
             ZoneMath.Phase p = base.get(i);
-            r[i] = closeFully && i == n - 1 ? 0 : Math.min(p.endRadius(), prev);
+            // With close-fully the last phase ends at final.radius; the circle then roams and closes.
+            r[i] = closeFully && i == n - 1 ? Math.min(prev, Math.max(0, yml.get().getDouble("final.radius", 6))) : Math.min(p.endRadius(), prev);
             w[i] = p.waitSeconds() * f;
             sh[i] = p.shrinkSeconds() * f;
             double need = (prev - r[i]) / maxSpeed;
@@ -125,8 +126,17 @@ public final class Zone {
 
     public ZoneMath.Plan planFor(MapConfig mc, int minutes) {
         boolean closeFully = yml.get().getBoolean("close-fully", true);
-        // A circle of nothing has nowhere to orbit to.
-        double orbitR = closeFully ? 0 : yml.get().getDouble("orbit.radius", 100), speed = yml.get().getDouble("orbit.speed", 4.3);
+        if (closeFully) {
+            // The final circle (final.radius) roams on a ring for final.roam-minutes, the last
+            // final.close-seconds of which it spends shrinking to nothing.
+            double roamR = yml.get().getDouble("final.roam-radius", 25), speed = yml.get().getDouble("final.roam-speed", 1.5);
+            double close = Math.max(0, yml.get().getDouble("final.close-seconds", 30));
+            double roam = Math.max(0, yml.get().getDouble("final.roam-minutes", 5) * 60 - close);
+            double[] oc = ZoneMath.orbitCenter(mc.finalX, mc.finalZ, mc.centerX, mc.centerZ, Math.max(1, roamR));
+            return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, phasesFor(minutes, mc.zoneR),
+                roamR, speed, oc[0], oc[1], roam, close);
+        }
+        double orbitR = yml.get().getDouble("orbit.radius", 100), speed = yml.get().getDouble("orbit.speed", 4.3);
         double[] oc = ZoneMath.orbitCenter(mc.finalX, mc.finalZ, mc.centerX, mc.centerZ, Math.max(1, orbitR));
         return new ZoneMath.Plan(new ZoneMath.Circle(mc.zoneX, mc.zoneZ, mc.zoneR), mc.finalX, mc.finalZ, phasesFor(minutes, mc.zoneR), orbitR, speed, oc[0], oc[1]);
     }
@@ -157,6 +167,16 @@ public final class Zone {
         if (!yml.get().getBoolean("no-healing-outside", false) || inGrace()) return false;
         ZoneMath.State s = now();
         return s != null && !s.circle().contains(p.getLocation().getX(), p.getLocation().getZ());
+    }
+
+    /** Minutes the final circle roams before it is fully closed (0 when it doesn't close). */
+    public int roamMinutes() {
+        return yml.get().getBoolean("close-fully", true) ? (int) Math.ceil(yml.get().getDouble("final.roam-minutes", 5)) : 0;
+    }
+
+    /** True once the phases are done: the small final circle roaming before it closes (or closed). */
+    public boolean inFinalStage(ZoneMath.State s) {
+        return plan != null && s != null && s.phase() >= plan.phases().size();
     }
 
     public ZoneMath.State now() {
@@ -282,15 +302,17 @@ public final class Zone {
 
     private void buildBars(ZoneMath.State s) {
         boolean grace = inGrace();
-        boolean closed = !grace && !s.shrinking() && s.phase() >= plan.phases().size();
+        boolean last = !grace && s.phase() >= plan.phases().size();
+        boolean closed = last && s.secondsLeftInStep() <= 0;
+        boolean roaming = last && !closed;
         int secs = grace ? graceSecondsLeft() : (int) Math.ceil(s.secondsLeftInStep());
         // Grace counts down to PvP: green, yellow for the last 30 s, blinking red for the last 10.
         String key = grace ? (secs <= 10 ? "zone.hud-pvp-in-now" : secs <= 30 ? "zone.hud-pvp-in-soon" : "zone.hud-pvp-in")
-            : closed ? "zone.hud-closed" : s.shrinking() ? "zone.hud-shrinking" : "zone.hud-waiting";
+            : closed ? "zone.hud-closed" : roaming ? "zone.hud-final" : s.shrinking() ? "zone.hud-shrinking" : "zone.hud-waiting";
         net.kyori.adventure.text.Component title = plugin.msg().get(key, "time", String.format("%d:%02d", secs / 60, secs % 60),
             "phase", s.phase() + 1, "phases", plan.phases().size(),
             "radius", (int) Math.round(s.circle().r()), "target", (int) Math.round(s.target().r()));
-        double zoneTotal = ZoneMath.totalSeconds(plan);
+        double zoneTotal = ZoneMath.endSeconds(plan);
         double elapsed = (System.currentTimeMillis() - startedAt) / 1000.0 - graceMs() / 1000.0;
         double left = grace ? graceSecondsLeft() / Math.max(1.0, graceMs() / 1000.0)
             : zoneTotal <= 0 ? 0 : Math.max(0, Math.min(1, 1 - elapsed / zoneTotal));

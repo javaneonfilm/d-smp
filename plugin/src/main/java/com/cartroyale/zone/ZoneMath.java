@@ -24,8 +24,17 @@ public final class ZoneMath {
         }
     }
 
+    /**
+     * After the last phase the final circle roams (orbits) for roamSeconds at its size, then
+     * shrinks to nothing over closeSeconds while still moving. roamSeconds = infinity roams forever.
+     */
     public record Plan(Circle start, double finalX, double finalZ, List<Phase> phases,
-                       double orbitRadius, double orbitSpeed, double orbitCenterX, double orbitCenterZ) {
+                       double orbitRadius, double orbitSpeed, double orbitCenterX, double orbitCenterZ,
+                       double roamSeconds, double closeSeconds) {
+        public Plan(Circle start, double finalX, double finalZ, List<Phase> phases,
+                    double orbitRadius, double orbitSpeed, double orbitCenterX, double orbitCenterZ) {
+            this(start, finalX, finalZ, phases, orbitRadius, orbitSpeed, orbitCenterX, orbitCenterZ, Double.POSITIVE_INFINITY, 0);
+        }
     }
 
     /** What the zone looks like at a moment in time. */
@@ -58,6 +67,12 @@ public final class ZoneMath {
         return out;
     }
 
+    /** Seconds from zone start until the zone is fully closed (after roaming), or the phases' end if it roams forever. */
+    public static double endSeconds(Plan p) {
+        double t = totalSeconds(p);
+        return Double.isInfinite(p.roamSeconds()) ? t : t + p.roamSeconds() + p.closeSeconds();
+    }
+
     /** Seconds from zone start until the last phase has finished shrinking. */
     public static double totalSeconds(Plan p) {
         double t = 0;
@@ -84,14 +99,26 @@ public final class ZoneMath {
         }
         Circle last = cs.get(cs.size() - 1);
         Phase lastPhase = p.phases().isEmpty() ? new Phase(0, 0, last.r(), 2, 20) : p.phases().get(p.phases().size() - 1);
-        if (p.orbitRadius() <= 0 || p.orbitSpeed() <= 0) {
-            return new State(last, last, p.phases().size(), false, false, 0, lastPhase.damageHp(), lastPhase.damageIntervalTicks());
+        boolean roams = p.orbitRadius() > 0 && p.orbitSpeed() > 0;
+        double since = t - clock;
+        double end = p.roamSeconds() + p.closeSeconds();
+        // Where the final circle is: moving round the orbit ring, or parked where the phases left it.
+        double x = last.x(), z = last.z();
+        if (roams) {
+            double a0 = Math.atan2(last.z() - p.orbitCenterZ(), last.x() - p.orbitCenterX());
+            double a = a0 + p.orbitSpeed() / p.orbitRadius() * Math.min(since, end);
+            x = p.orbitCenterX() + Math.cos(a) * p.orbitRadius();
+            z = p.orbitCenterZ() + Math.sin(a) * p.orbitRadius();
         }
-        double a0 = Math.atan2(last.z() - p.orbitCenterZ(), last.x() - p.orbitCenterX());
-        double omega = p.orbitSpeed() / p.orbitRadius();
-        double a = a0 + omega * (t - clock);
-        Circle orb = new Circle(p.orbitCenterX() + Math.cos(a) * p.orbitRadius(), p.orbitCenterZ() + Math.sin(a) * p.orbitRadius(), last.r());
-        return new State(orb, orb, p.phases().size(), false, true, 0, lastPhase.damageHp(), lastPhase.damageIntervalTicks());
+        if (since >= end) {
+            Circle gone = new Circle(x, z, 0);
+            return new State(gone, gone, p.phases().size(), false, false, 0, lastPhase.damageHp(), lastPhase.damageIntervalTicks());
+        }
+        boolean closing = since >= p.roamSeconds();
+        double r = closing ? lerp(last.r(), 0, p.closeSeconds() <= 0 ? 1 : (since - p.roamSeconds()) / p.closeSeconds()) : last.r();
+        Circle now = new Circle(x, z, r);
+        return new State(now, closing ? new Circle(x, z, 0) : now, p.phases().size(), closing, roams, end - since,
+            lastPhase.damageHp(), lastPhase.damageIntervalTicks());
     }
 
     /**

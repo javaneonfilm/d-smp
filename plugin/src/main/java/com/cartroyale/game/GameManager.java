@@ -320,7 +320,7 @@ public final class GameManager {
                 if (left <= 0) finishTeaming();
             }
             case PLAYING -> {
-                long hard = (match.row.s.minutes + (plugin.getConfig().getInt("match.grace-seconds", 120) + 59) / 60 + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
+                long hard = (match.row.s.minutes + (plugin.getConfig().getInt("match.grace-seconds", 120) + 59) / 60 + plugin.zone().roamMinutes() + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
                 if (now - match.playingAt >= hard) end(true);
             }
             case ENDING -> {

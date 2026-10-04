@@ -10,9 +10,17 @@ phases:
   - {wait: 90, shrink: 75, radius: 40, damage: 4, interval: 20}
   - {wait: 60, shrink: 60, radius: 5, damage: 6, interval: 20}
 
-# close-fully: the last circle shrinks to nothing (radius 0), so the zone is fully closed at the end.
+# close-fully: the last phase ends at final.radius (at the game's length, e.g. minute 20). That small
+# circle then roams on a ring for final.roam-minutes and spends the last final.close-seconds of it
+# shrinking to nothing, so with the defaults the zone is fully closed at minute 25.
 # max-speed: no shrink is faster than this many blocks per second; the time comes out of the wait.
 close-fully: true
+final:
+  radius: 6
+  roam-minutes: 5
+  close-seconds: 30
+  roam-radius: 25          # size of the ring it moves around on (blocks)
+  roam-speed: 1.5          # blocks per second
 # Zone damage = the phase's damage + damage-per-block for every block you are outside the circle,
 # never more than max-damage per hit (half-hearts). It ignores armor, Protection and Resistance.
 damage-per-block: 0.15

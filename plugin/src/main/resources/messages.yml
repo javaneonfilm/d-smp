@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 8
+messages-version: 10
 
 prefix: '<accent>●</accent> '
 
@@ -141,6 +141,7 @@ board:
   zone-grace: '<sc>pvp</sc> <time>'
   zone-waiting: '<time>'
   zone-shrinking: '<sc>shrink</sc> <time>'
+  zone-final: '<sc>closes</sc> <time>'
   zone-closed: '<sc>closed'
 
 states:
@@ -183,12 +184,12 @@ leaderboard:
 
 # ------------------------------------------------------------------ game flow
 titles:
-  countdown: '<accent><b><seconds>'
-  countdown-sub: '<sub><sc>purge next'
+  countdown: '<fg><b><sc>purge in:</sc></b> <accent><b><seconds>'
+  countdown-sub: ''
   purge: '<accent><b><sc>purge'
   purge-sub: '<sub><sc>picking players'
   board: '<accent><b><sc>get on'
-  board-sub: '<sub><sc>ghasts incoming'
+  board-sub: '<sub><sc>round starting!'
   victory: '<coin><b><sc>victory'
   game-over: '<accent><b><sc>game over'
   end-sub: '<sub><winners> <sc>won'
@@ -252,6 +253,7 @@ zone:
   hud-pvp-in-now: '<bad>●</bad> <bad><sc>pvp on in</sc> <time>'
   hud-waiting: '<accent>●</accent> <fg><sc>zone</sc> <phase>/<phases> <dim>·</dim> <sub><sc>moves in</sc> <fg><time></fg> <dim>·</dim> <sub><sc>r</sc><radius>'
   hud-shrinking: '<bad>●</bad> <fg><sc>shrinking</sc> <fg><time></fg> <dim>·</dim> <sub><sc>r</sc><radius> <dim>›</dim> <sub><target>'
+  hud-final: '<warn>●</warn> <fg><sc>final zone</sc> <dim>·</dim> <sub><sc>closes in</sc> <fg><time></fg> <dim>·</dim> <sub><sc>r</sc><radius>'
   hud-closed: '<bad>●</bad> <fg><sc>zone closed</sc> <dim>·</dim> <sub><sc>last one alive wins'
   bar-grace: '<ok><sc>grace</sc> <fg><time></fg> <dim>·</dim> <sub><sc>no pvp yet'
   grace-over: '<prefix><accent><b>PvP is on.</b> <fg>The zone starts moving now.'
