@@ -37,6 +37,8 @@ public final class Match {
     public String map;
     public long startedAt;
     public long playingAt;
+    /** The second set of chests (chests.second-wave) has been placed. */
+    public boolean lootWave;
     public int onlineAtPurge;
     public int placementCounter;
     public boolean purged;

@@ -107,6 +107,58 @@ public final class ChestManager implements org.bukkit.event.Listener {
         });
     }
 
+    /**
+     * A second set of chests partway through the game (chests.second-wave): only inside the
+     * current zone circle, kept chests.min-distance away from every chest already standing, and
+     * with their own (better) tier shares. The first set stays where it is.
+     */
+    public CompletableFuture<Integer> spawnWave(World w, MapConfig mc, com.cartroyale.game.Mode mode, int players, boolean luckier, boolean pearls,
+                                                String gameTag, double cx, double cz, double radius) {
+        var cfg = plugin.getConfig();
+        LootTables lt = plugin.loot();
+        int want = (int) Math.round(ChestSpots.countFor(players, lt.chestBase(), lt.chestPerPlayer(), lt.chestMax())
+            * Math.max(0, cfg.getDouble("chests.second-wave.amount", 0.5)));
+        double minDist = lt.chestSpacing();
+        List<Double> sh = cfg.getDoubleList("chests.second-wave.tier-shares");
+        double[] shares = sh.size() == 3 ? new double[]{sh.get(0), sh.get(1), sh.get(2)} : new double[]{20, 45, 35};
+        double inside = Math.max(0, radius - 3);
+        List<long[]> standing = new ArrayList<>();
+        for (Location l : chests) standing.add(new long[]{l.getBlockX(), l.getBlockZ()});
+        Random rng = new Random();
+        return plugin.scanner().spots(w, mc, plugin.arenas().spotsFile(mc.name)).thenApplyAsync(spots -> {
+            List<ChestSpots.Spot> ok = new ArrayList<>();
+            for (ChestSpots.Spot s : spots) {
+                if (Math.hypot(s.x() + 0.5 - cx, s.z() + 0.5 - cz) > inside) continue;
+                boolean near = false;
+                for (long[] c : standing) if (Math.hypot(s.x() - c[0], s.z() - c[1]) < minDist) {
+                    near = true;
+                    break;
+                }
+                if (!near) ok.add(s);
+            }
+            List<ChestSpots.Spot> picked = ChestSpots.pick(ok, minDist, want, rng);
+            return ChestSpots.assignTiers(picked, shares, rng);
+        }).thenCompose(placed -> {
+            CompletableFuture<Integer> done = new CompletableFuture<>();
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                java.util.concurrent.atomic.AtomicInteger left = new java.util.concurrent.atomic.AtomicInteger(placed.size());
+                java.util.concurrent.atomic.AtomicInteger made = new java.util.concurrent.atomic.AtomicInteger();
+                if (placed.isEmpty()) done.complete(0);
+                for (ChestSpots.Placed p : placed) {
+                    w.getChunkAtAsync(p.spot().x() >> 4, p.spot().z() >> 4, true).whenComplete((c, t) -> {
+                        if (t == null) {
+                            int before = chests.size();
+                            place(w, p, mode, luckier, pearls, rng, gameTag);
+                            if (chests.size() > before) made.incrementAndGet();
+                        }
+                        if (left.decrementAndGet() == 0) done.complete(made.get());
+                    });
+                }
+            });
+            return done;
+        });
+    }
+
     private void place(World w, ChestSpots.Placed p, com.cartroyale.game.Mode mode, boolean luckier, boolean pearls, Random rng, String gameTag) {
         Block b = w.getBlockAt(p.spot().x(), p.spot().y(), p.spot().z());
         if (!b.getType().isAir()) return;

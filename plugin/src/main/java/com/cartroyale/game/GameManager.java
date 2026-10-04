@@ -322,6 +322,11 @@ public final class GameManager {
             case PLAYING -> {
                 long hard = (match.row.s.minutes + (plugin.getConfig().getInt("match.grace-seconds", 120) + 59) / 60 + plugin.zone().roamMinutes() + plugin.getConfig().getInt("match.hard-timeout-extra-minutes", 5)) * 60_000L;
                 if (now - match.playingAt >= hard) end(true);
+                else if (!match.lootWave && plugin.getConfig().getBoolean("chests.second-wave.enabled", true)
+                    && now - match.playingAt >= plugin.getConfig().getDouble("chests.second-wave.minute", 15) * 60_000L) {
+                    match.lootWave = true;
+                    lootWave();
+                }
             }
             case ENDING -> {
                 if (match.inStateMs() >= plugin.getConfig().getInt("match.end-kick-seconds", 10) * 1000L) kickAndReset();
@@ -522,6 +527,31 @@ public final class GameManager {
         plugin.debug(String.format("boarding took %.1f ms (chests start %.1f, nametags %.1f, deploy %.1f)",
             (t3 - t0) / 1e6, (t1 - t0) / 1e6, (t2 - t1) / 1e6, (t3 - t2) / 1e6));
         checkWin();
+    }
+
+    /** The second set of chests, inside the zone as it is right now. */
+    private void lootWave() {
+        World w = plugin.arenas().world();
+        var mc = plugin.arenas().map();
+        var z = plugin.zone().now();
+        if (w == null || mc == null || z == null || z.circle().r() < 4) return;
+        GameSettings s = match.s();
+        long id = match.id();
+        plugin.chests().spawnWave(w, mc, s.mode, match.players.size(), s.has(Modifier.LUCKIER_LOOT), s.has(Modifier.PEARLS), "game-" + id,
+                z.circle().x(), z.circle().z(), z.circle().r())
+            .thenAccept(n -> Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getLogger().info("Game #" + id + ": second chest wave, " + n + " chests inside r" + Math.round(z.circle().r()));
+                if (n <= 0) return;
+                for (Player p : w.getPlayers()) {
+                    plugin.msg().send(p, "game.loot-wave", "count", n);
+                    p.showTitle(net.kyori.adventure.title.Title.title(plugin.msg().get("titles.loot-wave"), plugin.msg().get("titles.loot-wave-sub", "count", n)));
+                    p.playSound(p.getLocation(), org.bukkit.Sound.BLOCK_CHEST_OPEN, 1f, 0.8f);
+                }
+            }))
+            .exceptionally(t -> {
+                plugin.getLogger().log(Level.WARNING, "Second chest wave failed", t);
+                return null;
+            });
     }
 
     private void beginPlaying() {

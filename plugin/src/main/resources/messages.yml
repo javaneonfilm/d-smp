@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 10
+messages-version: 11
 
 prefix: '<accent>●</accent> '
 
@@ -192,6 +192,8 @@ titles:
   board-sub: '<sub><sc>round starting!'
   victory: '<coin><b><sc>victory'
   game-over: '<accent><b><sc>game over'
+  loot-wave: '<coin><b><sc>fresh loot'
+  loot-wave-sub: '<sub><count> <sc>new chests inside the zone'
   end-sub: '<sub><winners> <sc>won'
 
 game:
@@ -208,6 +210,7 @@ game:
   test-started: '<prefix><fg>Test game #<id> for <player> starting. <sub>No Discord, no stats. /cart stop to end it.'
   reason-stopped: 'stopped by <by>'
   reason-cancelled: 'cancelled by <by>'
+  loot-wave: '<prefix><coin><count> new chests</coin> <fg>just dropped inside the zone. <sub>Better odds on gold.'
   zone-start: '<prefix><fg>Everyone''s down, zone is live.'
   zone-start-grace: '<prefix><fg>Everyone''s down. <sub>PvP turns on in <ok><grace></ok>, then the zone closes over <minutes> min.'
   elim: '<dim>×</dim> <fg><victim></fg> <sub>died</sub> <dim>· <left> left'

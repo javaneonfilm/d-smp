@@ -93,6 +93,11 @@ chests:                     # amount, spacing and tier mix moved to loot.yml (/c
   hologram-height: 1.35
   random-armor-durability: true   # armor in chests comes worn: 10-100% left, usually low
   max-same-item: 2          # one item type fills at most this many slots in a chest
+  second-wave:              # a second set of chests partway through the game, inside the zone
+    enabled: true
+    minute: 15              # minutes after the drop
+    amount: 0.5             # this many times the first set's chest count
+    tier-shares: [20, 45, 35]   # bronze / silver / gold, better than the first set
   place-per-tick: 20
   scan-chunks-per-tick: 8
 
