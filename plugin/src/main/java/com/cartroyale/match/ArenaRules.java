@@ -197,7 +197,8 @@ public final class ArenaRules implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDecay(LeavesDecayEvent e) {
-        if (arena(e.getBlock())) e.setCancelled(true);
+        // Leaves never decay, in any world (lobby included).
+        e.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
