@@ -52,8 +52,7 @@ host:
     max-minutes: 40
   min-lead-minutes: 10      # ticket holders pick a start at least this far ahead
   slot-minutes: 30          # two games never start closer than this
-  ticket-hours: 6           # length of the temporary LuckPerms host group
-  host-group: host
+  host-group: host          # LuckPerms group a hoster has only while their own game runs
   revoke-cancels-game: true # a chargeback cancels the game the ticket paid for
   store-url: ''             # where to buy Game Tickets; empty = no link
 

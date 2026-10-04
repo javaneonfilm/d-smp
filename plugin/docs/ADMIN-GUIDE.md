@@ -32,8 +32,9 @@ lp group vipplus permission set cartzone.rank.vipplus true
 lp group vipplus parent add vip
 lp group admin permission set cartzone.admin true
 ```
-`host` needs no permission: a Game Ticket is what lets someone host. The plugin grants `host`
-temporarily (6 h, `host.ticket-hours`) so the rank shows.
+`host` needs no permission: a Game Ticket is what lets someone host. The plugin gives `host` to
+the hoster only while their own game runs (from its join window until it ends or is cancelled),
+then takes it away again.
 
 Admins (`cartzone.admin`) never play; they spectate. `/cart play` toggles that for you (for testing).
 

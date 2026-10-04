@@ -318,7 +318,7 @@ host:
   failed: '<prefix><accent>Couldn''t queue that game, try again.'
 
 tickets:
-  given: '<prefix><fg>Gave <player> <n> ticket(s). <sub>They have <count>. Host group: <lp>.'
+  given: '<prefix><fg>Gave <player> <n> ticket(s). <sub>They have <count>. Host rank: <lp>.'
   duplicate: '<prefix><sub>Transaction <tx> was already done. Tickets: <count>.'
   revoked: '<prefix><fg>Took <n> ticket(s) from <player>. <sub>They have <count>.'
   revoke-cancelled-game: '<prefix><fg>Cancelled game #<id> since that ticket paid for it.'

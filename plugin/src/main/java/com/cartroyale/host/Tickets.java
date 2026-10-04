@@ -15,7 +15,9 @@ import java.util.UUID;
 /**
  * HOST-4/5 and 6.2. {@code cart ticket give <uuid> [n] [transaction]} is run by CraftingStore from
  * the console. It is idempotent per transaction id, works while the player is offline, whitelists
- * the UUID and grants the temporary host group. Revoke is the chargeback path.
+ * the UUID. Revoke is the chargeback path. The host group is only held while the player's own
+ * game runs: {@link #hostStarted} gives it when the join window opens, {@link #hostEnded} takes it
+ * away when the game ends or is cancelled.
  */
 public final class Tickets {
 
@@ -77,9 +79,8 @@ public final class Tickets {
                 ourWhitelist.add(uuid);
                 persistWhitelist();
             }
-            int hours = plugin.getConfig().getInt("host.ticket-hours", 6);
-            boolean lp = Ranks.addTempGroup(uuid, plugin.getConfig().getString("host.host-group", "host"), hours);
-            plugin.msg().send(by, "tickets.given", "n", n, "player", name(uuid), "count", r.count(), "lp", lp ? "yes" : "no (LuckPerms missing)");
+            plugin.msg().send(by, "tickets.given", "n", n, "player", name(uuid), "count", r.count(),
+                "lp", Ranks.luckPerms() ? "while their game runs" : "no (LuckPerms missing)");
             plugin.getLogger().info("Gave " + n + " ticket(s) to " + uuid + " (tx " + tx + "), now " + r.count());
             Player p = Bukkit.getPlayer(uuid);
             if (p != null) {
@@ -122,7 +123,33 @@ public final class Tickets {
         });
     }
 
-    /** After a bought game ends: drop the whitelist entry and host group if nothing else is pending. */
+    private String hostGroup() {
+        return plugin.getConfig().getString("host.host-group", "host");
+    }
+
+    /**
+     * The hoster's game opened: they get the host group until it ends. It is a temporary group
+     * (time to the start + the game length + 30 min), so a crash can't leave it on them for good.
+     */
+    public void hostStarted(UUID uuid, long startAt, int gameMinutes) {
+        int minutes = (int) Math.max(0, (startAt - System.currentTimeMillis()) / 60_000L) + gameMinutes + 30;
+        if (Ranks.addTempGroupMinutes(uuid, hostGroup(), minutes)) refreshTagSoon(uuid);
+    }
+
+    /** The hoster's game ended or was cancelled: the host group goes. */
+    public void hostEnded(UUID uuid) {
+        if (Ranks.removeGroup(uuid, hostGroup())) refreshTagSoon(uuid);
+    }
+
+    /** LuckPerms applies the change a moment later; redraw the nametag after that. */
+    private void refreshTagSoon(UUID uuid) {
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null) plugin.nametags().refresh(p);
+        }, 40);
+    }
+
+    /** After a bought game ends: drop the whitelist entry if nothing else is pending. */
     public void afterGame(UUID uuid) {
         plugin.store().tickets(uuid).thenAccept(count -> Bukkit.getScheduler().runTask(plugin, () -> {
             boolean queued = plugin.games().queue().stream().anyMatch(g -> uuid.equals(g.s.hosterUuid));
@@ -137,7 +164,7 @@ public final class Tickets {
             Bukkit.getOfflinePlayer(uuid).setWhitelisted(false);
             persistWhitelist();
         }
-        Ranks.removeGroup(uuid, plugin.getConfig().getString("host.host-group", "host"));
+        Ranks.removeGroup(uuid, hostGroup());
     }
 
     private static String name(UUID u) {

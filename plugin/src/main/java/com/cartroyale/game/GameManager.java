@@ -349,6 +349,7 @@ public final class GameManager {
         }
         match = new Match(row);
         match.enter(GameState.JOIN_OPEN);
+        if (row.bought() && row.s.hosterUuid != null) plugin.tickets().hostStarted(row.s.hosterUuid, row.s.startAt, row.s.minutes);
         lastLobbyNotice = 0;
         String map = row.s.map != null ? row.s.map : plugin.arenas().randomMap();
         match.map = map;
@@ -650,7 +651,10 @@ public final class GameManager {
             p.playSound(p.getLocation(), won ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_ENDER_DRAGON_GROWL, 0.8f, 1f);
         }
         plugin.getLogger().info("Game #" + match.id() + " ended" + (timeout ? " (timeout)" : "") + ". Winners: " + winnerNames + ", MVP " + (mvp == null ? "-" : mvp.name));
-        if (match.row.bought() && match.s().hosterUuid != null) plugin.tickets().afterGame(match.s().hosterUuid);
+        if (match.row.bought() && match.s().hosterUuid != null) {
+            plugin.tickets().hostEnded(match.s().hosterUuid);
+            plugin.tickets().afterGame(match.s().hosterUuid);
+        }
     }
 
     private void kickAndReset() {
@@ -710,6 +714,7 @@ public final class GameManager {
         }
         plugin.store().setStatus(m.id(), GameRow.Status.CANCELLED);
         if (m.row.bought() && m.s().hosterUuid != null) {
+            plugin.tickets().hostEnded(m.s().hosterUuid);
             plugin.store().refundTicket(m.s().hosterUuid, m.id());
             Player h = Bukkit.getPlayer(m.s().hosterUuid);
             if (h != null) plugin.msg().send(h, "tickets.refunded", "id", m.id());

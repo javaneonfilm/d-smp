@@ -58,6 +58,13 @@ public final class Ranks {
             "lp user " + uuid + " parent addtemp " + group + " " + hours + "h accumulate");
     }
 
+    /** Temporary group for a set number of minutes, replacing any time left on it. */
+    public static boolean addTempGroupMinutes(UUID uuid, String group, int minutes) {
+        if (!luckPerms() || group == null || group.isBlank()) return false;
+        return Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+            "lp user " + uuid + " parent addtemp " + group + " " + Math.max(1, minutes) + "m replace");
+    }
+
     public static boolean removeGroup(UUID uuid, String group) {
         if (!luckPerms() || group == null || group.isBlank()) return false;
         return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + uuid + " parent removetemp " + group)
