@@ -69,14 +69,31 @@ public final class CartCommand implements TabExecutor {
             switch (sub) {
                 case "start" -> plugin.games().startSoon(a.length > 1 && a[1].equalsIgnoreCase("now"), s instanceof Player p ? p : null);
                 case "stop" -> {
-                    if (plugin.games().match() == null) m(s, "admin.no-game");
-                    else plugin.games().abort(plugin.msg().plain("game.reason-stopped", "by", s.getName()));
+                    // "/cart stop <id>" stops a queued game; without an id it stops the running one,
+                    // or lists the queue (with Cancel buttons) when nothing is running.
+                    if (a.length > 1) {
+                        long id;
+                        try {
+                            id = Long.parseLong(a[1].replace("#", ""));
+                        } catch (NumberFormatException ex) {
+                            return usage(s, "/cart stop [id]");
+                        }
+                        if (plugin.games().cancelQueued(id, plugin.msg().plain("game.reason-cancelled", "by", s.getName()))) m(s, "admin.queued-stopped", "id", id);
+                        else m(s, "admin.no-such-game", "id", id);
+                    } else if (plugin.games().match() == null) {
+                        if (plugin.games().queue().isEmpty()) m(s, "admin.no-game");
+                        else {
+                            m(s, "admin.stop-which");
+                            queue(s);
+                        }
+                    } else plugin.games().abort(plugin.msg().plain("game.reason-stopped", "by", s.getName()));
                 }
                 case "queue" -> queue(s);
                 case "cancel" -> {
                     if (a.length < 2) return usage(s, "/cart cancel <id>");
                     long id = Long.parseLong(a[1].replace("#", ""));
                     if (!plugin.games().cancelQueued(id, plugin.msg().plain("game.reason-cancelled", "by", s.getName()))) m(s, "admin.no-such-game", "id", id);
+                    else m(s, "admin.queued-stopped", "id", id);
                 }
                 case "schedule" -> {
                     // /cart schedule [pause [12h|3d]|resume]: no argument opens the GUI.
@@ -247,7 +264,8 @@ public final class CartCommand implements TabExecutor {
         for (GameRow g : q) {
             m(s, "admin.queue-line", "id", g.id, "start", plugin.announcer().startLine(g), "hoster", g.s.hosterName,
                 "mode", plugin.announcer().modeName(g.s), "team_size", plugin.announcer().teamSize(g.s.squad), "cap", g.s.purgeCap,
-                "source", g.source == null ? "-" : g.source.split(":")[0]);
+                "source", g.source == null ? "-" : g.source.split(":")[0],
+                "cancel", com.cartroyale.core.Msg.command(plugin.msg().get("admin.cancel-button"), "/cart cancel " + g.id));
         }
     }
 

@@ -43,6 +43,7 @@ host:
     mode: LT
     squad: 1
     modifiers: []
+  pearls-by-default: true   # every game (hosted or scheduled) has the Pearls modifier on
   limits:
     min-cap: 10
     max-cap: 120            # ticket holders
@@ -82,6 +83,7 @@ elytra:
 match:
   grace-seconds: 120        # after everyone lands: no PvP (explosions included) and the zone holds still
   max-totems: 1             # Totems of Undying a player can carry in a game (offhand included)
+  max-enchanted-apples: 1   # enchanted golden apples a player can carry in a game
   zone-close-minutes: 20    # then the zone is fully closed this long later (unless the host picks 20-40)
   hard-timeout-extra-minutes: 5
   end-kick-seconds: 10
@@ -105,7 +107,7 @@ chests:                     # amount, spacing and tier mix moved to loot.yml (/c
 books:
   sharpness-max: 5          # highest Sharpness a Sharpness Book can reach
   quickcharge-max: 3        # Quick Charge above 3 makes crossbows unusable in vanilla
-  protection-max: 5         # Protection Books and kills raise worn armor up to this (none > I > ... > V)
+  protection-max: 4         # Protection Books and kills raise worn armor up to this (none > I > ... > IV)
 upgrades:
   repair-on-kill: true      # a kill repairs your armor with what was left of the victim's, slot by slot
   armor-on-kill: true       # a kill gives the killer's worn armor +1 Protection (up to books.protection-max)

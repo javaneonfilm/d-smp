@@ -50,6 +50,12 @@ public final class ArenaRules implements Listener {
         return placed;
     }
 
+    /** Plants you can always break: grass, ferns, flowers, saplings, dead bushes, vines and similar. */
+    static boolean plants(Material m) {
+        return Tag.REPLACEABLE.isTagged(m) && !m.isAir() && m != Material.WATER && m != Material.LAVA
+            || Tag.FLOWERS.isTagged(m) || Tag.SAPLINGS.isTagged(m);
+    }
+
     /** Counts a block as player-placed (the self-test uses this). */
     public void markPlaced(Block b) {
         placed(b.getWorld()).add(b.getBlockKey());
@@ -80,7 +86,8 @@ public final class ArenaRules implements Listener {
             return;
         }
         if (plugin.rank().canBuild(e.getPlayer())) return;
-        if (!placed(b.getWorld()).remove(b.getBlockKey())) {
+        // Grass, ferns, flowers and the like can always be broken; the rest only if a player placed it.
+        if (!plants(b.getType()) && !placed(b.getWorld()).remove(b.getBlockKey())) {
             e.setCancelled(true);
             return;
         }

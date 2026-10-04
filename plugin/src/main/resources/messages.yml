@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 11
+messages-version: 13
 
 prefix: '<accent>●</accent> '
 
@@ -238,6 +238,8 @@ teams:
   disbanded: '<prefix><sub>Your team broke up.'
   you-left: '<prefix><sub>You left your team.'
   no-team: '<prefix><sub>You''re not in a team.'
+  created: '<prefix><fg>You made a team. <sub>Invite more, or /team disband to break it up.'
+  not-leader: '<prefix><sub>Only the team leader can disband it. /team leave to go.'
   list: '<prefix><fg>Team (<count>/<size>): <hl><members>'
 
 deploy:
@@ -277,6 +279,7 @@ zone:
 
 match:
   totem-limit: '<warn>You can only carry <max> totem.'
+  apple-limit: '<warn>You can only carry <max> enchanted golden apple.'
 
 spectate:
   now: '<prefix><sub>You''re spectating. <fg>/spectate</fg> to follow someone.'
@@ -373,7 +376,7 @@ items:
   books:
     armor:
       name: '<accent><b><sc>Protection Book</b>'
-      lore: ['<sub>+1 Protection on all the armor you wear.', '<sub>none > I > II > III > IV > V', '<dim>Used when you pick it up']
+      lore: ['<sub>+1 Protection on all the armor you wear.', '<sub>none > I > II > III > IV', '<dim>Used when you pick it up']
     sharpness:
       name: '<#4FE3E8><b><sc>Sharpness Book</b>'
       lore: ['<sub>+1 Sharpness on your sword.', '<sub>Sword maxed? Then your axe.', '<dim>Used when you pick it up']
@@ -383,7 +386,7 @@ items:
 
 books:
   armor-applied: '<prefix><fg>Your armor has <hl><item></hl> now.'
-  armor-waiting: '<prefix><sub>Holding onto the Protection Book until you wear armor below Protection V.'
+  armor-waiting: '<prefix><sub>Holding onto the Protection Book until you wear armor below Protection IV.'
   armor-tier: '<tier>'
   repaired: '<prefix><fg>Repaired your armor <hl>+<percent>%</hl> <sub>with <victim>''s.'
   kill-upgrade: '<prefix><fg>Kill. Armor''s now <hl><item></hl>.'
@@ -434,8 +437,11 @@ admin:
   no-such-game: '<prefix><sub>There''s no queued game #<id>.'
   already-running: '<prefix><sub>Game #<id> is already going (<state>).'
   queue-live: '<prefix><fg>Live: #<id> <sub>(<state>, <players> players, <alive> alive)'
+  cancel-button: '<bad>[Cancel]</bad>'
+  queued-stopped: '<prefix><fg>Game #<id> won''t happen. <sub>A paid ticket goes back to the host.'
+  stop-which: '<prefix><sub>No game is running. Click Cancel on a queued one, or /cart stop <id>:'
   queue-empty: '<prefix><sub>Nothing queued.'
-  queue-line: '<sub> #<id> <fg><start></fg> <sub><hoster>, <team_size>, cap <cap> <dim>(<source>)'
+  queue-line: '<sub> #<id> <fg><start></fg> <sub><hoster>, <team_size>, cap <cap> <dim>(<source>) <cancel>'
   reloaded: '<prefix><ok>Reloaded.'
   lobby-set: '<prefix><fg>Lobby spawn set.'
   play-on: '<prefix><fg>You''ll play in games now instead of spectating.'
@@ -497,12 +503,12 @@ help:
   player:
     - '<accent><b><sc>diamond smp</sc></b>'
     - '<fg>/cart host <sub>host a game with your ticket'
-    - '<fg>/team invite|accept|leave|list <sub>team up after the purge'
+    - '<fg>/team invite|accept|leave|disband|list <sub>team up after the purge'
     - '<fg>/tc [message] <sub>team chat, or /tc on its own to toggle it'
     - '<fg>/spectate <sub>follow someone while spectating'
   admin:
     - '<accent><b><sc>diamond smp admin</sc></b>'
-    - '<fg>/cart host | start [now] | stop | queue | cancel <id> | schedule'
+    - '<fg>/cart host | start [now] | stop [id] | queue | cancel <id> | schedule'
     - '<fg>/cart schedule pause [12h|3d] | resume <sub>stop or restart the scheduled games'
     - '<fg>/cart kit set|preview <sub>and</sub> /kitready'
     - '<fg>/cart arena info|list|tp|load|save <name>|setspawn|setcenter|setborder <r>|setdeploy'
@@ -568,6 +574,8 @@ gui:
     lore-accept: ['<ok>Invited you', '<dim>Click to accept']
     lore-mate: ['<ok>Teammate']
     leave: '<accent><sc>Leave team'
+    disband: '<accent><sc>Disband team'
+    disband-lore: ['<sub>Breaks the team up.', '<dim>You''re the leader']
   spectate:
     title: '<ink><b><sc>Follow someone'
     head: '<fg><player>'

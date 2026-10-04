@@ -43,6 +43,7 @@ public final class SmallCommands implements TabExecutor {
                     }
                     case "accept" -> plugin.teams().accept(p, a.length > 1 ? a[1] : null);
                     case "leave" -> plugin.teams().leave(p, true);
+                    case "disband" -> plugin.teams().disband(p);
                     case "list" -> plugin.teams().list(p);
                     default -> plugin.teams().openMenu(p);
                 }

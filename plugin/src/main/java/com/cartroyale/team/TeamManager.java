@@ -96,6 +96,12 @@ public final class TeamManager {
             plugin.msg().send(from, "teams.already-teamed", "player", to.getName());
             return;
         }
+        // Your first invite makes a team with you as its leader.
+        if (!memberOf.containsKey(from.getUniqueId())) {
+            teams.put(from.getUniqueId(), new ArrayList<>(List.of(from.getUniqueId())));
+            memberOf.put(from.getUniqueId(), from.getUniqueId());
+            plugin.msg().send(from, "teams.created");
+        }
         invites.computeIfAbsent(to.getUniqueId(), k -> new HashMap<>()).put(from.getUniqueId(), System.currentTimeMillis() + 60_000);
         plugin.msg().send(from, "teams.invited", "player", to.getName());
         plugin.msg().send(to, "teams.invite", "player", from.getName(), "accept",
@@ -123,9 +129,13 @@ public final class TeamManager {
             plugin.msg().send(p, "teams.no-invite");
             return;
         }
-        UUID leader = memberOf.getOrDefault(from, from);
-        List<UUID> team = teams.computeIfAbsent(leader, k -> new ArrayList<>(List.of(k)));
-        memberOf.put(leader, leader);
+        UUID leader = memberOf.get(from);
+        List<UUID> team = leader == null ? null : teams.get(leader);
+        if (team == null) {
+            // The inviter's team was disbanded since.
+            plugin.msg().send(p, "teams.no-invite");
+            return;
+        }
         if (team.size() >= size()) {
             plugin.msg().send(p, "teams.full");
             return;
@@ -164,6 +174,33 @@ public final class TeamManager {
             }
         }
         if (announce) plugin.msg().send(p, "teams.you-left");
+    }
+
+    /** The leader breaks the team up; everyone in it is teamless again. */
+    public void disband(Player p) {
+        UUID leader = memberOf.get(p.getUniqueId());
+        if (leader == null) {
+            plugin.msg().send(p, "teams.no-team");
+            return;
+        }
+        if (!leader.equals(p.getUniqueId())) {
+            plugin.msg().send(p, "teams.not-leader");
+            return;
+        }
+        List<UUID> team = teams.remove(leader);
+        if (team != null) {
+            for (UUID u : team) {
+                memberOf.remove(u);
+                Player m = Bukkit.getPlayer(u);
+                if (m != null) plugin.msg().send(m, "teams.disbanded");
+            }
+        }
+        // Invites the leader sent are void now.
+        for (Map<UUID, Long> m : invites.values()) m.remove(leader);
+    }
+
+    public boolean isLeader(UUID u) {
+        return u.equals(memberOf.get(u));
     }
 
     public void list(Player p) {
@@ -224,10 +261,17 @@ public final class TeamManager {
                 else invite(p, other);
             });
         }
-        gui.set(49, Items.make(Material.BARRIER, plugin.msg().item("gui.team.leave"), List.of()), e -> {
-            p.closeInventory();
-            leave(p, true);
-        });
+        if (isLeader(p.getUniqueId())) {
+            gui.set(49, Items.make(Material.TNT, plugin.msg().item("gui.team.disband"), plugin.msg().lore("gui.team.disband-lore")), e -> {
+                p.closeInventory();
+                disband(p);
+            });
+        } else {
+            gui.set(49, Items.make(Material.BARRIER, plugin.msg().item("gui.team.leave"), List.of()), e -> {
+                p.closeInventory();
+                leave(p, true);
+            });
+        }
         gui.open(p);
     }
 }

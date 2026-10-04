@@ -266,6 +266,13 @@ class LogicTest {
         assertEquals(end + 300, ZoneMath.endSeconds(p), 1e-9);
     }
 
+    @Test
+    void zoneDamageIsHalfAHeartToAHeartAndAHalf() {
+        assertEquals(1.0, ZoneMath.damage(0, 1, 3, 0.15), 1e-9);    // at the edge: half a heart
+        assertEquals(2.5, ZoneMath.damage(10, 1, 3, 0.15), 1e-9);   // 10 blocks out
+        assertEquals(3.0, ZoneMath.damage(200, 1, 3, 0.15), 1e-9);  // far out: capped at 1.5 hearts
+    }
+
     // ---------------- DAILY SHOP ----------------
 
     private static List<ShopMath.Item> cosmetics() {

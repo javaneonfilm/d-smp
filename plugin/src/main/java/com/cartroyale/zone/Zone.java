@@ -258,8 +258,11 @@ public final class Zone {
      * last attacker) like before.
      */
     private void zoneDamage(Player p, double base, double outside) {
-        double perBlock = yml.get().getDouble("damage-per-block", 0.15), max = yml.get().getDouble("max-damage", 16);
-        double dmg = Math.min(max, base + Math.max(0, outside) * perBlock);
+        // damage-min / damage-max in health points (2 = one heart): half a heart at the edge,
+        // rising with every block outside, never more than a heart and a half per hit.
+        double perBlock = yml.get().getDouble("damage-per-block", 0.15);
+        double min = yml.get().getDouble("damage-min", 1.0), max = Math.max(min, yml.get().getDouble("damage-max", 3.0));
+        double dmg = ZoneMath.damage(outside, min, max, perBlock);
         double abs = yml.get().getBoolean("damage-ignores-absorption", true) ? 0 : p.getAbsorptionAmount();
         if (abs > 0) {
             double used = Math.min(abs, dmg);

@@ -30,7 +30,7 @@ import java.util.UUID;
 
 /**
  * Loot books that use themselves up the moment they land in a player's inventory in the arena:
- * the Protection Book adds a Protection level to every worn armor piece (none, then I up to V,
+ * the Protection Book adds a Protection level to every worn armor piece (none, then I up to IV,
  * books.protection-max), Sharpness and Quick Charge add a level to a sword/axe/spear or crossbow.
  * A book that has nothing to work on yet (no crossbow, armor maxed) waits in the inventory and
  * fires as soon as it can. Kills upgrade the killer's armor the same way (upgrades.armor-on-kill).
@@ -178,7 +178,7 @@ public final class UpgradeBooks implements Listener {
 
     /** +1 Protection on every worn armor piece below the cap. Returns e.g. "Protection III", or null if nothing changed. */
     public String upgradeArmor(Player p) {
-        int cap = plugin.getConfig().getInt("books.protection-max", 5);
+        int cap = plugin.getConfig().getInt("books.protection-max", 4);
         PlayerInventory inv = p.getInventory();
         int best = 0;
         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {

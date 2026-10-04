@@ -13,7 +13,7 @@ commands:
     usage: /cart help
   team:
     description: Team up before a team game.
-    usage: /team <invite|accept|leave|list>
+    usage: /team <invite|accept|leave|disband|list>
   teamchat:
     description: Chat with your team only. Without a message it toggles team chat on/off.
     usage: /teamchat [message]

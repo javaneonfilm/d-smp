@@ -54,7 +54,7 @@ public final class LootEditorGui {
         int per = 45;
         int pages = Math.max(1, (list.size() + per - 1) / per);
         int pg = Math.max(0, Math.min(page, pages - 1));
-        Gui gui = new Gui(6, plugin.msg().get("gui.loot.tier-title", "tier", mode.name() + " " + plugin.msg().plain("gui.loot.tier-name-" + tier), "page", pg + 1, "pages", pages));
+        Gui gui = new Gui(6, plugin.msg().get("gui.loot.tier-title", "tier", plugin.msg().plain("gui.loot.tier-name-" + tier), "page", pg + 1, "pages", pages));
         for (int i = 0; i < per && pg * per + i < list.size(); i++) {
             LootTables.Entry en = list.get(pg * per + i);
             gui.set(i, icon(en), e -> {
@@ -88,7 +88,7 @@ public final class LootEditorGui {
             list.add(new LootTables.Entry(item, Rarity.COMMON, 1, Math.max(1, Math.min(amount, copy.getMaxStackSize())),
                 copy.getType() == Material.ENDER_PEARL, special));
             plugin.loot().save();
-            plugin.msg().send(p, "loot.added", "item", copy.getType().name().toLowerCase(), "tier", mode.name() + " " + tier);
+            plugin.msg().send(p, "loot.added", "item", copy.getType().name().toLowerCase(), "tier", plugin.msg().plain("gui.loot.tier-name-" + tier));
             openTier(p, mode, tier, (list.size() - 1) / per);
         });
         gui.set(45, Items.make(Material.OAK_DOOR, plugin.msg().item("gui.back"), List.of()), e -> openTiers(p));
@@ -101,7 +101,7 @@ public final class LootEditorGui {
 
     /** The plugin's own items (shield, upgrade books): click one to add it to the tier. */
     private void openSpecials(Player p, Mode mode, int tier) {
-        Gui gui = new Gui(3, plugin.msg().get("gui.loot.specials-title", "tier", mode.name() + " " + plugin.msg().plain("gui.loot.tier-name-" + tier)));
+        Gui gui = new Gui(3, plugin.msg().get("gui.loot.specials-title", "tier", plugin.msg().plain("gui.loot.tier-name-" + tier)));
         List<LootTables.Entry> list = plugin.loot().tier(mode, tier);
         int slot = 10;
         ItemStack shield = OneTimeShield.create(plugin, 1);
@@ -123,7 +123,7 @@ public final class LootEditorGui {
 
     private void added(Player p, Mode mode, int tier, List<LootTables.Entry> list, String what) {
         plugin.loot().save();
-        plugin.msg().send(p, "loot.added", "item", what, "tier", mode.name() + " " + tier);
+        plugin.msg().send(p, "loot.added", "item", what, "tier", plugin.msg().plain("gui.loot.tier-name-" + tier));
         openTier(p, mode, tier, (list.size() - 1) / 45);
     }
 

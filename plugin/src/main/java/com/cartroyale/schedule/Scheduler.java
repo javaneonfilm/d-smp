@@ -170,6 +170,7 @@ public final class Scheduler {
             GameSettings s = new GameSettings();
             s.mode = e.mode;
             s.modifiers.addAll(e.modifiers);
+            if (plugin.getConfig().getBoolean("host.pearls-by-default", true)) s.modifiers.add(Modifier.PEARLS);
             s.squad = e.squad;
             s.purgeCap = e.purgeCap;
             s.map = e.map;

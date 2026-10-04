@@ -66,9 +66,16 @@ final class CartZoneExpansion extends PlaceholderExpansion {
             }
             case "namecolor" -> color(plugin.nametags().color(p));
             case "name" -> color(plugin.nametags().color(p)) + p.getName();
+            case "team" -> {
+                Component t = plugin.nametags().teamTag(p.getUniqueId());
+                yield t.equals(Component.empty()) ? "" : LEGACY.serialize(t);
+            }
             case "suffix" -> {
+                // The team number (" [13]" in team games) comes first, then the equipped suffix.
+                Component t = plugin.nametags().teamTag(p.getUniqueId());
                 Component s = plugin.cosmetics().suffixComponent(p.getUniqueId());
-                yield s == null ? "" : " " + LEGACY.serialize(s);
+                String out = t.equals(Component.empty()) ? "" : LEGACY.serialize(t);
+                yield s == null ? out : out + " " + LEGACY.serialize(s);
             }
             case "rank" -> plugin.nametags().rank(p).id();
             default -> null;

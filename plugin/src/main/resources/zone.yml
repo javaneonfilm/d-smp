@@ -25,6 +25,8 @@ final:
 # never more than max-damage per hit (half-hearts). It ignores armor, Protection and Resistance.
 damage-per-block: 0.15
 max-damage: 16
+damage-min: 1.0                   # per hit, in health points: 1 = half a heart (right at the edge)
+damage-max: 3.0                   # 3 = a heart and a half (far outside); max-damage above is no longer used
 damage-ignores-absorption: true   # golden apple hearts don't soak zone damage
 no-healing-outside: false         # true = outside the zone you can't heal at all
 max-speed: 1.5

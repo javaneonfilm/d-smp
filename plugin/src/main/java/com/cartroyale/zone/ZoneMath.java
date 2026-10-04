@@ -132,6 +132,11 @@ public final class ZoneMath {
         return new double[]{finalX + dx / d * radius, finalZ + dz / d * radius};
     }
 
+    /** Zone damage per hit: min at the edge, + perBlock for every block outside, never above max. */
+    public static double damage(double outside, double min, double max, double perBlock) {
+        return Math.max(min, Math.min(Math.max(min, max), min + Math.max(0, outside) * perBlock));
+    }
+
     private static double lerp(double a, double b, double f) {
         return a + (b - a) * f;
     }

@@ -17,16 +17,12 @@ import java.util.UUID;
 
 /**
  * One scoreboard team per player on the main scoreboard carries the rank badge (prefix), the
- * equipped suffix, and the name colour (rank colour, or the team colour in a match, TEAM-2), so
+ * equipped suffix with the team number in team games, and the rank's name colour, so
  * every name shows the same thing in chat, the tab list and above the head. When the TAB plugin
  * is installed it draws the tab list and nametags instead, from the cartzone_* placeholders.
  */
 public final class Nametags {
 
-    private static final NamedTextColor[] COLORS = {
-        NamedTextColor.RED, NamedTextColor.BLUE, NamedTextColor.GREEN, NamedTextColor.GOLD, NamedTextColor.AQUA,
-        NamedTextColor.LIGHT_PURPLE, NamedTextColor.YELLOW, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_AQUA,
-        NamedTextColor.DARK_PURPLE, NamedTextColor.DARK_RED, NamedTextColor.DARK_BLUE, NamedTextColor.GRAY, NamedTextColor.WHITE};
 
     private final CartRoyale plugin;
     private final Map<UUID, Integer> matchTeam = new HashMap<>();
@@ -66,19 +62,21 @@ public final class Nametags {
         return t.isEmpty() ? Component.empty() : plugin.msg().parse(t);
     }
 
-    /** Name colour: the match team colour in a team game, otherwise the rank's colour, otherwise white. */
+    /** Name colour: the rank's colour, otherwise white. Teams show as a number instead (teamTag). */
     public TextColor color(Player p) {
-        Integer t = matchTeam.get(p.getUniqueId());
-        if (t != null) return COLORS[t % COLORS.length];
         TextColor c = rank(p).color();
         return c == null ? NamedTextColor.WHITE : c;
     }
 
     public TextColor color(UUID u) {
         Player p = Bukkit.getPlayer(u);
-        if (p != null) return color(p);
+        return p != null ? color(p) : NamedTextColor.WHITE;
+    }
+
+    /** In a team game, " [13]" after the name: the player's team number. Empty otherwise. */
+    public Component teamTag(UUID u) {
         Integer t = matchTeam.get(u);
-        return t == null ? NamedTextColor.WHITE : COLORS[t % COLORS.length];
+        return t == null ? Component.empty() : Component.text(" [" + (t + 1) + "]", TextColor.color(0xA9AEB8));
     }
 
     /** The TAB plugin draws the tab list and nametags itself (from our PlaceholderAPI placeholders). */
@@ -97,7 +95,7 @@ public final class Nametags {
         Component prefix = tag(p);
         Component pre = prefix.equals(Component.empty()) ? Component.empty() : prefix.append(Component.space());
         Component suffix = plugin.cosmetics().suffixComponent(p.getUniqueId());
-        Component suf = suffix == null ? Component.empty() : Component.space().append(suffix);
+        Component suf = teamTag(p.getUniqueId()).append(suffix == null ? Component.empty() : Component.space().append(suffix));
         TextColor c = color(p);
         // Every player has their own scoreboard (Sidebar), so the team goes on all of them.
         for (Scoreboard b : boards()) apply(b, p.getName(), teamName(p.getUniqueId()), pre, suf, c);
@@ -143,7 +141,8 @@ public final class Nametags {
 
     public void applyMatch(Match m) {
         matchTeam.clear();
-        for (Match.MP mp : m.players.values()) if (mp.team >= 0) matchTeam.put(mp.uuid, mp.team);
+        // Numbers only mean something with squads; in solos everyone would just get their own.
+        if (m.s().squad > 1) for (Match.MP mp : m.players.values()) if (mp.team >= 0) matchTeam.put(mp.uuid, mp.team);
         for (Player p : Bukkit.getOnlinePlayers()) refresh(p);
     }
 
