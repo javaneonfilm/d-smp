@@ -6,7 +6,10 @@ const SITE = {
   discord: "#",           // your Discord invite link
   edition: "Java 1.21.11",
   liveStatus: true,       // live player count via api.mcsrvstat.us (visitors' browsers ask it for your server's status)
-  demo: true              // true = show sample data so you can see the design. Set to false when you go live.
+  // Your Cloudflare Worker (worker/README.md). The plugin sends it the leaderboards, recent rounds
+  // and player count every minute and this page reads them, so nothing here needs updating by hand.
+  api: "",                // e.g. "https://dsmp-stats.yourname.workers.dev/stats"
+  demo: true              // sample data until real data arrives. With api set, real data replaces it automatically.
 };
 
 // The three things you sell.
@@ -64,7 +67,8 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmt = n => new Intl.NumberFormat().format(n);
-const D = SITE.demo ? DEMO : DATA;
+let D = SITE.demo ? DEMO : DATA;
+let live = false;   // true once real data came in from SITE.api
 
 /* ---------- wire up config ---------- */
 $$("[data-ip]").forEach(el => (el.textContent = SITE.ip));
@@ -75,7 +79,7 @@ $("#demo-note").hidden = !SITE.demo;
 /* ---------- small helpers for rendering ---------- */
 function head(name) {
   const h = [...name].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
-  const real = SITE.demo ? "" : `<img src="https://mc-heads.net/avatar/${encodeURIComponent(name)}/64" alt="" loading="lazy" onerror="this.remove()">`;
+  const real = SITE.demo && !live ? "" : `<img src="https://mc-heads.net/avatar/${encodeURIComponent(name)}/64" alt="" loading="lazy" onerror="this.remove()">`;
   return `<span class="hd" style="--h:${h}">${esc(name[0] || "?")}${real}</span>`;
 }
 const empty = msg => `<div class="bempty">${msg}</div>`;
@@ -101,13 +105,14 @@ $("#lb-tabs").addEventListener("click", e => {
 renderLB();
 
 /* ---------- recent rounds ---------- */
-(function () {
+function renderRounds() {
   const rows = (D.rounds || []).slice(0, 8).map(r => asObj(r, ["id", "winner", "players", "time"]));
   $("#gm-body").innerHTML = rows.length
     ? `<div class="bhead g"><span>Round</span><span>Winner</span><span>Players</span><span>Time</span></div>` +
       rows.map((r, i) => `<div class="brow g" style="--i:${i}"><span><span class="flap">#${esc(r.id)}</span></span><span class="name">${head(r.winner)}<span>${esc(r.winner)}</span></span><span>${esc(r.players)}</span><span>${esc(r.time)}</span></div>`).join("")
     : empty("No rounds played yet.");
-})();
+}
+renderRounds();
 
 /* ---------- news ---------- */
 (function () {
@@ -179,10 +184,37 @@ document.addEventListener("click", e => {
   if (b) copyIP(b);
 });
 
+/* ---------- live data from the plugin (via the Worker) ---------- */
+async function getJSON(url) {
+  const c = new AbortController();
+  const t = setTimeout(() => c.abort(), 7000);
+  try {
+    const r = await fetch(url, { signal: c.signal, cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+// Fills the boards with real data. Returns the live status when it is fresh (under 3 minutes old).
+async function loadLive() {
+  if (!/^(https:\/\/|http:\/\/(127\.0\.0\.1|localhost):)/.test(SITE.api || "")) return null;
+  try {
+    const d = await getJSON(SITE.api);
+    if (!Array.isArray(d.wins) || !Array.isArray(d.rounds)) return null;
+    live = true;
+    D = Object.assign({}, D, { wins: d.wins, kills: d.kills || [], played: d.played || [], rounds: d.rounds });
+    $("#demo-note").hidden = true;
+    renderLB(); renderRounds();
+    const age = Date.now() - Date.parse(d.updated || 0);
+    return d.status && age < 180000 ? d.status : null;
+  } catch (e) { return null; }
+}
+
 /* ---------- live server status ---------- */
 async function loadStatus() {
   const cell = $("#st-state"), label = $("#st-label"), pl = $("#st-players");
   const set = (cls, text, players) => { cell.className = "status__cell is-" + cls; label.textContent = text; pl.textContent = players; };
+  const st = await loadLive();
+  if (st) return set("online", st.state === "playing" ? "Online, in a game" : "Online", st.online + " / " + st.max);
   if (!SITE.liveStatus) return set("unknown", "Not tracked", "-");
   try {
     const c = new AbortController();

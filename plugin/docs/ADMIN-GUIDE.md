@@ -108,9 +108,11 @@ See `docs/RESOURCEPACK.md`: upload `cartzone-pack.zip`, paste the direct link an
 
 ## 10. Website stats
 
-`stats.export.mode: WORKER` with `stats.export.url` (your Cloudflare Worker, https) and
-`stats-token` in secrets.yml posts leaderboards every 60 s. `FILE` writes
-`plugins/CartZone/stats.json` instead. `'OFF'` (with quotes) turns it off.
+The website's leaderboards, recent rounds and player count come from the plugin through a small
+Cloudflare Worker (setup: `worker/README.md`). The plugin makes `stats-token` in secrets.yml by
+itself; with `stats.export.mode: AUTO` (the default) it starts posting every 60 s as soon as
+`stats.export.url` is set. `WORKER` forces posting, `FILE` writes `plugins/CartZone/stats.json`
+instead, `'OFF'` (with quotes) turns it off. `/cart diag` shows the last result.
 
 ## 11. When something is wrong
 

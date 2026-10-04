@@ -39,7 +39,19 @@ public final class Stats {
     }
 
     public String status() {
-        return plugin.getConfig().getString("stats.export.mode", "OFF") + ", last: " + last;
+        String set = plugin.getConfig().getString("stats.export.mode", "AUTO").toUpperCase();
+        String mode = mode();
+        return (set.equals(mode) ? mode : set + " (" + mode + ")") + ", last: " + last;
+    }
+
+    /** AUTO posts to the Worker as soon as stats.export.url and stats-token are both set. */
+    private String mode() {
+        String mode = plugin.getConfig().getString("stats.export.mode", "AUTO").toUpperCase();
+        if (!mode.equals("AUTO")) return mode;
+        String url = plugin.getConfig().getString("stats.export.url", "");
+        String token = plugin.secret("stats-token");
+        boolean linked = okUrl(url) && token != null && !token.isBlank() && !token.equals("REPLACE_ME");
+        return linked ? "WORKER" : "OFF";
     }
 
     public void pushSoon() {
@@ -48,7 +60,7 @@ public final class Stats {
 
     /** Main thread: snapshot the live status, then build and send off-thread. */
     public void push() {
-        String mode = plugin.getConfig().getString("stats.export.mode", "OFF").toUpperCase();
+        String mode = mode();
         // YAML reads an unquoted OFF as the boolean false.
         if (mode.equals("OFF") || mode.equals("FALSE") || !busy.compareAndSet(false, true)) return;
         Match m = plugin.games().match();
@@ -82,7 +94,7 @@ public final class Stats {
         }
         String url = plugin.getConfig().getString("stats.export.url", "");
         String token = plugin.secret("stats-token");
-        if (url == null || !url.startsWith("https://") || token == null || token.isBlank()) {
+        if (!okUrl(url) || token == null || token.isBlank()) {
             last = "not configured (stats.export.url in config.yml, stats-token in secrets.yml)";
             return;
         }
@@ -96,6 +108,11 @@ public final class Stats {
         } catch (Exception e) {
             last = "upload failed: " + e.getClass().getSimpleName();
         }
+    }
+
+    /** https only; plain http just for a Worker running on this machine (testing). */
+    private static boolean okUrl(String url) {
+        return url != null && (url.startsWith("https://") || url.startsWith("http://127.0.0.1:") || url.startsWith("http://localhost:"));
     }
 
     static String json(List<Store.Stat> wins, List<Store.Stat> kills, List<Store.Stat> played, List<Store.Round> rounds, String status) {

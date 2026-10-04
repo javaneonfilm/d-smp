@@ -114,6 +114,7 @@ public final class CartRoyale extends JavaPlugin {
         }
         saveDefaultConfig();
         migrateServerIp();
+        migrateWebsite();
         migrateTimezone();
         addNewRankTags();
         getConfig().options().copyDefaults(true);
@@ -128,6 +129,7 @@ public final class CartRoyale extends JavaPlugin {
             secrets.get().options().setHeader(java.util.List.of("Secrets. Never share this file, never commit it. See secrets.example.yml."));
             secrets.save();
         }
+        ensureStatsToken();
         db = new Database(this);
         if (!db.open()) {
             // TECH-3: fail safe. Without a database nothing can be tracked or charged correctly.
@@ -278,6 +280,55 @@ public final class CartRoyale extends JavaPlugin {
      * The address became plain cartzone.vip (2026-10-01). Existing config.yml files have the old one
      * written in, so swap that single line in place (saveConfig would freeze every default into the file).
      */
+    /**
+     * The website stats token (the same value goes into the Cloudflare Worker as TOKEN). Made here
+     * once, so the owner only has to copy it out of secrets.yml instead of inventing one.
+     */
+    private void ensureStatsToken() {
+        String t = secrets.get().getString("stats-token", "");
+        if (t != null && !t.isBlank() && !t.equals("REPLACE_ME")) return;
+        byte[] b = new byte[24];
+        new java.security.SecureRandom().nextBytes(b);
+        StringBuilder sb = new StringBuilder();
+        for (byte x : b) sb.append(String.format("%02x", x));
+        secrets.get().set("stats-token", sb.toString());
+        secrets.save();
+        getLogger().info("Made a website stats token (stats-token in secrets.yml). Put the same value in the Cloudflare Worker as TOKEN.");
+    }
+
+    /**
+     * 2026-10-04: the website exists now. Once, switches the stats export from the old 'OFF' default
+     * to AUTO (posts as soon as stats.export.url is set) and links /stats to d-smp.vip.
+     */
+    private void migrateWebsite() {
+        java.io.File marker = new java.io.File(getDataFolder(), ".website-migrated");
+        java.io.File f = new java.io.File(getDataFolder(), "config.yml");
+        if (marker.exists() || !f.exists()) return;
+        try {
+            String txt = java.nio.file.Files.readString(f.toPath());
+            StringBuilder out = new StringBuilder();
+            for (String line : txt.split("\n", -1)) {
+                String t = line.trim();
+                if (t.startsWith("mode: 'OFF'") || t.startsWith("mode: OFF") || t.startsWith("mode: \"OFF\"")) {
+                    String pad = line.substring(0, line.indexOf("mode:"));
+                    if (pad.equals("    ")) line = pad + "mode: AUTO              # AUTO = post to the Worker once url (and stats-token in secrets.yml) are set; WORKER, FILE or 'OFF'";
+                } else if (t.equals("site-url: ''")) {
+                    line = line.substring(0, line.indexOf("site-url:")) + "site-url: 'https://d-smp.vip/#boards'";
+                }
+                out.append(line).append('\n');
+            }
+            String fixed = out.substring(0, out.length() - 1);
+            if (!fixed.equals(txt)) {
+                java.nio.file.Files.writeString(f.toPath(), fixed);
+                reloadConfig();
+                getLogger().info("config.yml: website stats set to AUTO and /stats links to d-smp.vip.");
+            }
+            java.nio.file.Files.writeString(marker.toPath(), "done\n");
+        } catch (java.io.IOException e) {
+            getLogger().warning("Could not update config.yml for the website: " + e.getMessage());
+        }
+    }
+
     /**
      * 2026-10-02: schedule times were meant as German time, but the config said UTC, so every game
      * started two hours late for him. Switches a config that still says UTC to Europe/Berlin, once

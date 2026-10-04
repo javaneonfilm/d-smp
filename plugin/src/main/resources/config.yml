@@ -201,10 +201,10 @@ webhooks:
       '4': ''
 
 stats:
-  site-url: ''              # leaderboards page shown in /stats; empty = no link
+  site-url: 'https://d-smp.vip/#boards'  # leaderboards page shown in /stats; empty = no link
   export:
-    mode: 'OFF'             # WORKER (POST to url), FILE (plugins/CartZone/stats.json) or 'OFF' (keep the quotes)
-    url: ''                 # the Cloudflare Worker endpoint, https only
+    mode: AUTO              # AUTO = post to the Worker once url (and stats-token in secrets.yml) are set; WORKER, FILE or 'OFF'
+    url: ''                 # your Cloudflare Worker, e.g. https://dsmp-stats.yourname.workers.dev/stats (see worker/README.md)
     interval-seconds: 60
 
 resource-pack:
