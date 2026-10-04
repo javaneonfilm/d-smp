@@ -149,12 +149,12 @@ public final class Zone {
     }
 
     /**
-     * zone.yml no-healing-outside: true while a living player stands outside the zone, so health
-     * can't come back there (regeneration, golden apples, saturation) and the zone always wins.
+     * zone.yml no-healing-outside (off by default): true while a living player stands outside the
+     * zone, so health can't come back there. Healing works normally unless that is turned on.
      */
     public boolean blocksHealing(Player p) {
         if (world == null || match == null || !p.getWorld().equals(world) || !match.isAlive(p.getUniqueId())) return false;
-        if (!yml.get().getBoolean("no-healing-outside", true) || inGrace()) return false;
+        if (!yml.get().getBoolean("no-healing-outside", false) || inGrace()) return false;
         ZoneMath.State s = now();
         return s != null && !s.circle().contains(p.getLocation().getX(), p.getLocation().getZ());
     }

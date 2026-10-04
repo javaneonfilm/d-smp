@@ -63,9 +63,10 @@ float cz_rand(vec2 id) {
     return fract(sin(dot(id, vec2(41.37, 289.11))) * 15731.743);
 }
 
-// One layer of hexagons, cell width w blocks. aa = edge softness in cell units.
-vec4 cz_hex_layer(float angle, float radius, float h, float w, float aa, float time) {
-    float cols = max(6.0, floor(6.2831853 * radius / w + 0.5));   // whole cells around the ring
+// One layer of hexagons: cols whole cells around the ring (so the pattern meets itself), cells
+// as tall as they are wide. aa = edge softness in cell units.
+vec4 cz_hex_cols(float angle, float radius, float h, float cols, float aa, float time) {
+    float w = 6.2831853 * radius / cols;
     vec4 cell = cz_hex_cell(vec2(angle * cols, h / w));
     float e = cz_hex_dist(cell.xy);
     float row = cell.w;
@@ -98,6 +99,19 @@ vec4 cz_hex_layer(float angle, float radius, float h, float w, float aa, float t
     col = mix(col, vec3(0.88, 1.0, 1.0), flare * 0.7);
     a = max(a, flare * 0.6);
     return vec4(col, a);
+}
+
+// Hexagons about w blocks wide. The number around the ring can't simply follow the radius: every
+// time it ticked over while the zone shrank, the whole pattern jumped. Instead it uses the two
+// nearest powers of two and fades between them, so the pattern changes smoothly at any radius.
+vec4 cz_hex_layer(float angle, float radius, float h, float w, float aa, float time) {
+    float n = log2(max(6.0, 6.2831853 * radius / w));
+    float lo = floor(n);
+    float t = smoothstep(0.0, 1.0, n - lo);
+    vec4 a = cz_hex_cols(angle, radius, h, exp2(lo), aa, time);
+    if (t <= 0.001) return a;
+    vec4 b = cz_hex_cols(angle, radius, h, exp2(lo + 1.0), aa, time);
+    return mix(a, b, t);
 }
 
 // The look: a light blue glass of hexagons, thin bright outlines, faint breathing centres and the
