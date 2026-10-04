@@ -185,9 +185,14 @@ public final class LootTables {
     public List<LootRoller.Slot<ItemStack>> roll(Mode mode, int tier, boolean luckier, boolean pearls, Random rng) {
         List<LootRoller.Entry<ItemStack>> table = new ArrayList<>();
         // Gear from chests wears out like normal, even if it was saved unbreakable.
-        for (Entry e : tier(mode, tier)) table.add(new LootRoller.Entry<>(com.cartroyale.util.Items.breakable(e.item.clone()), e.rarity, e.min, e.max, e.pearl));
+        for (Entry e : tier(mode, tier)) table.add(new LootRoller.Entry<>(com.cartroyale.util.Items.stackablePotion(com.cartroyale.util.Items.breakable(e.item.clone())), e.rarity, e.min, e.max, e.pearl));
         var opts = new LootRoller.Options(minSlots, maxSlots, 27, weights, luckier, lucky, pearls);
-        return LootRoller.roll(table, opts, rng);
+        // Same item type = same plugin item id (the books are all BOOK), otherwise the same material.
+        int maxSame = plugin.getConfig().getInt("chests.max-same-item", 2);
+        return LootRoller.roll(table, opts, rng, en -> {
+            String id = com.cartroyale.util.Items.id(en.item());
+            return id != null ? id : en.item().getType();
+        }, maxSame);
     }
 
     // ---- chest amount / spacing / fill, edited in the loot GUI (stored in loot.yml) ----

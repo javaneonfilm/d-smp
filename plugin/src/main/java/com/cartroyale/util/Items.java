@@ -97,4 +97,15 @@ public final class Items {
         }
         return it;
     }
+
+    /** Potions (drink, splash, lingering) stack to 16 instead of 1. */
+    @SuppressWarnings("UnstableApiUsage")
+    public static ItemStack stackablePotion(ItemStack it) {
+        if (it == null) return null;
+        org.bukkit.Material m = it.getType();
+        if (m == org.bukkit.Material.POTION || m == org.bukkit.Material.SPLASH_POTION || m == org.bukkit.Material.LINGERING_POTION) {
+            it.setData(io.papermc.paper.datacomponent.DataComponentTypes.MAX_STACK_SIZE, 16);
+        }
+        return it;
+    }
 }

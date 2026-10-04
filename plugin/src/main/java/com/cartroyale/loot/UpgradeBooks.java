@@ -145,8 +145,14 @@ public final class UpgradeBooks implements Listener {
         var cfg = plugin.getConfig();
         return switch (k) {
             case ARMOR -> upgradeArmor(p);
-            case SHARPNESS -> enchant(p, Enchantment.SHARPNESS, cfg.getInt("books.sharpness-max", 5),
-                m -> m.endsWith("_SWORD") || m.endsWith("_AXE") || m.endsWith("_SPEAR"));
+            // Swords first; once every sword is maxed the next level goes on an axe, then a spear.
+            case SHARPNESS -> {
+                int cap = cfg.getInt("books.sharpness-max", 5);
+                String r = enchant(p, Enchantment.SHARPNESS, cap, m -> m.endsWith("_SWORD"));
+                if (r == null) r = enchant(p, Enchantment.SHARPNESS, cap, m -> m.endsWith("_AXE"));
+                if (r == null) r = enchant(p, Enchantment.SHARPNESS, cap, m -> m.endsWith("_SPEAR"));
+                yield r;
+            }
             case QUICKCHARGE -> enchant(p, Enchantment.QUICK_CHARGE, cfg.getInt("books.quickcharge-max", 3), m -> m.equals("CROSSBOW"));
         };
     }

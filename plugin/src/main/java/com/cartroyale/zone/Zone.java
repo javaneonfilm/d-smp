@@ -148,6 +148,17 @@ public final class Zone {
         return (int) Math.max(0, Math.ceil((graceMs() - (System.currentTimeMillis() - startedAt)) / 1000.0));
     }
 
+    /**
+     * zone.yml no-healing-outside: true while a living player stands outside the zone, so health
+     * can't come back there (regeneration, golden apples, saturation) and the zone always wins.
+     */
+    public boolean blocksHealing(Player p) {
+        if (world == null || match == null || !p.getWorld().equals(world) || !match.isAlive(p.getUniqueId())) return false;
+        if (!yml.get().getBoolean("no-healing-outside", true) || inGrace()) return false;
+        ZoneMath.State s = now();
+        return s != null && !s.circle().contains(p.getLocation().getX(), p.getLocation().getZ());
+    }
+
     public ZoneMath.State now() {
         if (plan == null) return null;
         // During the grace period the clock is negative, which ZoneMath reads as a longer first wait.
@@ -207,7 +218,7 @@ public final class Zone {
             Location l = p.getLocation();
             boolean playing = match.isAlive(p.getUniqueId()) && p.getGameMode() != GameMode.SPECTATOR;
             boolean outside = !c.contains(l.getX(), l.getZ());
-            if (shader && wall.update(p, c, baseY, reanchor, all)) walled.add(p.getUniqueId());
+            if (shader && wall.update(p, s, baseY, reanchor, all)) walled.add(p.getUniqueId());
             else if (drawTick) draw(p, c);
             if (tick % 10 == 0) updateBar(p, s);
             if (!playing) continue;
@@ -221,14 +232,15 @@ public final class Zone {
 
     /**
      * Zone damage grows with distance outside (zone.yml damage-per-block, capped at max-damage)
-     * and goes straight through armor, Protection and Resistance: absorption hearts first, then
-     * health. A hit that would kill goes through the normal damage path, so the death is still
-     * credited to the zone (and any last attacker) like before.
+     * and goes straight through armor, Protection and Resistance. Absorption hearts (golden apples)
+     * don't soak it either unless zone.yml damage-ignores-absorption is false. A hit that would kill
+     * goes through the normal damage path, so the death is still credited to the zone (and any
+     * last attacker) like before.
      */
     private void zoneDamage(Player p, double base, double outside) {
         double perBlock = yml.get().getDouble("damage-per-block", 0.15), max = yml.get().getDouble("max-damage", 16);
         double dmg = Math.min(max, base + Math.max(0, outside) * perBlock);
-        double abs = p.getAbsorptionAmount();
+        double abs = yml.get().getBoolean("damage-ignores-absorption", true) ? 0 : p.getAbsorptionAmount();
         if (abs > 0) {
             double used = Math.min(abs, dmg);
             p.setAbsorptionAmount(abs - used);

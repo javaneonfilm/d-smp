@@ -73,7 +73,7 @@ public final class KitManager {
     @SuppressWarnings("UnstableApiUsage")
     public static ItemStack prep(ItemStack it) {
         if (it == null || it.getType() == Material.AIR) return null;
-        return Items.breakable(it);
+        return Items.stackablePotion(Items.breakable(it));
     }
 
     public ItemStack[] preview(Mode m) {

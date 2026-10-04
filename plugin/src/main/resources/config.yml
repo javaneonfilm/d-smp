@@ -90,6 +90,7 @@ match:
 chests:                     # amount, spacing and tier mix moved to loot.yml (/cart loot -> Chest settings)
   hologram-height: 1.35
   random-armor-durability: true   # armor in chests comes worn: 10-100% left, usually low
+  max-same-item: 2          # one item type fills at most this many slots in a chest
   place-per-tick: 20
   scan-chunks-per-tick: 8
 

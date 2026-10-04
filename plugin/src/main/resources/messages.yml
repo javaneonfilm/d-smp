@@ -4,7 +4,7 @@
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 7
+messages-version: 8
 
 prefix: '<accent>●</accent> '
 
@@ -371,7 +371,7 @@ items:
       lore: ['<sub>+1 Protection on all the armor you wear.', '<sub>none > I > II > III > IV > V', '<dim>Used when you pick it up']
     sharpness:
       name: '<#4FE3E8><b><sc>Sharpness Book</b>'
-      lore: ['<sub>+1 Sharpness on your sword, axe or spear', '<dim>Used when you pick it up']
+      lore: ['<sub>+1 Sharpness on your sword.', '<sub>Sword maxed? Then your axe.', '<dim>Used when you pick it up']
     quickcharge:
       name: '<#FFB020><b><sc>Quick Charge Book</b>'
       lore: ['<sub>+1 Quick Charge on your crossbow', '<dim>Used when you pick it up']

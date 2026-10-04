@@ -55,12 +55,22 @@ final class ZoneWall {
         retiring.clear();
     }
 
-    /** Draws the wall for one player. False when they can't see shader walls (no pack), so the caller falls back to particles. */
-    boolean update(Player p, ZoneMath.Circle c, double baseY, double reanchor, boolean all) {
+    /**
+     * Draws the wall for one player. False when they can't see shader walls (no pack), so the
+     * caller falls back to particles.
+     *
+     * While the zone shrinks, the display is sent the circle it shrinks TO with an interpolation
+     * as long as the shrink itself, so the client glides it there smoothly at its own frame rate
+     * instead of stepping 20 times a second. It is sent once per shrink: re-sending the same
+     * target only restarts the client's glide from where the shrink began. The orbiting final
+     * circle still moves tick by tick.
+     */
+    boolean update(Player p, ZoneMath.State s, double baseY, double reanchor, boolean all) {
         if (!all && !plugin.presence().hasPack(p.getUniqueId())) {
             remove(p.getUniqueId());
             return false;
         }
+        ZoneMath.Circle c = s.circle();
         Location l = p.getLocation();
         ItemDisplay d = walls.get(p.getUniqueId());
         if (d == null || !d.isValid() || !d.getWorld().equals(l.getWorld())
@@ -72,11 +82,16 @@ final class ZoneWall {
         }
         // A player who rejoined is a new Player object that hasn't been shown the display yet.
         if (!p.canSee(d)) p.showEntity(plugin, d);
-        float[] t = shape(d, c, baseY);
+
+        boolean glide = s.shrinking() && !s.orbiting();
+        ZoneMath.Circle goal = glide ? s.target() : c;
+        int ticks = glide ? Math.max(1, (int) Math.round(s.secondsLeftInStep() * 20)) : 1;
+        float[] t = shape(d, goal, baseY);
         float[] last = sent.get(p.getUniqueId());
         if (last == null || !java.util.Arrays.equals(last, t)) {
+            d.setInterpolationDuration(ticks);
+            d.setInterpolationDelay(0);
             d.setTransformation(transformation(t));
-            d.setInterpolationDelay(0); // glide to the new size over one tick instead of stepping
             sent.put(p.getUniqueId(), t);
         }
         return true;

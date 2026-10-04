@@ -17,6 +17,8 @@ close-fully: true
 # never more than max-damage per hit (half-hearts). It ignores armor, Protection and Resistance.
 damage-per-block: 0.15
 max-damage: 16
+damage-ignores-absorption: true   # golden apple hearts don't soak zone damage
+no-healing-outside: true          # outside the zone you can't heal (regen, apples, food)
 max-speed: 1.5
 
 # Only without close-fully: after the last phase the final circle orbits on a ring of this radius at walking speed.

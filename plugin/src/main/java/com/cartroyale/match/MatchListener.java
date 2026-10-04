@@ -136,6 +136,12 @@ public final class MatchListener implements Listener {
         mp.lastDamageAt = System.currentTimeMillis();
     }
 
+    /** No healing outside the zone (see Zone.blocksHealing). */
+    @EventHandler(ignoreCancelled = true)
+    public void onHeal(org.bukkit.event.entity.EntityRegainHealthEvent e) {
+        if (e.getEntity() instanceof Player p && plugin.zone().blocksHealing(p)) e.setCancelled(true);
+    }
+
     // ---------------- death ----------------
 
     @EventHandler(priority = EventPriority.HIGH)

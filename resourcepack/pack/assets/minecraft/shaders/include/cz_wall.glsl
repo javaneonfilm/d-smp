@@ -75,28 +75,28 @@ vec4 cz_hex_layer(float angle, float radius, float h, float w, float aa, float t
     float breathe = sin(time * 1.7 - row * 0.55 + r * 0.8);
     float inner = 0.3 + 0.05 * breathe;
 
-    vec3 bg = vec3(0.5, 0.82, 1.0);
+    vec3 bg = vec3(0.4, 0.74, 0.98);
     vec3 lit = vec3(0.62, 0.9, 1.0);
     vec3 rim = vec3(0.3, 0.62, 0.85);
     vec3 edge = vec3(0.8, 0.98, 1.0);
 
     float inside = 1.0 - smoothstep(inner - aa, inner + aa, e);
     vec3 col = mix(bg, lit, inside);
-    float a = mix(0.05, 0.1, inside);
+    float a = mix(0.2, 0.28, inside);
     // a darker band just outside the lit middle
     float band = smoothstep(inner, inner + 0.08, e) * (1.0 - smoothstep(0.4, 0.47, e));
     col = mix(col, rim, band * 0.35);
-    a += band * 0.03;
+    a += band * 0.06;
     // thin light ring around the lit middle, and a bright outline on the cell edge
     float ring = 1.0 - smoothstep(0.0, aa * 1.5 + 0.012, abs(e - inner));
     float outline = smoothstep(0.5 - aa * 2.0 - 0.018, 0.5, e);
     col = mix(col, edge, max(ring * 0.4, outline));
-    a = max(a, max(ring * 0.14, outline * 0.65));
+    a = max(a, max(ring * 0.35, outline * 0.85));
 
     // Now and then a cell flares up.
     float flare = smoothstep(0.92, 1.0, sin(time * 0.9 + r * 60.0)) * (1.0 - e * 1.6);
     col = mix(col, vec3(0.88, 1.0, 1.0), flare * 0.7);
-    a = max(a, flare * 0.45);
+    a = max(a, flare * 0.6);
     return vec4(col, a);
 }
 

@@ -324,4 +324,20 @@ class LogicTest {
         ZonedDateTime fri = ZonedDateTime.of(2026, 10, 2, 16, 0, 0, 0, utc);
         assertEquals(ZonedDateTime.of(2026, 10, 9, 16, 0, 0, 0, utc), e.nextAfter(fri, utc));
     }
+
+    @Test
+    void lootNeverFillsMoreThanTwoSlotsWithOneItem() {
+        Random rng = new Random(7);
+        // A gold tier that is mostly one item: it may show up twice, never more.
+        var gold = List.of(
+            new LootRoller.Entry<>("gapple", Rarity.COMMON, 1, 30, false),
+            new LootRoller.Entry<>("pearl", Rarity.RARE, 1, 3, false),
+            new LootRoller.Entry<>("book", Rarity.EPIC, 1, 1, false));
+        var o = new LootRoller.Options(6, 12, 27, weights(), false, lucky(), true);
+        for (int i = 0; i < 2000; i++) {
+            java.util.Map<String, Integer> n = new java.util.HashMap<>();
+            for (var s : LootRoller.roll(gold, o, rng)) n.merge(s.item(), 1, Integer::sum);
+            for (int c : n.values()) org.junit.jupiter.api.Assertions.assertTrue(c <= 2, "an item filled " + c + " slots");
+        }
+    }
 }
