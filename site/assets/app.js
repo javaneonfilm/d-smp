@@ -4,12 +4,12 @@
 const SITE = {
   ip: "d-smp.vip",        // the address players type into Minecraft
   discord: "#",           // your Discord invite link
-  edition: "Java 1.21.11",
+  edition: "Java +1.21.11",
   liveStatus: true,       // live player count via api.mcsrvstat.us (visitors' browsers ask it for your server's status)
   // Your Cloudflare Worker (worker/README.md). The plugin sends it the leaderboards, recent rounds
   // and player count every minute and this page reads them, so nothing here needs updating by hand.
   api: "https://dsmp-stats.lu-schreiner2010.workers.dev/stats",
-  demo: true              // sample data until real data arrives. With api set, real data replaces it automatically.
+  demo: false             // true = sample data (only for looking at the design)
 };
 
 // The three things you sell. Payment runs through your own PayPal (worker/README.md).
