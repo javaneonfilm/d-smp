@@ -310,7 +310,7 @@ public final class CartRoyale extends JavaPlugin {
     }
 
     /**
-     * The server became Diamond SMP (d-smp.vip). config.yml keeps its own copy of every default, so
+     * The server became d-smp.vip. config.yml keeps its own copy of every default, so
      * the old CartZone values are swapped here, only where they are still the old defaults.
      */
     private void migrateServerIp() {
@@ -322,8 +322,8 @@ public final class CartRoyale extends JavaPlugin {
             for (String line : txt.split("\n", -1)) {
                 String t = line.trim();
                 if (line.startsWith("server-ip:") && (t.endsWith("play.cartzone.vip") || t.endsWith(" cartzone.vip"))) line = "server-ip: d-smp.vip";
-                else if (t.equals("hoster-name: CartZone")) line = line.replace("CartZone", "Diamond SMP");
-                else if (t.equals("username: CartZone")) line = line.replace("CartZone", "Diamond SMP");
+                else if (t.equals("hoster-name: CartZone") || t.equals("hoster-name: Diamond SMP")) line = line.substring(0, line.indexOf("hoster-name:")) + "hoster-name: d-smp.vip";
+                else if (t.equals("username: CartZone") || t.equals("username: Diamond SMP")) line = line.substring(0, line.indexOf("username:")) + "username: d-smp.vip";
                 // Protection now tops out at IV (2026-10-04).
                 else if (t.startsWith("protection-max: 5")) line = line.substring(0, line.indexOf("protection-max:")) + "protection-max: 4";
                 // There never was a site behind these, so the links go.
@@ -335,10 +335,10 @@ public final class CartRoyale extends JavaPlugin {
             if (!fixed.equals(txt)) {
                 java.nio.file.Files.writeString(f.toPath(), fixed);
                 reloadConfig();
-                getLogger().info("config.yml: switched the server IP and names to Diamond SMP (d-smp.vip).");
+                getLogger().info("config.yml: switched the server IP and names to d-smp.vip.");
             }
         } catch (java.io.IOException e) {
-            getLogger().warning("Could not update config.yml for the Diamond SMP rename: " + e.getMessage());
+            getLogger().warning("Could not update config.yml for the d-smp.vip rename: " + e.getMessage());
         }
     }
 

@@ -15,7 +15,7 @@ import java.util.List;
 /** HOOK-1..4 plus the daily "today's games" post. All wording comes from messages.yml (discord.*). */
 public final class Announcer {
 
-    private static final int BRAND = 0x80ADC0; // Diamond SMP light blue
+    private static final int BRAND = 0x80ADC0; // d-smp.vip light blue
 
     private final CartRoyale plugin;
 

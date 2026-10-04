@@ -1,34 +1,34 @@
 /* ============================================================
-   CARTZONE.VIP — site config. Edit the values in this first block.
+   D-SMP.VIP - site config. Edit the values in this first block.
    ============================================================ */
 const SITE = {
-  ip: "cartzone.vip",   // the address players type into Minecraft
+  ip: "d-smp.vip",        // the address players type into Minecraft
   discord: "#",           // your Discord invite link
-  edition: "Java Edition",
+  edition: "Java 1.21.11",
   liveStatus: true,       // live player count via api.mcsrvstat.us (visitors' browsers ask it for your server's status)
   demo: true              // true = show sample data so you can see the design. Set to false when you go live.
 };
 
 // The three things you sell.
-//  - url:   your checkout link for that product, e.g. https://yourstore.craftingstore.net/package/123
+//  - url:   your checkout link for that product, e.g. https://yourstore.tebex.io/package/123
 //           Until you set one, the button shows "Coming soon" and nobody can pay.
 //  - price: only what is DISPLAYED here. The real charge is whatever you set at checkout, so keep them identical.
 //  - perks: only list what you can really deliver in-game. Keep them cosmetic or access-only (no pay-to-win).
 const SHOP = [
   {
-    art: "chat", name: "VIP", blurb: "Show your colors in chat.",
+    art: "chat", name: "VIP", blurb: "Get in more often.",
     price: "€9.99", per: "30 days", cta: "Buy VIP", url: "",
     perks: ["Much lower chance of being purged when the lobby is full", "Wind charges in the lobby", "[VIP] tag in chat and the tab list"]
   },
   {
     art: "immune", name: "VIP+", blurb: "Always get in.", featured: true, badge: "Most popular",
     price: "€19.99", per: "30 days", cta: "Buy VIP+", url: "",
-    perks: ["Everything in VIP", "Can't be purged, so you always get in", "Elytra and wind charges in the lobby", "Gold [VIP+] tag"]
+    perks: ["Everything in VIP", "Never purged, so you always get in", "Elytra and wind charges in the lobby", "[VIP+] tag in chat and the tab list"]
   },
   {
     art: "pass", name: "Game Ticket", blurb: "Host your own game.",
     price: "€4.99", per: "per game", cta: "Buy a game", url: "",
-    perks: ["Host your own game: pick the mode, modifiers, squad size and player cap", "Set it up in-game right after buying, and Discord announces it", "Host rank for your game"]
+    perks: ["Pick the squad size, player cap, modifiers and length", "Set it up in-game right after buying, and Discord announces it", "Host rank for your game"]
   }
 ];
 
@@ -37,21 +37,21 @@ const DATA = {
   wins:   [],  // { name: "Player", val: 12 }
   kills:  [],  // { name: "Player", val: 240 }
   played: [],  // { name: "Player", val: 31 }
-  rounds: [],  // { id: 42, winner: "Player", players: "18/20", time: "07:42" }
-  news:   [],  // { title: "Season 1 is live", date: "2026-10-01", body: "…", tag: "Update" }
+  rounds: [],  // { id: 42, winner: "Player", players: "18/20", time: "21:42" }
+  news:   [],  // { title: "Season 1 is live", date: "2026-10-01", body: "...", tag: "Update" }
   staff:  []   // { name: "Player", role: "owner" | "admin" | "mod" | "helper" }
 };
 
 // Sample data, only shown while SITE.demo is true.
 const DEMO = {
-  wins:   [["RailRider",48],["TNTTommy",41],["BoomCart",37],["CobbleKing",33],["FuseLit",29],["MineHauler",24],["SparkPlug",21],["GoldRush",18],["Detonator",15],["LastStop",12]],
-  kills:  [["Detonator",412],["BoomCart",377],["RailRider",351],["FuseLit",298],["TNTTommy",266],["SparkPlug",240],["CobbleKing",213],["MineHauler",190],["GoldRush",171],["LastStop",144]],
-  played: [["RailRider",120],["MineHauler",114],["TNTTommy",109],["CobbleKing",97],["BoomCart",92],["FuseLit",88],["GoldRush",74],["SparkPlug",70],["Detonator",66],["LastStop",51]],
-  rounds: [[128,"BoomCart","20/20","08:14"],[127,"RailRider","18/20","06:52"],[126,"FuseLit","20/20","09:31"],[125,"TNTTommy","16/20","05:47"],[124,"RailRider","20/20","10:05"],[123,"Detonator","19/20","07:20"],[122,"CobbleKing","17/20","06:11"],[121,"SparkPlug","20/20","08:58"]],
+  wins:   [["Glintstone",48],["FrostByte",41],["Shardling",37],["IceVein",33],["DeepCut",29],["Brightcore",24],["Prismatic",21],["ColdSteel",18],["Facet",15],["LastLight",12]],
+  kills:  [["DeepCut",412],["Shardling",377],["Glintstone",351],["IceVein",298],["FrostByte",266],["Prismatic",240],["Brightcore",213],["ColdSteel",190],["Facet",171],["LastLight",144]],
+  played: [["Glintstone",120],["Brightcore",114],["FrostByte",109],["IceVein",97],["Shardling",92],["DeepCut",88],["Facet",74],["Prismatic",70],["ColdSteel",66],["LastLight",51]],
+  rounds: [[128,"Shardling","64/80","22:14"],[127,"Glintstone","58/80","19:52"],[126,"DeepCut","80/80","24:31"],[125,"FrostByte","47/80","18:47"],[124,"Glintstone","72/80","23:05"],[123,"IceVein","69/80","21:20"],[122,"Brightcore","51/80","20:11"],[121,"Prismatic","80/80","24:58"]],
   news: [
-    { title: "Season 1 is live", date: "Add a date", body: "Connect to the server and jump into your first round.", tag: "Update" },
-    { title: "Store is open", date: "Add a date", body: "Access and lobby perks only. Kill effects, cart explosion effects and suffixes are earned with coins in game.", tag: "Store" },
-    { title: "Leaderboards", date: "Add a date", body: "Every win and kill counts. Climb the board and get your name up there.", tag: "Ranked" }
+    { title: "Season 1 is live", date: "Add a date", body: "Connect to d-smp.vip and jump into your first round.", tag: "Update" },
+    { title: "Protection books", date: "Add a date", body: "Books and kills now stack Protection on your armor, up to IV. Kills also repair your gear.", tag: "Gameplay" },
+    { title: "Store is open", date: "Add a date", body: "Ranks and hosted games only. Kill effects and suffixes are earned with coins in game.", tag: "Store" }
   ],
   staff: [{ name: "YourName", role: "owner" }, { name: "AdminName", role: "admin" }, { name: "ModName", role: "mod" }]
 };
@@ -88,9 +88,9 @@ function renderLB() {
   const label = TABS.find(t => t[0] === lbKey)[1];
   const rows = (D[lbKey] || []).slice(0, 10).map(r => asObj(r, ["name", "val"]));
   $("#lb-body").innerHTML = rows.length
-    ? `<div class="bhead"><span>#</span><span>Rider</span><span>${label}</span></div>` +
+    ? `<div class="bhead"><span>#</span><span>Player</span><span>${label}</span></div>` +
       rows.map((r, i) => `<div class="brow ${i < 3 ? "brow--top" : ""}" style="--i:${i}"><span><span class="flap">${i + 1}</span></span><span class="name">${head(r.name)}<span>${esc(r.name)}</span></span><span class="num">${fmt(r.val)}</span></div>`).join("")
-    : empty("No riders on the board yet.<br>The first round is about to roll.");
+    : empty("Nobody on the board yet.<br>The first round is coming.");
   $$("#lb-tabs .tab").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === lbKey));
 }
 $("#lb-tabs").innerHTML = TABS.map(([k, l]) => `<button class="tab" type="button" data-k="${k}" aria-pressed="${k === lbKey}">${l}</button>`).join("");
@@ -128,15 +128,15 @@ renderLB();
 
 /* ---------- store ---------- */
 const ART = {
-  chat: `<div class="tier__art art-chat"><p class="mc"><b class="tg-vip">[VIP]</b> <i>RailRider</i>: gg</p><p class="mc"><i>Player</i>: how is he so fast</p><p class="mc"><b class="tg-vip">[VIP]</b> <i>BoomCart</i>: last cart standing</p></div>`,
-  immune: `<div class="tier__art art-chat"><p class="mc"><i>Purge</i>: 80 players removed</p><p class="mc"><b class="tg-vipplus">[VIP+]</b> <i>FuseLit</i>: still here</p><p class="mc"><b class="tg-vipplus">[VIP+]</b> <i>BoomCart</i>: never purged</p></div>`,
+  chat: `<div class="tier__art"><p class="mc"><b class="tg-vip">[VIP]</b> <i>Glintstone</i>: gg</p><p class="mc"><span class="dim">Purge</span>: 60 players removed</p><p class="mc"><b class="tg-vip">[VIP]</b> <i>IceVein</i>: made it in again</p></div>`,
+  immune: `<div class="tier__art"><p class="mc"><span class="dim">Purge</span>: 80 players removed</p><p class="mc"><b class="tg-vipplus">[VIP+]</b> <i>DeepCut</i>: still here</p><p class="mc"><b class="tg-vipplus">[VIP+]</b> <i>Shardling</i>: never purged</p></div>`,
   pass: `<div class="tier__art art-pass"><div class="pass"><div><small>Admit one</small><b>Your<br>game</b></div><span class="no">01</span></div></div>`
 };
 const safeUrl = u => (/^https?:\/\//i.test(u || "") ? u : "");
 $("#tiers").innerHTML = SHOP.map((p, i) => {
   const url = safeUrl(p.url);
   const buy = url
-    ? `<a class="btn ${p.featured ? "btn--tnt" : "btn--buy"} buy" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(p.cta)}</a>`
+    ? `<a class="btn ${p.featured ? "btn--gem" : "btn--buy"} buy" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(p.cta)}</a>`
     : `<button class="btn btn--off buy" type="button" disabled>Coming soon</button>`;
   return `<article class="tier${p.featured ? " tier--feat" : ""} rv" style="--d:${i}">
     ${p.badge ? `<span class="tier__badge">${esc(p.badge)}</span>` : ""}
@@ -161,7 +161,7 @@ function toast(msg) {
   toastT = setTimeout(() => toastEl.classList.remove("show"), 2600);
 }
 function copyIP(from) {
-  const done = () => toast(`Copied ${SITE.ip}. Paste it in Multiplayer → Add Server.`);
+  const done = () => toast(`Copied ${SITE.ip}. Paste it in Multiplayer, Add Server.`);
   const fallback = () => {
     const ta = document.createElement("textarea");
     ta.value = SITE.ip; ta.style.cssText = "position:fixed;opacity:0";
@@ -172,7 +172,7 @@ function copyIP(from) {
   if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(SITE.ip).then(done, fallback);
   else fallback();
   const r = from.getBoundingClientRect();
-  sparks(r.left + r.width / 2, r.top + r.height / 2, 26);
+  sparkle(r.left + r.width / 2, r.top + r.height / 2, 28);
 }
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-copy-ip]");
@@ -182,8 +182,8 @@ document.addEventListener("click", e => {
 /* ---------- live server status ---------- */
 async function loadStatus() {
   const cell = $("#st-state"), label = $("#st-label"), pl = $("#st-players");
-  const set = (cls, text, players) => { cell.className = "cell is-" + cls; label.textContent = text; pl.textContent = players; };
-  if (!SITE.liveStatus) return set("unknown", "Not tracked", "—");
+  const set = (cls, text, players) => { cell.className = "status__cell is-" + cls; label.textContent = text; pl.textContent = players; };
+  if (!SITE.liveStatus) return set("unknown", "Not tracked", "-");
   try {
     const c = new AbortController();
     const t = setTimeout(() => c.abort(), 7000);
@@ -191,8 +191,8 @@ async function loadStatus() {
     clearTimeout(t);
     const d = await r.json();
     if (d.online) set("online", "Online", (d.players && d.players.online != null ? d.players.online : 0) + " / " + (d.players && d.players.max != null ? d.players.max : "?"));
-    else set("offline", "Offline", "—");
-  } catch (e) { set("unknown", "Unavailable", "—"); }
+    else set("offline", "Offline", "-");
+  } catch (e) { set("unknown", "Unavailable", "-"); }
 }
 loadStatus();
 setInterval(() => { if (!document.hidden) loadStatus(); }, 60000);
@@ -204,7 +204,8 @@ burger.addEventListener("click", () => burger.setAttribute("aria-expanded", nav.
 nav.addEventListener("click", e => { if (e.target.closest("a")) closeMenu(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
 
-/* ---------- scroll reveal ---------- */
+/* ---------- scroll reveal + nav highlight ---------- */
+const header = $("#top"), links = $$("#nav a");
 let pendingRv = $$(".rv");
 function reveal() {
   const line = innerHeight * 0.94;
@@ -213,24 +214,6 @@ function reveal() {
     return true;
   });
 }
-
-/* ---------- rail progress + nav highlight ---------- */
-const rail = $("#railbar"), links = $$("#nav a"), stations = $$("[data-station]");
-const HEAD = 68;
-let secTops = [];
-function layout() {
-  const max = document.documentElement.scrollHeight - innerHeight;
-  $$(".st", rail).forEach(n => n.remove());
-  stations.forEach(s => {
-    const y = s.getBoundingClientRect().top + scrollY - HEAD;
-    if (max > 0 && y > 40) {
-      const i = document.createElement("i");
-      i.className = "st"; i.style.left = Math.min(100, (y / max) * 100) + "%";
-      rail.appendChild(i);
-    }
-  });
-  secTops = links.map(a => ({ a, y: $(a.getAttribute("href")).getBoundingClientRect().top + scrollY }));
-}
 let ticking = false;
 function onScroll() {
   if (ticking) return;
@@ -238,22 +221,24 @@ function onScroll() {
   requestAnimationFrame(() => {
     ticking = false;
     reveal();
-    const max = document.documentElement.scrollHeight - innerHeight;
-    rail.style.setProperty("--p", (max > 0 ? Math.min(100, (scrollY / max) * 100) : 0) + "%");
-    let cur = secTops[0];
-    secTops.forEach(s => { if (s.y <= scrollY + HEAD + 160) cur = s; });
-    links.forEach(a => a.classList.toggle("on", !!cur && a === cur.a));
+    header.classList.toggle("scrolled", scrollY > 10);
+    let cur = null;
+    links.forEach(a => {
+      const s = $(a.getAttribute("href"));
+      if (s && s.getBoundingClientRect().top <= 220) cur = a;
+    });
+    links.forEach(a => a.classList.toggle("on", a === cur));
   });
 }
 addEventListener("scroll", onScroll, { passive: true });
-addEventListener("resize", () => { layout(); onScroll(); });
-addEventListener("load", () => { layout(); onScroll(); });
-if ("ResizeObserver" in window) new ResizeObserver(() => { layout(); onScroll(); }).observe(document.body);
-layout(); onScroll(); reveal();
+addEventListener("resize", onScroll);
+addEventListener("load", onScroll);
+// Rows added after load (news, staff, store) get picked up too.
+pendingRv = $$(".rv");
+onScroll(); reveal();
 
-/* ---------- effects: fuse embers + explosion ---------- */
+/* ---------- sparkles: light blue diamond glints ---------- */
 const fx = $("#fx"), ctx = fx.getContext("2d");
-const cartBtn = $("#cart"), stage = $("#stage");
 let W, H;
 function sizeFx() {
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -263,91 +248,54 @@ function sizeFx() {
 }
 addEventListener("resize", sizeFx); sizeFx();
 
-const COLORS = ["#e8371c", "#ff8a1f", "#ffc93c", "#f3ecdf"];
-const parts = [], rings = [];
-let running = false, heroVisible = true, lastEmber = 0;
-
-function addPart(o) { parts.push(Object.assign({ life: 0 }, o)); }
-function sparks(x, y, n) {
+const COLORS = ["#eff6f8", "#c4dfe4", "#8cc8dc", "#80adc0"];
+const parts = [];
+let running = false;
+function sparkle(x, y, n) {
+  if (reduce) return;
   for (let i = 0; i < n; i++) {
     const a = Math.random() * 6.283, sp = 1.5 + Math.random() * 5;
-    addPart({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.5, g: 0.18, max: 30 + Math.random() * 25, s: 3 + Math.random() * 4, c: COLORS[(Math.random() * 3) | 0] });
+    parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.2, g: 0.12, life: 0, max: 32 + Math.random() * 26, s: 3 + Math.random() * 4, c: COLORS[(Math.random() * 4) | 0] });
   }
-  run();
+  if (!running) { running = true; requestAnimationFrame(tick); }
 }
-function boom(x, y) {
-  for (let i = 0; i < 110; i++) {
-    const a = Math.random() * 6.283, sp = 2 + Math.random() * 11;
-    addPart({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2, g: 0.22, max: 40 + Math.random() * 45, s: 4 + Math.random() * 9, c: COLORS[(Math.random() * 4) | 0] });
-  }
-  for (let i = 0; i < 26; i++) {
-    const a = Math.random() * 6.283, sp = 0.5 + Math.random() * 3;
-    addPart({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1, g: -0.02, max: 55 + Math.random() * 40, s: 10 + Math.random() * 16, c: "#3a322c" });
-  }
-  rings.push({ x, y, r: 12, life: 0 });
-  run();
-}
-function tick(t) {
+function tick() {
   ctx.clearRect(0, 0, W, H);
-  if (heroVisible && !reduce && t - lastEmber > 55) {
-    const r = cartBtn.getBoundingClientRect();
-    if (r.bottom > 0 && r.top < H)
-      addPart({ x: r.left + r.width * 0.5 + (Math.random() - 0.5) * 12, y: r.top + r.height * 0.17, vx: (Math.random() - 0.5) * 0.7, vy: -(0.7 + Math.random() * 1.3), g: -0.004, max: 55 + Math.random() * 50, s: 2 + Math.random() * 3, c: COLORS[(Math.random() * 3) | 0] });
-    lastEmber = t;
-  }
   for (let i = parts.length - 1; i >= 0; i--) {
     const p = parts[i];
-    p.life++; p.vy += p.g; p.x += p.vx; p.y += p.vy;
+    p.life++; p.vy += p.g; p.vx *= 0.98; p.x += p.vx; p.y += p.vy;
     const a = 1 - p.life / p.max;
     if (a <= 0) { parts.splice(i, 1); continue; }
-    ctx.globalAlpha = p.c === "#3a322c" ? a * 0.55 : a;
+    ctx.globalAlpha = a;
     ctx.fillStyle = p.c;
-    ctx.fillRect(Math.round(p.x / 2) * 2, Math.round(p.y / 2) * 2, p.s, p.s);
-  }
-  for (let i = rings.length - 1; i >= 0; i--) {
-    const g = rings[i];
-    g.life++; g.r += 14;
-    const a = 1 - g.life / 22;
-    if (a <= 0) { rings.splice(i, 1); continue; }
-    ctx.globalAlpha = a; ctx.strokeStyle = "#ffc93c"; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(g.x, g.y, g.r, 0, 6.283); ctx.stroke();
+    // a tiny rotated square, like a diamond glint
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(0.785);
+    ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s);
+    ctx.restore();
   }
   ctx.globalAlpha = 1;
-  if (parts.length || rings.length || (heroVisible && !reduce)) requestAnimationFrame(tick);
+  if (parts.length) requestAnimationFrame(tick);
   else running = false;
 }
-function run() { if (!running) { running = true; requestAnimationFrame(tick); } }
 
-new IntersectionObserver(es => { heroVisible = es[0].isIntersecting; if (heroVisible) run(); }).observe(stage);
-run();
-
-/* click the cart: boom */
-let blasts = 0;
-const flash = $("#flash"), hint = $("#hint");
-cartBtn.addEventListener("click", () => {
-  const r = cartBtn.getBoundingClientRect();
-  const x = r.left + r.width / 2, y = r.top + r.height * 0.4;
-  boom(x, y);
-  flash.style.setProperty("--fx", x + "px"); flash.style.setProperty("--fy", y + "px");
-  flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
-  cartBtn.classList.remove("boom"); void cartBtn.offsetWidth; cartBtn.classList.add("boom");
-  if (!reduce) { document.body.classList.add("shake"); setTimeout(() => document.body.classList.remove("shake"), 450); }
-  blasts++;
-  hint.textContent = blasts === 1 ? "Boom. Again?" : `Carts blown up: ${blasts}`;
+/* ---------- the big diamond: tilts toward the cursor, sparkles on click ---------- */
+const gem = $("#gem");
+gem.addEventListener("click", () => {
+  const r = gem.getBoundingClientRect();
+  sparkle(r.left + r.width / 2, r.top + r.height / 2, 40);
 });
-
-/* cart tilts toward the cursor */
 if (!reduce && matchMedia("(hover:hover)").matches) {
   let raf = 0;
-  stage.addEventListener("pointermove", e => {
+  addEventListener("pointermove", e => {
     if (raf) return;
     raf = requestAnimationFrame(() => {
       raf = 0;
-      const r = stage.getBoundingClientRect();
-      const nx = (e.clientX - r.left) / r.width - 0.5, ny = (e.clientY - r.top) / r.height - 0.5;
-      cartBtn.style.setProperty("--ry", nx * 16 + "deg");
-      cartBtn.style.setProperty("--rx", -ny * 12 + "deg");
+      const r = gem.getBoundingClientRect();
+      if (r.bottom < 0) return;
+      const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / innerWidth * 2));
+      const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / innerHeight * 2));
+      gem.style.setProperty("--ry", nx * 12 + "deg");
+      gem.style.setProperty("--rx", -ny * 10 + "deg");
     });
   });
-  stage.addEventListener("pointerleave", () => { cartBtn.style.setProperty("--ry", "0deg"); cartBtn.style.setProperty("--rx", "0deg"); });
 }

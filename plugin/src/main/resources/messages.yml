@@ -1,10 +1,10 @@
-# Diamond SMP messages (the CartZone plugin). MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
+# d-smp.vip messages (the CartZone plugin). MiniMessage format (https://docs.advntr.dev/minimessage/format.html).
 # Placeholders look like <name>. <prefix> inserts the prefix below.
 # The discord.* entries are plain Discord markdown, not MiniMessage.
 #
 # When a plugin update raises messages-version, this file is replaced and your old one is kept
 # as messages-old-<n>.yml, so copy your edits back over from there.
-messages-version: 13
+messages-version: 14
 
 prefix: '<accent>●</accent> '
 
@@ -74,15 +74,15 @@ categories:
 
 # ------------------------------------------------------------------ joining / lobby
 access:
-  no-game: "<accent><b><sc>diamond smp</sc></b>
+  no-game: "<accent><b><sc>d-smp.vip</sc></b>
 
 <fg>No game right now.
 <sub>The next one gets posted on our Discord."
-  next-game: "<accent><b><sc>diamond smp</sc></b>
+  next-game: "<accent><b><sc>d-smp.vip</sc></b>
 
 <fg>Next game is #<id> at <hl><start></hl>.
 <sub>You can join <minutes> minutes before it starts."
-  in-progress: "<accent><b><sc>diamond smp</sc></b>
+  in-progress: "<accent><b><sc>d-smp.vip</sc></b>
 
 <fg>Game #<id> already started.
 <sub>Check Discord for the next one."
@@ -96,13 +96,13 @@ chat:
   spectator-format: '<dim><sc>spec</sc></dim> <sub><name> <dim>›</dim> <sub><message>'
 
 ip-bar:
-  plain: '<accent><b><sc>diamond smp</sc></b></accent> <dim>·</dim> <fg><ip>'
+  plain: '<accent><b><sc><ip></sc></b></accent>'
   styled: '<fg><sc><ip></sc>'
 
 tab:
   header: "
-<accent><b><sc>diamond smp</sc></b></accent>
-<sub><sc><ip></sc>
+<accent><b><sc><ip></sc></b></accent>
+<sub><sc>squad battle royale</sc>
 "
   footer: "
 <sub><sc>online</sc> <fg><online></fg> <dim>·</dim> <sub><state>
@@ -111,7 +111,7 @@ tab:
 # The sidebar. <tab> pushes the rest of the line to the right edge. In board.game a line that is
 # only <squad> becomes your squad list (team games, players without the resource pack).
 board:
-  title: '<accent><b><sc>diamond smp'
+  title: '<accent><b><sc>d-smp.vip'
   lobby:
     - ''
     - ' <sub><sc>online</sc><tab><fg><online> '
@@ -339,7 +339,7 @@ loot:
   added: '<prefix><fg>Added <item> to <tier>.'
 
 pack:
-  prompt: '<fg>Diamond SMP uses a small resource pack for the HUD, badges and items.'
+  prompt: '<fg>d-smp.vip uses a small resource pack for the HUD, badges and items.'
   declined-kick: "<accent><b>You need the resource pack</b>\n\n<fg>Turn on server resource packs for this server and rejoin."
   failed: '<prefix><sub>The resource pack didn''t load. Game still works, just looks plainer.'
   misconfigured: 'Resource pack is on but resource-pack.url or resource-pack.sha1 is missing or wrong.'
@@ -467,13 +467,13 @@ webhook:
   test-disabled: '<prefix><sub>Webhooks are off (webhooks.enabled in config.yml).'
   test-bad-url: '<prefix><sub>The webhook URL in secrets.yml has to start with https://'
   test-title: 'Webhook test'
-  test-body: 'If you can read this, Diamond SMP can post here. Sent by <who>.'
+  test-body: 'If you can read this, d-smp.vip can post here. Sent by <who>.'
   hint-url: 'The webhook URL is wrong or the webhook was deleted. Make a new one and paste it into secrets.yml.'
   hint-400: 'Discord didn''t like the message itself, check the server console.'
   hint-network: 'Looks like the server can''t reach Discord. Try again in a bit.'
 
 diag:
-  head: '<accent><b><sc>diamond smp diag'
+  head: '<accent><b><sc>d-smp.vip diag'
   state: '<sub>State <fg><state></fg>, game <fg><game></fg>, players <fg><players></fg>, alive <fg><alive>'
   next: '<sub>Next <fg><next></fg> <sub>(<queued> queued)'
   eligible: '<sub>Would get in right now: <fg><n></fg> <sub>(min <min>), whitelist <fg><whitelist>'
@@ -501,13 +501,13 @@ cmd:
 
 help:
   player:
-    - '<accent><b><sc>diamond smp</sc></b>'
+    - '<accent><b><sc>d-smp.vip</sc></b>'
     - '<fg>/cart host <sub>host a game with your ticket'
     - '<fg>/team invite|accept|leave|disband|list <sub>team up after the purge'
     - '<fg>/tc [message] <sub>team chat, or /tc on its own to toggle it'
     - '<fg>/spectate <sub>follow someone while spectating'
   admin:
-    - '<accent><b><sc>diamond smp admin</sc></b>'
+    - '<accent><b><sc>d-smp.vip admin</sc></b>'
     - '<fg>/cart host | start [now] | stop [id] | queue | cancel <id> | schedule'
     - '<fg>/cart schedule pause [12h|3d] | resume <sub>stop or restart the scheduled games'
     - '<fg>/cart kit set|preview <sub>and</sub> /kitready'
@@ -689,7 +689,7 @@ offence:
   muted: '<prefix><accent>You''re muted for <length></accent> <sub>(<type>). Ends <until>.'
   still-muted: '<prefix><sub>You''re muted for another <fg><left></fg>.'
   ban-reason: '<type> (<length>, #<id>)'
-  ban-screen: "<accent><b>You're banned from Diamond SMP</b>\n\n<fg><type>, <length>\n<sub>Ends: <fg><until>\n\n<dim>Ban #<id>, you can appeal on our Discord."
+  ban-screen: "<accent><b>You're banned from d-smp.vip</b>\n\n<fg><type>, <length>\n<sub>Ends: <fg><until>\n\n<dim>Ban #<id>, you can appeal on our Discord."
   blocked: '<prefix><accent>That message didn''t go through.'
   staff-applied: "<accent>[#<id>]</accent> <fg><player></fg> <sub>got a <fg><length> <action></fg> for <fg><type></fg> <sub>from <by> <dim>(<reason>)</dim> <click:run_command:'/offence undo <id>'><hover:show_text:'Undo #<id>'><coin>[Undo]</coin></hover></click>"
   staff-undone: '<ok>[#<id>]</ok> <sub><by> undid <fg><player></fg><sub>''s <type>. It doesn''t count anymore.'

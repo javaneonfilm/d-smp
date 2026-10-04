@@ -176,7 +176,7 @@ def zone_panel():
 
 
 def cart_icon():
-    """The Diamond SMP logo (16x16, resourcepack/brand), drawn 10 px tall next to the IP."""
+    """The d-smp.vip logo (16x16, resourcepack/brand), drawn 10 px tall next to the IP."""
     return Image.open(os.path.join(ROOT, "brand", "logo16.png")).convert("RGBA")
 
 
@@ -258,7 +258,7 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     write_json("pack.mcmeta", {"pack": {
-        "description": "Diamond SMP - HUD, books, zone wall",
+        "description": "d-smp.vip - HUD, books, zone wall",
         # 1.21.11 is format 75; 1.21.9+ reads the min/max range, older clients read pack_format.
         "pack_format": 75, "min_format": 75, "max_format": 99},
         # 26.x moved item rendering to core/item (and 26.2 text to core/text), so newer clients get their own copies.

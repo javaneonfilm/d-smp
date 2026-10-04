@@ -59,7 +59,7 @@ host:
 
 schedule:
   create-ahead-minutes: 60  # scheduled games are created (and announced) this far ahead
-  hoster-name: Diamond SMP
+  hoster-name: d-smp.vip
 
 deploy:
   distance: 300             # blocks the ghasts fly before dropping everyone
@@ -187,7 +187,7 @@ anticheat:
 
 webhooks:
   enabled: true
-  username: Diamond SMP
+  username: d-smp.vip
   events-role-id: ''        # right-click the @Events role with Developer Mode on, Copy Role ID
   flag: ''                  # optional text before the title; plain text, no emoji
   warning-minutes: 5

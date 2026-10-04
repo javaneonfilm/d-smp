@@ -38,7 +38,7 @@ public final class Msg {
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
 
-    /** The glass palette, in Diamond SMP's colours (taken from the logo). */
+    /** The glass palette, in d-smp.vip's colours (taken from the logo). */
     public static final Map<String, Integer> PALETTE = Map.of(
         "accent", 0x8CC8DC,   // diamond light blue
         "hl", 0xC4DFE4,       // highlighted values: times, names in a sentence
