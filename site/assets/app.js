@@ -8,7 +8,7 @@ const SITE = {
   liveStatus: true,       // live player count via api.mcsrvstat.us (visitors' browsers ask it for your server's status)
   // Your Cloudflare Worker (worker/README.md). The plugin sends it the leaderboards, recent rounds
   // and player count every minute and this page reads them, so nothing here needs updating by hand.
-  api: "",                // e.g. "https://dsmp-stats.yourname.workers.dev/stats"
+  api: "https://dsmp-stats.lu-schreiner2010.workers.dev/stats",
   demo: true              // sample data until real data arrives. With api set, real data replaces it automatically.
 };
 
@@ -168,7 +168,7 @@ async function openStore() {
     const priceEl = $(`[data-price="${p.id}"]`);
     if (priceEl) priceEl.textContent = p.price;
     const b = $(`[data-buy="${p.id}"]`);
-    if (b) {
+    if (b && prices.open) {
       b.disabled = false;
       b.className = `btn ${p.featured ? "btn--gem" : "btn--buy"} buy`;
       b.textContent = p.cta;

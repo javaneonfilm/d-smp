@@ -52,7 +52,7 @@ export default {
 
     try {
       if (path === "/" || path === "/stats") return await stats(req, env, cors);
-      if (path === "/products" && req.method === "GET") return products(cors);
+      if (path === "/products" && req.method === "GET") return products(env, cors);
       if (path === "/checkout" && req.method === "POST") return await checkout(req, env, cors);
       if (path === "/paypal/return" && req.method === "GET") return await paypalReturn(req, env);
       if (path === "/paypal/webhook" && req.method === "POST") return await paypalWebhook(req, env);
@@ -106,10 +106,11 @@ async function stats(req, env, cors) {
 
 // ------------------------------------------------------------------ store: website side
 
-function products(cors) {
-  const out = {};
+// Prices for the website, plus whether PayPal is set up (the site only enables Buy then).
+function products(env, cors) {
+  const out = { open: !!(env.PAYPAL_CLIENT_ID && env.PAYPAL_SECRET && env.DB) };
   for (const [id, p] of Object.entries(PRODUCTS)) out[id] = { name: p.name, amount: p.amount, currency: CURRENCY };
-  return json(out, 200, { ...cors, "Cache-Control": "public, max-age=300" });
+  return json(out, 200, { ...cors, "Cache-Control": "public, max-age=60" });
 }
 
 // The website sends { product, name, waiver, method: "paypal" | "card" }; the buyer gets a PayPal
